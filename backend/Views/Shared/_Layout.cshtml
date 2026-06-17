@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Nexus Admin</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-[#050505] text-white min-h-screen flex font-sans selection:bg-blue-500/30 selection:text-blue-200">
+    <!-- Sidebar -->
+    <aside class="w-72 bg-black/40 backdrop-blur-xl border-r border-white/10 h-screen sticky top-0 flex flex-col hidden lg:flex">
+        <div class="h-[76px] flex items-center px-8 border-b border-white/10">
+            <a href="/" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 tracking-tighter">
+                NEXUS<span class="text-white">ADMIN</span>
+            </a>
+        </div>
+        
+        <nav class="flex-1 px-4 py-8 flex flex-col gap-2 overflow-y-auto">
+            <div class="text-xs font-bold text-gray-500 mb-2 px-4 uppercase tracking-wider">Tổng Quan</div>
+            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+            
+            <div class="text-xs font-bold text-gray-500 mb-2 mt-6 px-4 uppercase tracking-wider">Quản Lý</div>
+            <a href="/Products" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Sản Phẩm (Game)
+            </a>
+            <a href="/Users" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Khách Hàng
+            </a>
+            <a href="/Orders" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Đơn Hàng
+            </a>
+            <a href="/Keys" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Keys" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                Mã Game
+            </a>
+            <a href="/Comments" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Comments" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                Bình Luận
+            </a>
+            <a href="/News" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "News" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14"></path></svg>
+                Tin Tức
+            </a>
+            <a href="/PaymentConfigs" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 hover:text-blue-400 transition-colors @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PaymentConfigs" ? "bg-white/10 text-white font-bold" : "font-medium")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                Cổng Thanh Toán
+            </a>
+            </nav>
+        
+        <div class="p-4 border-t border-white/10">
+            <form method="post" asp-controller="Auth" asp-action="Logout">
+                <button type="submit" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-bold transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Đăng Xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-[76px] bg-black/40 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40 flex items-center justify-between px-8">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-gray-400 hover:text-blue-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <h2 class="text-xl font-bold text-white">@ViewData["Title"]</h2>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold uppercase shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                    A
+                </div>
+                <div class="hidden sm:block">
+                    <p class="text-sm font-bold text-white">Admin</p>
+                    <p class="text-xs text-blue-400 font-medium">System Manager</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 p-8 overflow-y-auto">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="bg-green-500/20 text-green-400 p-4 rounded-xl mb-6 font-medium border border-green-500/30">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="bg-red-500/20 text-red-400 p-4 rounded-xl mb-6 font-medium border border-red-500/30">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

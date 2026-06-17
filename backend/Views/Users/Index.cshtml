@@ -1,0 +1,319 @@
+@{
+    ViewData["Title"] = "Quản Lý Khách Hàng";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8" x-data="userManagement()">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="relative w-full md:w-96">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto min-h-[400px]">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-16 text-center">ID</th>
+                    <th class="pb-4 font-medium">Tài Khoản</th>
+                    <th class="pb-4 font-medium">Email</th>
+                    <th class="pb-4 font-medium">Quyền Hạn</th>
+                    <th class="pb-4 font-medium">Ngày Đăng Ký</th>
+                    <th class="pb-4 font-medium text-center">Trạng Thái</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm" id="usersTableBody">
+                <!-- Data will be loaded here via JS -->
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-500">
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                            Đang tải dữ liệu...
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
+        <div class="text-sm text-gray-400" id="pageInfo">
+            Hiển thị 0 kết quả
+        </div>
+        <div class="flex items-center gap-2" id="paginationContainer">
+            <!-- Pagination buttons loaded via JS -->
+        </div>
+    </div>
+</div>
+
+    <!-- Modal Chỉnh Sửa Khách Hàng -->
+    <div id="userModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-white/5 backdrop-blur-sm" onclick="closeUserModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-xl font-bold text-white">Chỉnh Sửa Khách Hàng</h3>
+                <button onclick="closeUserModal()" class="text-gray-400 hover:text-blue-400 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="userForm" class="p-6 space-y-4">
+                <input type="hidden" id="userId" value="" />
+                
+                <div class="flex flex-col items-center gap-4 mb-4">
+                    <div class="relative w-24 h-24 rounded-full bg-gray-800 border-2 border-white/10 flex items-center justify-center overflow-hidden group">
+                        <img id="uAvatarPreview" src="" class="hidden w-full h-full object-cover" />
+                        <div id="uAvatarInitials" class="w-full h-full flex items-center justify-center text-3xl text-white font-bold bg-gradient-to-r from-blue-500 to-purple-500">U</div>
+                        <div class="absolute inset-0 bg-[#050505] hidden group-hover:flex items-center justify-center cursor-pointer transition-all" onclick="document.getElementById('uAvatarFile').click()">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                    </div>
+                    <input type="file" id="uAvatarFile" accept="image/*" class="hidden" onchange="uploadUserAvatar(this)" />
+                    <input type="hidden" id="uAvatarUrl" value="" />
+                    <span id="uAvatarUploading" class="text-sm text-blue-400 hidden"><i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên...</span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Tài Khoản (Username)</label>
+                    <input type="text" id="uUsername" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                    <input type="email" id="uEmail" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+            </form>
+            
+            <div class="p-6 border-t border-white/10 flex justify-end gap-3 bg-white/5">
+                <button type="button" onclick="closeUserModal()" class="px-5 py-2.5 rounded-xl text-white font-medium hover:bg-white/10 transition-colors">Hủy Bỏ</button>
+                <button type="button" onclick="saveUser()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500/100 text-white rounded-xl font-bold transition-colors">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentPage = 1;
+    let currentSearch = '';
+
+    const DOM = {
+        tbody: document.getElementById('usersTableBody'),
+        searchInput: document.getElementById('searchInput'),
+        pageInfo: document.getElementById('pageInfo'),
+        paginationContainer: document.getElementById('paginationContainer'),
+        modal: document.getElementById('userModal'),
+        form: document.getElementById('userForm')
+    };
+
+    function showToast(message, isError = false) {
+        alert(message); 
+    }
+
+    async function loadUsers(page = 1, search = '') {
+        try {
+            const res = await fetch(`http://localhost:5021/api/users?page=${page}&pageSize=10&search=${encodeURIComponent(search)}`);
+            if (!res.ok) throw new Error("Lỗi kết nối API");
+            const result = await res.json();
+            
+            currentPage = result.currentPage;
+            renderTable(result.data);
+            renderPagination(result.totalPages, result.currentPage, result.totalItems);
+        } catch (error) {
+            console.error(error);
+            DOM.tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-red-500">Lỗi khi tải dữ liệu!</td></tr>`;
+        }
+    }
+
+    function renderTable(users) {
+        if (!users || users.length === 0) {
+            DOM.tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-gray-500">Không tìm thấy người dùng nào.</td></tr>`;
+            return;
+        }
+
+        DOM.tbody.innerHTML = users.map(user => {
+            const roleBadge = user.roleName === 'Administrator' 
+                ? `<span class="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-xs font-bold border border-purple-500/20">Admin</span>`
+                : `<span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-bold border border-blue-500/20">Customer</span>`;
+            
+            const lockBadge = user.isLocked
+                ? `<span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20"><i class="fas fa-lock mr-1"></i>Đã Khoá</span>`
+                : `<span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20"><i class="fas fa-unlock mr-1"></i>Bình Thường</span>`;
+
+            const lockButtonText = user.isLocked ? "Mở Khoá" : "Khoá";
+            const lockButtonColor = user.isLocked ? "text-green-400 hover:text-green-300" : "text-red-400 hover:text-red-300";
+
+            let avatarHtml = '';
+            if (user.avatarUrl) {
+                avatarHtml = `<img src="${user.avatarUrl}" class="w-10 h-10 rounded-full object-cover shadow-lg border border-white/20" />`;
+            } else {
+                avatarHtml = `<div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold uppercase shadow-lg border border-white/20">${user.username.charAt(0)}</div>`;
+            }
+
+            const uJson = encodeURIComponent(JSON.stringify(user));
+
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                    <td class="py-4 text-gray-400 text-center">#${user.id}</td>
+                    <td class="py-4">
+                        <div class="flex items-center gap-4">
+                            ${avatarHtml}
+                            <div class="font-bold text-white">${user.username}</div>
+                        </div>
+                    </td>
+                    <td class="py-4 text-gray-300">${user.email}</td>
+                    <td class="py-4">${roleBadge}</td>
+                    <td class="py-4 text-gray-400">${new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
+                    <td class="py-4 text-center">${lockBadge}</td>
+                    <td class="py-4 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="editUser('${uJson}')" class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/100 hover:text-blue-400 flex items-center justify-center transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                            <button onclick="toggleLock(${user.id})" class="w-8 h-8 rounded bg-[#050505]0/10 ${lockButtonColor} flex items-center justify-center transition-colors" title="${lockButtonText}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderPagination(totalPages, current, totalItems) {
+        DOM.pageInfo.innerText = `Tổng cộng ${totalItems} kết quả (Trang ${current}/${totalPages || 1})`;
+        if (totalPages <= 1) { DOM.paginationContainer.innerHTML = ''; return; }
+        let html = `<button onclick="loadUsers(${current - 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === 1 ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button onclick="loadUsers(${i}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center ${i === current ? 'bg-blue-600 font-bold shadow-lg shadow-blue-500/20 text-white' : 'border border-white/10 hover:bg-white/10 text-gray-400 hover:text-blue-400'} transition-colors">${i}</button>`;
+        }
+        html += `<button onclick="loadUsers(${current + 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === totalPages ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
+        DOM.paginationContainer.innerHTML = html;
+    }
+
+    async function toggleLock(id) {
+        if (!confirm("Bạn có chắc chắn muốn thay đổi trạng thái khoá của tài khoản này?")) return;
+        try {
+            const res = await fetch(`http://localhost:5021/api/users/${id}/toggle-lock`, { method: 'PUT' });
+            if (res.ok) {
+                const result = await res.json();
+                showToast(result.message);
+                loadUsers(currentPage, currentSearch); 
+            } else {
+                showToast("Có lỗi xảy ra khi cập nhật", true);
+            }
+        } catch (error) {
+            console.error(error);
+            showToast("Lỗi kết nối", true);
+        }
+    }
+
+    // Modal Edit User
+    function editUser(uJsonEncoded) {
+        const u = JSON.parse(decodeURIComponent(uJsonEncoded));
+        document.getElementById('userId').value = u.id;
+        document.getElementById('uUsername').value = u.username;
+        document.getElementById('uEmail').value = u.email;
+        document.getElementById('uAvatarUrl').value = u.avatarUrl || '';
+        
+        if (u.avatarUrl) {
+            document.getElementById('uAvatarPreview').src = u.avatarUrl;
+            document.getElementById('uAvatarPreview').classList.remove('hidden');
+            document.getElementById('uAvatarInitials').classList.add('hidden');
+        } else {
+            document.getElementById('uAvatarPreview').classList.add('hidden');
+            document.getElementById('uAvatarInitials').classList.remove('hidden');
+            document.getElementById('uAvatarInitials').innerText = u.username.charAt(0).toUpperCase();
+        }
+
+        DOM.modal.classList.remove('hidden');
+    }
+
+    function closeUserModal() {
+        DOM.modal.classList.add('hidden');
+    }
+
+    async function uploadUserAvatar(input) {
+        if (!input.files || input.files.length === 0) return;
+        
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('files', file);
+
+        document.getElementById('uAvatarUploading').classList.remove('hidden');
+        
+        try {
+            const res = await fetch('http://localhost:5021/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                if (result.urls && result.urls.length > 0) {
+                    const url = result.urls[0];
+                    document.getElementById('uAvatarUrl').value = url;
+                    document.getElementById('uAvatarPreview').src = url;
+                    document.getElementById('uAvatarPreview').classList.remove('hidden');
+                    document.getElementById('uAvatarInitials').classList.add('hidden');
+                }
+            } else {
+                showToast("Lỗi khi tải ảnh lên!", true);
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Lỗi kết nối API Upload", true);
+        } finally {
+            document.getElementById('uAvatarUploading').classList.add('hidden');
+        }
+    }
+
+    async function saveUser() {
+        if (!DOM.form.checkValidity()) {
+            DOM.form.reportValidity();
+            return;
+        }
+
+        const id = document.getElementById('userId').value;
+        const payload = {
+            username: document.getElementById('uUsername').value,
+            email: document.getElementById('uEmail').value,
+            avatarUrl: document.getElementById('uAvatarUrl').value
+        };
+
+        try {
+            const res = await fetch(`http://localhost:5021/api/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showToast("Cập nhật khách hàng thành công!");
+                closeUserModal();
+                loadUsers(currentPage, currentSearch);
+            } else {
+                showToast("Có lỗi xảy ra khi lưu!", true);
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Lỗi kết nối API", true);
+        }
+    }
+
+    let searchTimeout;
+    DOM.searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentSearch = e.target.value;
+            loadUsers(1, currentSearch);
+        }, 500); 
+    });
+
+    document.addEventListener('DOMContentLoaded', () => loadUsers(1, ''));
+</script>
+}

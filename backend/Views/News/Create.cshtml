@@ -1,0 +1,53 @@
+@model Backend.Models.NewsViewModel
+
+@{
+    ViewData["Title"] = "Soạn Tin Tức";
+}
+
+<div class="max-w-5xl">
+    <div class="flex items-center gap-4 mb-8">
+        <a href="/News" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-white">Viết Bài Mới</h1>
+    </div>
+
+    <form asp-action="Create" method="post" class="space-y-6">
+        <div class="glassmorphism rounded-3xl p-8">
+            <div class="grid grid-cols-1 gap-6">
+                <div class="space-y-2">
+                    <label asp-for="Title" class="text-sm font-bold text-gray-300">Tiêu Đề Bài Viết <span class="text-red-500">*</span></label>
+                    <input asp-for="Title" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-lg transition-colors" placeholder="Nhập tiêu đề thật kêu..." required />
+                </div>
+                
+                <div class="space-y-2">
+                    <label asp-for="Summary" class="text-sm font-bold text-gray-300">Tóm Tắt Ngắn</label>
+                    <textarea asp-for="Summary" rows="2" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="1-2 câu tóm tắt nội dung..."></textarea>
+                </div>
+
+                <div class="space-y-2">
+                    <label asp-for="CoverImageUrl" class="text-sm font-bold text-gray-300">Link Ảnh Bìa (Cover Image)</label>
+                    <input asp-for="CoverImageUrl" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="https://..." />
+                </div>
+
+                <div class="space-y-2">
+                    <label asp-for="Content" class="text-sm font-bold text-gray-300">Nội Dung Chi Tiết <span class="text-red-500">*</span></label>
+                    <div class="p-2 bg-white/5 border border-white/10 rounded-t-xl flex gap-2">
+                        <button type="button" class="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-blue-400" title="Bold">B</button>
+                        <button type="button" class="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-blue-400" title="Italic">I</button>
+                        <button type="button" class="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-blue-400" title="Link">Link</button>
+                    </div>
+                    <textarea asp-for="Content" rows="15" class="w-full bg-[#050505] border border-white/10 border-t-0 rounded-b-xl px-4 py-4 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Nhập nội dung bài viết vào đây..." required></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <a href="/News" class="px-6 py-3 rounded-xl font-bold text-white bg-white/5 hover:bg-white/10 transition-colors">Hủy Bỏ</a>
+            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                Xuất Bản Ngay
+            </button>
+        </div>
+    </form>
+</div>

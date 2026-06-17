@@ -1,0 +1,431 @@
+@{
+    ViewData["Title"] = "Quản Lý Sản Phẩm (Game)";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8" x-data="productManagement()">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="relative w-full md:w-96">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center gap-2 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Thêm Game Mới
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto min-h-[400px]">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-16 text-center">ID</th>
+                    <th class="pb-4 font-medium">Hình Ảnh & Tên Game</th>
+                    <th class="pb-4 font-medium">Nhà Phát Triển</th>
+                    <th class="pb-4 font-medium">Thể Loại</th>
+                    <th class="pb-4 font-medium">Giá Gốc</th>
+                    <th class="pb-4 font-medium">Trạng Thái</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm" id="productsTableBody">
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-500">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
+        <div class="text-sm text-gray-400" id="pageInfo">Hiển thị 0 kết quả</div>
+        <div class="flex items-center gap-2" id="paginationContainer"></div>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Sản Phẩm -->
+<div id="productModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-white/5 backdrop-blur-sm" onclick="closeModal()"></div>
+    
+    <!-- Modal Content -->
+    <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl transform transition-all">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h3 id="modalTitle" class="text-xl font-bold text-white">Thêm Game Mới</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-blue-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <form id="productForm" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            <input type="hidden" id="productId" value="" />
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Tên Game</label>
+                    <input type="text" id="pName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Giá Gốc (VNĐ)</label>
+                    <input type="number" id="pPrice" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Thể Loại (Type)</label>
+                    <input type="text" id="pType" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Media (Hình Ảnh & Video)</label>
+                    <div class="p-4 border-2 border-dashed border-white/20 rounded-xl bg-white/5 relative hover:border-blue-500 transition-colors cursor-pointer text-center group" onclick="document.getElementById('pMediaFiles').click()">
+                        <input type="file" id="pMediaFiles" multiple accept="image/*,video/*" class="hidden" onchange="handleMediaUpload(this)" />
+                        <svg class="w-10 h-10 text-gray-500 mx-auto mb-2 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p class="text-sm text-gray-400 group-hover:text-blue-400 transition-colors">Click để tải lên (Hỗ trợ Ảnh và Video .mp4)</p>
+                        <p id="pMediaUploading" class="text-xs text-blue-400 font-bold mt-2 hidden"><i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên...</p>
+                    </div>
+                    <div id="pMediaPreviewContainer" class="mt-4 grid grid-cols-4 gap-4">
+                        <!-- Media previews will go here -->
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Mô Hình Giá</label>
+                    <select id="pPricing" class="w-full bg-[#1a1a1f] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none">
+                        <option value="Paid">Trả phí (Paid)</option>
+                        <option value="Free">Miễn phí (Free)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Trạng Thái</label>
+                    <select id="pStatus" class="w-full bg-[#1a1a1f] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none">
+                        <option value="Active">Đang Bán</option>
+                        <option value="Inactive">Ngừng Bán</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <div class="flex justify-between items-end">
+                    <label class="block text-sm font-medium text-gray-400">Mô tả</label>
+                    <label class="cursor-pointer px-3 py-1.5 bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-blue-400 rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        Đính kèm File (.docx, .pdf)
+                        <input type="file" id="pDocxFile" accept=".docx,.doc,.pdf" class="hidden" onchange="handleDocUpload(this)" />
+                    </label>
+                </div>
+                <p id="pDocUploading" class="text-xs text-blue-400 font-bold hidden"><i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên tài liệu đính kèm...</p>
+                <textarea id="pDescription" rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none"></textarea>
+            </div>
+        </form>
+        
+        <div class="p-6 border-t border-white/10 flex justify-end gap-3 bg-white/5">
+            <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl text-white font-medium hover:bg-white/10 transition-colors">Hủy Bỏ</button>
+            <button type="button" onclick="saveProduct()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500/100 text-white rounded-xl font-bold transition-colors">Lưu Sản Phẩm</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentPage = 1;
+    let currentSearch = '';
+    let currentDeveloperId = 1; // Mặc định do auth chưa làm hoàn chỉnh trên backend MVC (lấy id 1 cho admin)
+
+    const DOM = {
+        tbody: document.getElementById('productsTableBody'),
+        searchInput: document.getElementById('searchInput'),
+        pageInfo: document.getElementById('pageInfo'),
+        paginationContainer: document.getElementById('paginationContainer'),
+        modal: document.getElementById('productModal'),
+        form: document.getElementById('productForm')
+    };
+
+    function showToast(message) {
+        alert(message); // Temporary
+    }
+
+    async function loadProducts(page = 1, search = '') {
+        try {
+            const res = await fetch(`http://localhost:5021/api/products?page=${page}&pageSize=10&search=${encodeURIComponent(search)}`);
+            if (!res.ok) throw new Error("Lỗi kết nối");
+            const result = await res.json();
+            
+            currentPage = result.currentPage;
+            renderTable(result.data);
+            renderPagination(result.totalPages, result.currentPage, result.totalItems);
+        } catch (error) {
+            console.error(error);
+            DOM.tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-red-500">Lỗi khi tải dữ liệu!</td></tr>`;
+        }
+    }
+
+    function renderTable(products) {
+        if (!products || products.length === 0) {
+            DOM.tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-gray-500">Không tìm thấy sản phẩm.</td></tr>`;
+            return;
+        }
+
+        DOM.tbody.innerHTML = products.map(p => {
+            const statusBadge = p.status === 'Active' 
+                ? `<span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Đang Bán</span>`
+                : `<span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">Ngừng Bán</span>`;
+            
+            const price = p.basePrice > 0 ? p.basePrice.toLocaleString() + 'đ' : 'Miễn phí';
+            const img = p.imageUrl ? `<img src="${p.imageUrl}" class="w-full h-full object-cover" />` : '';
+
+            // Store JSON stringify for edit
+            const pJson = encodeURIComponent(JSON.stringify(p));
+
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                    <td class="py-4 text-gray-400 text-center">#${p.id}</td>
+                    <td class="py-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-10 bg-gray-800 rounded overflow-hidden flex-shrink-0">
+                                ${img}
+                            </div>
+                            <div class="font-bold text-white group-hover:text-blue-400 transition-colors">
+                                ${p.name}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 text-gray-300">${p.developerName}</td>
+                    <td class="py-4 text-gray-400">${p.type}</td>
+                    <td class="py-4 font-black text-white">${price}</td>
+                    <td class="py-4">${statusBadge}</td>
+                    <td class="py-4 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="editProduct('${pJson}')" class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/100 hover:text-blue-400 flex items-center justify-center transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                            <button onclick="deleteProduct(${p.id})" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-blue-400 flex items-center justify-center transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderPagination(totalPages, current, totalItems) {
+        DOM.pageInfo.innerText = `Tổng cộng ${totalItems} kết quả (Trang ${current}/${totalPages || 1})`;
+        if (totalPages <= 1) { DOM.paginationContainer.innerHTML = ''; return; }
+
+        let html = `<button onclick="loadProducts(${current - 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === 1 ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button onclick="loadProducts(${i}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center ${i === current ? 'bg-blue-600 font-bold shadow-lg shadow-blue-500/20 text-white' : 'border border-white/10 hover:bg-white/10 text-gray-400 hover:text-blue-400'} transition-colors">${i}</button>`;
+        }
+        html += `<button onclick="loadProducts(${current + 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === totalPages ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
+        DOM.paginationContainer.innerHTML = html;
+    }
+
+    let uploadedMedia = []; // Array of {url, type}
+
+    // Modal logic
+    function openModal() {
+        document.getElementById('modalTitle').innerText = "Thêm Game Mới";
+        DOM.form.reset();
+        document.getElementById('productId').value = '';
+        uploadedMedia = [];
+        renderMediaPreview();
+        DOM.modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        DOM.modal.classList.add('hidden');
+    }
+
+    function editProduct(pJsonEncoded) {
+        const p = JSON.parse(decodeURIComponent(pJsonEncoded));
+        document.getElementById('modalTitle').innerText = "Sửa Thông Tin Game";
+        document.getElementById('productId').value = p.id;
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pPrice').value = p.basePrice;
+        document.getElementById('pType').value = p.type;
+        document.getElementById('pPricing').value = p.pricing;
+        document.getElementById('pStatus').value = p.status;
+        document.getElementById('pDescription').value = p.description;
+
+        uploadedMedia = p.media || [];
+        if (uploadedMedia.length === 0 && p.imageUrl) {
+            uploadedMedia.push({ url: p.imageUrl, type: 'Image' });
+        }
+        renderMediaPreview();
+
+        DOM.modal.classList.remove('hidden');
+    }
+
+    async function handleMediaUpload(input) {
+        if (!input.files || input.files.length === 0) return;
+        
+        const formData = new FormData();
+        for (let i = 0; i < input.files.length; i++) {
+            formData.append('files', input.files[i]);
+        }
+
+        document.getElementById('pMediaUploading').classList.remove('hidden');
+        
+        try {
+            const res = await fetch('http://localhost:5021/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                if (result.urls && result.urls.length > 0) {
+                    for (let i = 0; i < result.urls.length; i++) {
+                        const url = result.urls[i];
+                        const type = url.match(/\.(mp4|webm|ogg)$/i) ? 'Video' : 'Image';
+                        uploadedMedia.push({ url, type });
+                    }
+                    renderMediaPreview();
+                }
+            } else {
+                showToast("Lỗi khi tải file lên!");
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Lỗi kết nối API Upload");
+        } finally {
+            document.getElementById('pMediaUploading').classList.add('hidden');
+            input.value = ""; // Reset input
+        }
+    }
+
+    async function handleDocUpload(input) {
+        if (!input.files || input.files.length === 0) return;
+        
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('files', file);
+
+        document.getElementById('pDocUploading').classList.remove('hidden');
+        
+        try {
+            const res = await fetch('http://localhost:5021/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) throw new Error('Upload failed');
+            
+            const result = await res.json();
+            if (result.urls && result.urls.length > 0) {
+                const docUrl = result.urls[0];
+                const descInput = document.getElementById('pDescription');
+                // Append the link at the end of the description
+                const linkMarkdown = `\n<a href="${docUrl}" class="text-blue-400 font-bold underline" download><i class="fas fa-file-download mr-1"></i>Tải xuống tài liệu (${file.name})</a>`;
+                descInput.value = descInput.value + linkMarkdown;
+            }
+        } catch (err) {
+            console.error('Lỗi upload doc:', err);
+            alert('Có lỗi xảy ra khi tải lên tài liệu.');
+        } finally {
+            document.getElementById('pDocUploading').classList.add('hidden');
+            input.value = '';
+        }
+    }
+
+    function removeMedia(index) {
+        uploadedMedia.splice(index, 1);
+        renderMediaPreview();
+    }
+
+    function renderMediaPreview() {
+        const container = document.getElementById('pMediaPreviewContainer');
+        if (uploadedMedia.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = uploadedMedia.map((media, index) => {
+            const inner = media.type === 'Video' 
+                ? `<video src="${media.url}" class="w-full h-24 object-cover" controls></video>`
+                : `<img src="${media.url}" class="w-full h-24 object-cover" />`;
+            
+            return `
+                <div class="relative group rounded-xl overflow-hidden border border-white/10 bg-gray-800">
+                    ${inner}
+                    <div class="absolute inset-0 bg-white/5 hidden group-hover:flex items-center justify-center transition-all">
+                        <button type="button" onclick="removeMedia(${index})" class="w-8 h-8 bg-red-500/100 rounded-full text-white flex items-center justify-center hover:bg-red-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function saveProduct() {
+        if (!DOM.form.checkValidity()) {
+            DOM.form.reportValidity();
+            return;
+        }
+
+        const id = document.getElementById('productId').value;
+        const isUpdate = !!id;
+        const url = isUpdate ? `http://localhost:5021/api/products/${id}` : `http://localhost:5021/api/products`;
+        const method = isUpdate ? 'PUT' : 'POST';
+
+        const payload = {
+            name: document.getElementById('pName').value,
+            description: document.getElementById('pDescription').value,
+            type: document.getElementById('pType').value,
+            pricing: document.getElementById('pPricing').value,
+            basePrice: parseFloat(document.getElementById('pPrice').value),
+            status: document.getElementById('pStatus').value,
+            imageUrl: uploadedMedia.length > 0 ? uploadedMedia[0].url : '',
+            media: uploadedMedia,
+            developerId: currentDeveloperId,
+            releaseDate: new Date().toISOString()
+        };
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showToast(isUpdate ? "Đã cập nhật sản phẩm!" : "Đã thêm sản phẩm mới!");
+                closeModal();
+                loadProducts(currentPage, currentSearch);
+            } else {
+                showToast("Có lỗi xảy ra khi lưu!");
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Lỗi kết nối API");
+        }
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm("Bạn có chắc chắn muốn xoá sản phẩm này? Thao tác không thể hoàn tác!")) return;
+
+        try {
+            const res = await fetch(`http://localhost:5021/api/products/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                showToast("Đã xoá sản phẩm!");
+                loadProducts(currentPage, currentSearch);
+            } else {
+                showToast("Không thể xoá sản phẩm này.");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Search debounce
+    let searchTimeout;
+    DOM.searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentSearch = e.target.value;
+            loadProducts(1, currentSearch);
+        }, 500);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => loadProducts(1, ''));
+</script>
+}

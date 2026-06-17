@@ -1,0 +1,78 @@
+@model Backend.Models.OrderListViewModel
+
+@{
+    ViewData["Title"] = "Quản Lý Đơn Hàng";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="relative w-full md:w-96">
+            <input type="text" placeholder="Tìm kiếm mã đơn hàng..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Lọc
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-24">Mã ĐH</th>
+                    <th class="pb-4 font-medium">Khách Hàng</th>
+                    <th class="pb-4 font-medium">Sản Phẩm</th>
+                    <th class="pb-4 font-medium">Tổng Tiền</th>
+                    <th class="pb-4 font-medium">Trạng Thái</th>
+                    <th class="pb-4 font-medium">Thời Gian</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm">
+                @if (Model.Orders != null && Model.Orders.Any())
+                {
+                    foreach (var order in Model.Orders)
+                    {
+                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                            <td class="py-4 font-bold text-white">#ORD-@order.Id</td>
+                            <td class="py-4 text-gray-300">@order.Username</td>
+                            <td class="py-4 text-gray-400">
+                                @string.Join(", ", order.Items)
+                            </td>
+                            <td class="py-4 font-black text-blue-400">@order.TotalAmount.ToString("N0")đ</td>
+                            <td class="py-4">
+                                @if (order.Status == "Completed")
+                                {
+                                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Hoàn Thành</span>
+                                }
+                                else if (order.Status == "Pending")
+                                {
+                                    <span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">Chờ Xử Lý</span>
+                                }
+                                else
+                                {
+                                    <span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Thất Bại</span>
+                                }
+                            </td>
+                            <td class="py-4 text-gray-500">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="py-4 text-right">
+                                <a href="/Orders/Details/@order.Id" class="text-blue-400 hover:text-blue-300 transition-colors font-medium">Chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-gray-500">
+                            Không có đơn hàng nào.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+@model Backend.Models.NewsListViewModel
+
+@{
+    ViewData["Title"] = "Quản Lý Tin Tức";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="relative w-full md:w-96">
+            <input type="text" placeholder="Tìm kiếm bài viết..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/News/Create" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center gap-2 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Viết Bài Mới
+            </a>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-16">ID</th>
+                    <th class="pb-4 font-medium">Tiêu Đề</th>
+                    <th class="pb-4 font-medium">Tác Giả</th>
+                    <th class="pb-4 font-medium">Ngày Đăng</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm">
+                @if (Model.NewsArticles != null && Model.NewsArticles.Any())
+                {
+                    foreach (var n in Model.NewsArticles)
+                    {
+                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                            <td class="py-4 text-gray-400 font-bold">#@n.Id</td>
+                            <td class="py-4">
+                                <div class="font-bold text-white group-hover:text-blue-400 transition-colors">@n.Title</div>
+                            </td>
+                            <td class="py-4 text-gray-300">@n.AuthorName</td>
+                            <td class="py-4 text-gray-400">@n.PublishedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/100 hover:text-blue-400 flex items-center justify-center transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <form method="post" asp-action="Delete" asp-controller="News" class="inline">
+                                        <input type="hidden" name="id" value="@n.Id" />
+                                        <button type="submit" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-blue-400 flex items-center justify-center transition-colors" onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này?');">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

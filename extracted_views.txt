@@ -1,0 +1,77 @@
+﻿Created At: 2026-06-17T06:45:28Z
+Completed At: 2026-06-17T06:45:28Z
+File Path: `file:///d:/DA/frontend/Views/Shared/_Layout.cshtml`
+Total Lines: 323
+Total Bytes: 22441
+Showing lines 1 to 323
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: <!DOCTYPE html>
+2: <html lang="en" data-theme="dark">
+3: <head>
+4:     <meta charset="utf-8" />
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+6:     <title>@ViewData["Title"] - Nexus Store</title>
+7:     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+8: </head>
+9: <body class="bg-[#0a0a0c] text-white min-h-screen flex flex-col font-sans selection:bg-blue-500/30 selection:text-blue-200">
+10:     <header>
+11:         <nav class="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10 h-[76px] flex items-center justify-between px-8 w-full transition-all">
+12:             <div class="flex items-center gap-6 md:gap-10">
+13:                 <a href="/" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 tracking-tighter">
+14:                     NEXUS<span class="text-white">STORE</span>
+15:                 </a>
+16:                 
+17:                 <nav class="hidden md:flex gap-6 font-medium">
+18:                     <a href="/" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "text-blue-400 font-bold border-b-2 border-blue-400 pb-1" : "text-gray-300 hover:text-blue-400 font-medium") transition-colors">Trang Chủ</a>
+19:                     <a href="/Browse" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Browse" ? "text-blue-400 font-bold border-b-2 border-blue-400 pb-1" : "text-gray-300 hover:text-blue-400 font-medium") transition-colors">Duyệt Game / App</a>
+20:                     <a href="/News" class="@(Vie
+<truncated 20368 bytes>
+      function removeLoading() {
+278:                 const loading = document.getElementById("chatbot-loading");
+279:                 if (loading) loading.remove();
+280:             }
+281: 
+282:             chatForm.addEventListener("submit", async (e) => {
+283:                 e.preventDefault();
+284:                 const msg = chatInput.value.trim();
+285:                 if (!msg) return;
+286: 
+287:                 appendMessage(msg, true);
+288:                 chatInput.value = "";
+289:                 submitBtn.disabled = true;
+290:                 appendLoading();
+291: 
+292:                 try {
+293:                     const headers = { "Content-Type": "application/json" };
+294:                     if (token) headers["Authorization"] = `Bearer ${token}`;
+295: 
+296:                     const res = await fetch("http://localhost:5021/api/assistant/chat", {
+297:                         method: "POST",
+298:                         headers: headers,
+299:                         body: JSON.stringify({ Message: msg })
+300:                     });
+301: 
+302:                     removeLoading();
+303:                     
+304:                     if (res.ok) {
+305:                         const data = await res.json();
+306:                         appendMessage(data.reply);
+307:                     } else {
+308:                         appendMessage("Xin lỗi, có lỗi xảy ra khi kết nối với máy chủ AI.");
+309:                     }
+310:                 } catch (err) {
+311:                     removeLoading();
+312:                     appendMessage("Xin lỗi, hiện tại tôi không thể kết nối tới não bộ AI.");
+313:                     console.error("Chat error:", err);
+314:                 } finally {
+315:                     submitBtn.disabled = false;
+316:                     chatInput.focus();
+317:                 }
+318:             });
+319:         });
+320:     </script>
+321: </body>
+322: </html>
+323: 
+The above content shows the entire, complete file contents of the requested file.
+

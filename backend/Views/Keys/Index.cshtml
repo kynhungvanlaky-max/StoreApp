@@ -1,0 +1,101 @@
+@model Backend.Models.KeyListViewModel
+
+@{
+    ViewData["Title"] = "Quản Lý Product Keys";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="relative w-full md:w-96">
+            <input type="text" placeholder="Tìm kiếm mã Key..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="document.getElementById('importKeyModal').showModal()" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center gap-2 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Import Key Mới
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-24">ID</th>
+                    <th class="pb-4 font-medium">Sản Phẩm</th>
+                    <th class="pb-4 font-medium">Mã Key</th>
+                    <th class="pb-4 font-medium">Ngày Nhập</th>
+                    <th class="pb-4 font-medium">Trạng Thái</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm">
+                @if (Model.Keys != null && Model.Keys.Any())
+                {
+                    foreach (var key in Model.Keys)
+                    {
+                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                            <td class="py-4 font-bold text-gray-400">#@key.Id</td>
+                            <td class="py-4 font-bold text-white">@key.ProductName</td>
+                            <td class="py-4 font-mono text-blue-400">@key.KeyCode</td>
+                            <td class="py-4 text-gray-400">N/A</td>
+                            <td class="py-4">
+                                @if (key.Status == "Chưa bán" || key.IsSold == false)
+                                {
+                                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Chưa Bán</span>
+                                }
+                                else
+                                {
+                                    <span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Đã Bán</span>
+                                }
+                            </td>
+                            <td class="py-4 text-right">
+                                <form method="post" asp-action="Delete" asp-controller="Keys" class="inline">
+                                    <input type="hidden" name="id" value="@key.Id" />
+                                    <button type="submit" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-blue-400 inline-flex items-center justify-center transition-colors" onclick="return confirm('Bạn có chắc chắn muốn xóa mã game này?');">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Import Modal (Mô phỏng Dialog) -->
+<dialog id="importKeyModal" class="bg-transparent backdrop:bg-black/80 backdrop:backdrop-blur-sm w-full max-w-lg p-0 rounded-3xl m-auto shadow-2xl border border-white/10">
+    <div class="bg-black/40 p-8 rounded-3xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+        <form method="post" asp-controller="Keys" asp-action="Generate">
+            <h3 class="font-black text-2xl text-white mb-6">Import / Sinh Key Tự Động</h3>
+            
+            <div class="space-y-4 mb-8">
+                <div>
+                    <label class="block text-sm font-bold text-gray-400 mb-2">Sản Phẩm</label>
+                    <select name="productId" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                        @if (Model.Products != null)
+                        {
+                            foreach (var p in Model.Products)
+                            {
+                                <option value="@p.Id">@p.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-400 mb-2">Số lượng Key cần tạo</label>
+                    <input type="number" name="quantity" required min="1" max="1000" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500" placeholder="Ví dụ: 50" />
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('importKeyModal').close()" class="px-6 py-3 rounded-xl font-bold text-white bg-white/5 hover:bg-white/10 transition-colors">Hủy</button>
+                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold transition-all">Tạo Ngay</button>
+            </div>
+        </form>
+    </div>
+</dialog>

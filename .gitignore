@@ -1,0 +1,23 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# Node.js
+**/node_modules/
+**/.next/
+
+# Environment / Secrets
+**/appsettings.Development.json
+**/.env
+**/.env.local
+
+# IDE
+.vscode/settings.json
+*.swp
+
+# OS
+**/.DS_Store
+**/Thumbs.db

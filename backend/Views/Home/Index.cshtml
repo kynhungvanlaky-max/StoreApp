@@ -1,0 +1,205 @@
+@model Backend.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard Tổng Quan";
+}
+
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <!-- Stat 1 -->
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 font-medium mb-1">Tổng Doanh Thu</p>
+                <h3 class="text-3xl font-black text-white mb-2">@Model.TotalRevenue.ToString("N0")đ</h3>
+                <p class="text-sm text-green-400 flex items-center gap-1 font-bold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    +12.5% so với tháng trước
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 2 -->
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-purple-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 font-medium mb-1">Đơn Hàng Mới</p>
+                <h3 id="stat-orders" class="text-3xl font-black text-white mb-2 transition-all duration-300 transform origin-left">@Model.TotalOrders</h3>
+                <p class="text-sm text-green-400 flex items-center gap-1 font-bold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    +5.2% so với tháng trước
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 3 -->
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 font-medium mb-1">Tổng Game</p>
+                <h3 class="text-3xl font-black text-white mb-2">@Model.ActiveKeys.ToString("N0")</h3>
+                <p class="text-sm text-gray-500 flex items-center gap-1 font-bold">
+                    Đang được bán
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 4 -->
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-pink-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-400 font-medium mb-1">Khách Hàng</p>
+                <h3 class="text-3xl font-black text-white mb-2">@((8549 + Model.NewUsers).ToString("N0"))</h3>
+                <p class="text-sm text-green-400 flex items-center gap-1 font-bold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    +@Model.NewUsers user mới
+                </p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Giao dịch gần đây & Cảnh báo -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 glassmorphism rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-white">Giao Dịch Gần Đây</h3>
+            <a href="/Orders" class="text-sm font-bold text-blue-400 hover:text-blue-300">Xem tất cả</a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-500 text-sm border-b border-white/10">
+                        <th class="pb-3 font-medium">Mã ĐH</th>
+                        <th class="pb-3 font-medium">Khách Hàng</th>
+                        <th class="pb-3 font-medium">Số Tiền</th>
+                        <th class="pb-3 font-medium">Trạng Thái</th>
+                        <th class="pb-3 font-medium text-right">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                        <td class="py-4 font-medium text-white">#ORD-001</td>
+                        <td class="py-4 text-gray-300">nguyenvana@gmail.com</td>
+                        <td class="py-4 font-bold text-blue-400">450,000đ</td>
+                        <td class="py-4">
+                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Hoàn Thành</span>
+                        </td>
+                        <td class="py-4 text-right">
+                            <button class="text-gray-400 hover:text-blue-400 transition-colors">Chi tiết</button>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                        <td class="py-4 font-medium text-white">#ORD-002</td>
+                        <td class="py-4 text-gray-300">tranvanb@gmail.com</td>
+                        <td class="py-4 font-bold text-blue-400">1,200,000đ</td>
+                        <td class="py-4">
+                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">Chờ Xử Lý</span>
+                        </td>
+                        <td class="py-4 text-right">
+                            <button class="text-gray-400 hover:text-blue-400 transition-colors">Chi tiết</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-4 font-medium text-white">#ORD-003</td>
+                        <td class="py-4 text-gray-300">lethic@gmail.com</td>
+                        <td class="py-4 font-bold text-blue-400">150,000đ</td>
+                        <td class="py-4">
+                            <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Thất Bại</span>
+                        </td>
+                        <td class="py-4 text-right">
+                            <button class="text-gray-400 hover:text-blue-400 transition-colors">Chi tiết</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="glassmorphism rounded-2xl p-6">
+        <h3 class="text-lg font-bold text-white mb-6">Cảnh Báo Hệ Thống</h3>
+        
+        <div class="space-y-4">
+            <div class="flex gap-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex-shrink-0 flex items-center justify-center text-yellow-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-yellow-400 mb-1">Key sắp hết</h4>
+                    <p class="text-sm text-gray-400">Sản phẩm "Cyberpunk 2077" chỉ còn lại 3 key. Vui lòng import thêm.</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                <div class="w-10 h-10 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center text-red-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-red-400 mb-1">Lỗi Đồng Bộ API</h4>
+                    <p class="text-sm text-gray-400">Kết nối với cổng thanh toán Stripe bị gián đoạn 5 phút trước.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+        // Khởi tạo kết nối SignalR
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:5021/hubs/nexus")
+            .withAutomaticReconnect()
+            .build();
+
+        // Lắng nghe sự kiện "ReceiveNewOrder"
+        connection.on("ReceiveNewOrder", function () {
+            // Lấy element đang chứa Đơn hàng
+            const orderCountEl = document.getElementById("stat-orders");
+            
+            if(orderCountEl) {
+                // Nhảy số
+                let currentVal = parseInt(orderCountEl.innerText) || 0;
+                orderCountEl.innerText = currentVal + 1;
+
+                // Hiệu ứng nhấp nháy báo hiệu có thay đổi
+                orderCountEl.classList.add("text-yellow-400");
+                orderCountEl.classList.add("scale-125");
+                orderCountEl.classList.add("transition-all");
+
+                setTimeout(() => {
+                    orderCountEl.classList.remove("text-yellow-400");
+                    orderCountEl.classList.remove("scale-125");
+                }, 1000);
+            }
+            
+            // Có thể thêm Pop-up thông báo nhỏ ở góc màn hình ở đây
+            console.log("Real-time: Nhận được 1 đơn hàng mới!");
+        });
+
+        // Bắt đầu kết nối
+        connection.start().then(function () {
+            console.log("Đã kết nối SignalR tới NexusHub!");
+        }).catch(function (err) {
+            console.error("Lỗi kết nối SignalR:", err.toString());
+        });
+    </script>
+}
+</div>
