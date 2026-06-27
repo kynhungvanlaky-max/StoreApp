@@ -18,51 +18,80 @@
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left">
-            <thead>
-                <tr class="text-gray-500 text-sm border-b border-white/10">
-                    <th class="pb-4 font-medium w-24">ID</th>
-                    <th class="pb-4 font-medium">Sản Phẩm</th>
-                    <th class="pb-4 font-medium">Mã Key</th>
-                    <th class="pb-4 font-medium">Ngày Nhập</th>
-                    <th class="pb-4 font-medium">Trạng Thái</th>
-                    <th class="pb-4 font-medium text-right">Hành Động</th>
-                </tr>
-            </thead>
-            <tbody class="text-sm">
-                @if (Model.Keys != null && Model.Keys.Any())
-                {
-                    foreach (var key in Model.Keys)
-                    {
-                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
-                            <td class="py-4 font-bold text-gray-400">#@key.Id</td>
-                            <td class="py-4 font-bold text-white">@key.ProductName</td>
-                            <td class="py-4 font-mono text-blue-400">@key.KeyCode</td>
-                            <td class="py-4 text-gray-400">N/A</td>
-                            <td class="py-4">
-                                @if (key.Status == "Chưa bán" || key.IsSold == false)
-                                {
-                                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Chưa Bán</span>
-                                }
-                                else
-                                {
-                                    <span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Đã Bán</span>
-                                }
-                            </td>
-                            <td class="py-4 text-right">
-                                <form method="post" asp-action="Delete" asp-controller="Keys" class="inline">
-                                    <input type="hidden" name="id" value="@key.Id" />
-                                    <button type="submit" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-blue-400 inline-flex items-center justify-center transition-colors" onclick="return confirm('Bạn có chắc chắn muốn xóa mã game này?');">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
+    <div class="space-y-4">
+        @if (Model.Keys != null && Model.Keys.Any())
+        {
+            var groupedKeys = Model.Keys.GroupBy(k => k.ProductName);
+            int groupIndex = 0;
+            foreach (var group in groupedKeys)
+            {
+                groupIndex++;
+                var totalKeys = group.Count();
+                var soldKeys = group.Count(k => k.IsSold || k.Status == "Đã bán");
+                var availableKeys = totalKeys - soldKeys;
+                
+                <div class="bg-black/20 border border-white/10 rounded-2xl overflow-hidden">
+                    <button type="button" onclick="document.getElementById('group-@groupIndex').classList.toggle('hidden'); document.getElementById('icon-@groupIndex').classList.toggle('rotate-180');" class="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors focus:outline-none">
+                        <div class="flex items-center gap-4">
+                            <h4 class="text-xl font-bold text-white text-left">@group.Key</h4>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-bold border border-blue-500/20">Tổng: @totalKeys</span>
+                            <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Sẵn sàng: @availableKeys</span>
+                            <svg id="icon-@groupIndex" class="w-6 h-6 text-gray-400 transition-transform duration-300 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </button>
+                    <div id="group-@groupIndex" class="hidden border-t border-white/10 p-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-gray-500 text-sm border-b border-white/10">
+                                        <th class="pb-4 font-medium w-24">ID</th>
+                                        <th class="pb-4 font-medium">Mã Key</th>
+                                        <th class="pb-4 font-medium">Trạng Thái</th>
+                                        <th class="pb-4 font-medium text-right">Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    @foreach (var key in group)
+                                    {
+                                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                                            <td class="py-4 font-bold text-gray-400">#@key.Id</td>
+                                            <td class="py-4 font-mono text-blue-400">@key.KeyCode</td>
+                                            <td class="py-4">
+                                                @if (key.Status == "Chưa bán" || key.IsSold == false)
+                                                {
+                                                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Chưa Bán</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Đã Bán</span>
+                                                }
+                                            </td>
+                                            <td class="py-4 text-right">
+                                                <form method="post" asp-action="Delete" asp-controller="Keys" class="inline">
+                                                    <input type="hidden" name="id" value="@key.Id" />
+                                                    <button type="submit" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-white inline-flex items-center justify-center transition-colors" onclick="return confirm('Bạn có chắc chắn muốn xóa mã game này?');">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-12 text-gray-400">
+                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                <p>Chưa có mã key nào được tạo.</p>
+            </div>
+        }
     </div>
 </div>
 

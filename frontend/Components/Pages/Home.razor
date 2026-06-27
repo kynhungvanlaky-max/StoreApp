@@ -1,0 +1,354 @@
+@page "/"
+@inject Frontend.Services.RecentlyViewedService RecentlyViewedService
+@inject Frontend.Services.RecommendationService RecommendationService
+
+<PageTitle>Nexus Store</PageTitle>
+
+<div class="px-6 py-8 mx-auto max-w-7xl">
+    
+    @* Hero Carousel (Epic Style) *@
+    @if (featuredProducts.Any())
+    {
+        var hero = featuredProducts.First();
+        <div class="relative w-full aspect-[21/9] lg:aspect-[2.5/1] rounded-2xl overflow-hidden group mb-12 cursor-pointer">
+            <div class="absolute inset-0 bg-[#1e1e1e]">
+                <img src="@(string.IsNullOrEmpty(hero.ImageUrl) ? "/images/placeholder-game.jpg" : hero.ImageUrl)" class="w-full h-full object-cover opacity-80" alt="@hero.Name" />
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#121212]/80 to-transparent"></div>
+            
+            <div class="absolute inset-y-0 left-0 flex items-center p-8 lg:p-12 w-full md:w-2/3 lg:w-1/2">
+                <div class="space-y-4">
+                    @if (hero.BasePrice > 0 && hero.Pricing != hero.BasePrice.ToString())
+                    {
+                        <span class="px-2 py-1 text-xs font-bold text-[#121212] bg-white rounded uppercase tracking-wider">Khuyến mãi</span>
+                    }
+                    <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                        @hero.Name
+                    </h1>
+                    <p class="text-base text-gray-300 line-clamp-3">@hero.Description</p>
+                    <p class="text-lg font-medium text-white">@GetDisplayPrice(hero)</p>
+                    
+                    <div class="pt-2 flex gap-3">
+                        <a href="/products/@hero.Id" class="px-8 py-3 text-sm font-bold text-[#121212] bg-white rounded hover:bg-gray-200 transition-colors uppercase tracking-wide">
+                            Mua Ngay
+                        </a>
+                        <button class="px-4 py-3 text-white bg-white/10 rounded hover:bg-white/20 transition-colors" title="Thêm vào wishlist">
+                            <Icon Name="HeroiconName.Plus" Class="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Special Offers - Portrait Cards (Epic Style) *@
+    <div class="mb-12">
+        <div class="flex justify-between items-end mb-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                Đang Giảm Giá
+                <Icon Name="HeroiconName.ChevronRight" Class="w-5 h-5 text-gray-400" />
+            </h2>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+            @foreach (var p in specialOffers)
+            {
+                <a href="/products/@p.Id" class="group block">
+                    <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
+                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate">@p.Name</h3>
+                        <div class="flex items-center gap-2">
+                            @if (p.BasePrice > 0)
+                            {
+                                <span class="px-1.5 py-0.5 text-[11px] font-bold text-[#121212] bg-[#0078F2] rounded">-20%</span>
+                                <span class="text-xs text-gray-500 line-through">@p.BasePrice.ToString("N0") đ</span>
+                            }
+                            <span class="text-sm font-medium text-white">@GetDisplayPrice(p)</span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+    
+    @* Categories - Minimal Epic Style *@
+    <div class="mb-16 border-t border-[#303030] pt-8">
+        <h2 class="text-xl font-bold text-white mb-6">Danh mục phổ biến</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            @{
+                var categories = new[] 
+                { 
+                    ("Hành động", "PuzzlePiece"),
+                    ("Nhập vai (RPG)", "Map"),
+                    ("Chiến thuật", "Trophy"),
+                    ("Thể thao", "GlobeAlt")
+                };
+            }
+            @foreach (var cat in categories)
+            {
+                <a href="/products" class="flex flex-col items-center justify-center p-6 rounded-xl bg-[#202020] hover:bg-[#303030] transition-colors group">
+                    <Icon Name="@cat.Item2" Class="w-8 h-8 text-gray-400 group-hover:text-white mb-3 transition-colors" />
+                    <h3 class="font-bold text-gray-300 group-hover:text-white text-sm">@cat.Item1</h3>
+                </a>
+            }
+        </div>
+    </div>
+
+    @* New Releases - Horizontal List Epic Style *@
+    <div>
+        <div class="flex justify-between items-end mb-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                Mới Ra Mắt
+                <Icon Name="HeroiconName.ChevronRight" Class="w-5 h-5 text-gray-400" />
+            </h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+            @foreach (var p in newReleases)
+            {
+                <a href="/products/@p.Id" class="flex gap-4 p-3 rounded-lg hover:bg-[#202020] transition-colors group items-center">
+                    <div class="w-16 h-20 rounded overflow-hidden bg-[#303030] shrink-0">
+                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
+                        <div class="font-medium text-white text-sm">@GetDisplayPrice(p)</div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+    @* Trending Now - List Style *@
+    <div class="mb-16 border-t border-[#303030] pt-8 mt-12">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <Icon Name="HeroiconName.Fire" Class="w-6 h-6 text-orange-500" />
+                Xu Hướng Hiện Tại
+            </h2>
+            <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach (var p in trendingProducts)
+            {
+                <a href="/products/@p.Id" class="flex gap-4 p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#202020] border border-transparent hover:border-[#303030] transition-colors group items-center">
+                    <div class="w-20 h-24 rounded-lg overflow-hidden bg-[#303030] shrink-0">
+                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    </div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                        <h3 class="text-sm font-bold text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
+                        <p class="text-xs text-gray-500 line-clamp-1 mb-2">@p.Description</p>
+                        <div class="font-bold text-[#0078F2] text-sm">@GetDisplayPrice(p)</div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+    @* Wallet Promo Banner *@
+    <div class="mb-16 relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#004b96] to-[#0078F2] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between shadow-2xl">
+        <div class="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
+        <div class="relative z-10 space-y-3 mb-6 md:mb-0 max-w-xl">
+            <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Nạp Ví Nexus Hôm Nay</h2>
+            <p class="text-blue-100 text-lg">Nhận ngay ưu đãi <span class="font-bold text-white bg-white/20 px-2 py-0.5 rounded">+10% giá trị</span> cho mọi lần nạp từ 500.000đ trở lên. Mua game thả ga không lo về giá!</p>
+        </div>
+        <div class="relative z-10 shrink-0">
+            <a href="/profile/wallet" class="px-8 py-4 bg-white text-[#0078F2] font-black rounded-xl hover:bg-gray-100 transition-transform hover:scale-105 shadow-xl uppercase tracking-wider text-sm inline-block">
+                Nạp Ví Ngay
+            </a>
+        </div>
+    </div>
+
+    @* Free to Play *@
+    @if (freeProducts.Any())
+    {
+        <div class="mb-16">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <Icon Name="HeroiconName.Gift" Class="w-6 h-6 text-green-500" />
+                    Chơi Miễn Phí
+                </h2>
+                <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Khám phá</a>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                @foreach (var p in freeProducts)
+                {
+                    <a href="/products/@p.Id" class="group block bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#303030] hover:border-[#0078F2] transition-colors">
+                        <div class="aspect-[3/4] relative">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
+                        </div>
+                        <div class="p-3 text-center">
+                            <h3 class="text-xs font-bold text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
+                            <span class="text-[11px] font-black text-green-500 uppercase tracking-wider bg-green-500/10 px-2 py-0.5 rounded">Miễn Phí</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @* Recently Viewed Games *@
+    @if (recentlyViewedProducts.Any())
+    {
+        <div class="mb-12 border-t border-[#303030] pt-8">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <Icon Name="HeroiconName.Clock" Class="w-6 h-6 text-blue-500" />
+                    Đã Xem Gần Đây
+                </h2>
+                <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                @foreach (var p in recentlyViewedProducts)
+                {
+                    <a href="/products/@p.ProductId" class="group block bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#303030] hover:border-[#0078F2] transition-all hover:scale-[1.02]">
+                        <div class="aspect-[3/4] relative overflow-hidden">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
+                        </div>
+                        <div class="p-3">
+                            <h3 class="text-sm font-bold text-gray-200 group-hover:text-white truncate">@p.Name</h3>
+                            <div class="text-xs text-gray-500 mt-1">@p.BasePrice.ToString("N0") đ</div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @* Game Recommendations *@
+    @if (recommendedProducts.Any())
+    {
+        <div class="mb-12 border-t border-[#303030] pt-8">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <Icon Name="HeroiconName.LightBulb" Class="w-6 h-6 text-yellow-500" />
+                    Gợi Ý Cho Bạn
+                </h2>
+                <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach (var p in recommendedProducts)
+                {
+                    <a href="/products/@p.Id" class="flex gap-4 p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#202020] border border-transparent hover:border-[#303030] transition-colors group items-center">
+                        <div class="w-20 h-24 rounded-lg overflow-hidden bg-[#303030] shrink-0">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        </div>
+                        <div class="flex-1 min-w-0 flex flex-col justify-center">
+                            <h3 class="text-sm font-bold text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
+                            <p class="text-xs text-gray-500 line-clamp-1 mb-2">@p.Description</p>
+                            <div class="font-bold text-[#0078F2] text-sm">@GetDisplayPrice(p)</div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @* Latest News *@
+    <div class="mb-8 border-t border-[#303030] pt-8">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <Icon Name="HeroiconName.Newspaper" Class="w-6 h-6 text-purple-500" />
+                Tin Tức Mới Nhất
+            </h2>
+            <a href="/news" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @foreach (var article in latestNews)
+            {
+                <a href="/news/@article.Id" class="group bg-[#1a1a1a] rounded-2xl overflow-hidden border border-[#303030] hover:border-gray-500 transition-colors flex flex-col h-full">
+                    <div class="aspect-video relative overflow-hidden bg-[#202020]">
+                        <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-game.jpg" : article.CoverImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                    <div class="p-5 flex flex-col flex-1">
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">@article.PublishedAt.ToString("dd/MM/yyyy")</div>
+                        <h3 class="text-base font-bold text-white leading-snug mb-2 group-hover:text-[#0078F2] transition-colors">@article.Title</h3>
+                        <p class="text-sm text-gray-400 line-clamp-2 mt-auto">@article.Summary</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] public Frontend.Services.ProductService ProductService { get; set; } = default!;
+    [Inject] public Frontend.Services.NewsService NewsService { get; set; } = default!;
+    
+    private List<Frontend.Models.Product.ProductDto> featuredProducts = new();
+    private List<Frontend.Models.Product.ProductDto> specialOffers = new();
+    private List<Frontend.Models.Product.ProductDto> newReleases = new();
+    private List<Frontend.Models.Product.ProductDto> trendingProducts = new();
+    private List<Frontend.Models.Product.ProductDto> freeProducts = new();
+    private List<Frontend.Models.News.NewsArticleDto> latestNews = new();
+    private List<Frontend.Services.RecentlyViewedItem> recentlyViewedProducts = new();
+    private List<Frontend.Models.Product.ProductDto> recommendedProducts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProductService.GetProductsAsync(1, 20);
+        if (result != null && result.Items.Any())
+        {
+            var products = result.Items;
+            featuredProducts = products.Take(1).ToList();
+            specialOffers = products.Skip(1).Take(5).ToList();
+            newReleases = products.OrderByDescending(p => p.ReleaseDate).Take(6).ToList();
+            trendingProducts = products.Skip(6).Take(6).ToList();
+            freeProducts = products.Where(p => p.BasePrice == 0 || (p.Pricing != null && (p.Pricing.ToLower() == "free" || p.Pricing.ToLower() == "miễn phí"))).Take(6).ToList();
+        }
+
+        var newsResult = await NewsService.GetNewsAsync();
+        if (newsResult != null && newsResult.Items != null)
+        {
+            latestNews = newsResult.Items.OrderByDescending(n => n.PublishedAt).Take(3).ToList();
+        }
+
+        // Load recently viewed from local storage
+        recentlyViewedProducts = await RecentlyViewedService.GetRecentlyViewedAsync();
+
+        // Load recommendations based on recently viewed product's category
+        var lastViewed = recentlyViewedProducts.FirstOrDefault();
+        var productResult = lastViewed != null ? await ProductService.GetProductByIdAsync(lastViewed.ProductId) : null;
+        if (productResult != null)
+        {
+            var firstCategory = productResult.Categories?.FirstOrDefault();
+            if (firstCategory != null)
+            {
+                recommendedProducts = await RecommendationService.GetRecommendationsAsync(null, lastViewed?.ProductId);
+            }
+        }
+
+        if (!recommendedProducts.Any())
+        {
+            recommendedProducts = await RecommendationService.GetTrendingAsync(6);
+        }
+    }
+
+    private string GetDisplayPrice(Frontend.Models.Product.ProductDto p)
+    {
+        if (decimal.TryParse(p.Pricing?.Replace(".", "").Replace(",", "").Replace("đ", "").Replace(" ", "").Trim(), out var price))
+        {
+            return price.ToString("N0") + " đ";
+        }
+        
+        if (!string.IsNullOrEmpty(p.Pricing) && p.Pricing != "Paid" && p.Pricing != "Free")
+        {
+            return p.Pricing.Contains("đ") ? p.Pricing : p.Pricing + " đ";
+        }
+        
+        if (p.BasePrice > 0)
+        {
+            return p.BasePrice.ToString("N0") + " đ";
+        }
+        
+        return p.Pricing?.Trim().Equals("Miễn phí", StringComparison.OrdinalIgnoreCase) == true || p.Pricing == "Free" ? "Miễn phí" : "Liên hệ";
+    }
+}

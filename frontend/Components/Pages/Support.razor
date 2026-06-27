@@ -1,0 +1,190 @@
+@page "/support"
+@layout Frontend.Components.Layout.MainLayout
+@inject Frontend.Services.SupportService SupportService
+
+<PageTitle>Hỗ Trợ Khách Hàng — NexusKeys</PageTitle>
+
+<div class="container mx-auto px-4 py-12 max-w-5xl">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-black text-white mb-4">Trung Tâm Hỗ Trợ</h1>
+        <p class="text-gray-400 text-lg">Bạn cần giúp đỡ? Đội ngũ Nexus Store luôn sẵn sàng hỗ trợ bạn.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        @* FAQ Section *@
+        <div>
+            <div class="flex items-center gap-3 mb-6">
+                <Icon Name="HeroiconName.QuestionMarkCircle" Class="w-8 h-8 text-primary" />
+                <h2 class="text-2xl font-bold text-white">Câu hỏi thường gặp</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="collapse collapse-plus bg-[#202020] border border-[#303030] hover:border-primary/50 transition-colors">
+                    <input type="radio" name="faq-accordion" checked /> 
+                    <div class="collapse-title text-lg font-medium text-white peer-checked:text-primary peer-checked:bg-primary/5 transition-colors">
+                        Làm sao để nhận Key sau khi mua?
+                    </div>
+                    <div class="collapse-content text-gray-400 peer-checked:bg-primary/5">
+                        <p class="pt-2">Ngay sau khi thanh toán thành công, hệ thống sẽ tự động hiển thị License Key trên màn hình hóa đơn. Bạn cũng có thể xem lại toàn bộ Key đã mua tại mục <strong class="text-white">Quản lý License Key</strong> trong phần Tài khoản của tôi.</p>
+                    </div>
+                </div>
+                
+                <div class="collapse collapse-plus bg-[#202020] border border-[#303030] hover:border-primary/50 transition-colors">
+                    <input type="radio" name="faq-accordion" /> 
+                    <div class="collapse-title text-lg font-medium text-white peer-checked:text-primary peer-checked:bg-primary/5 transition-colors">
+                        Tôi thanh toán qua MoMo/VNPay nhưng chưa nhận được game?
+                    </div>
+                    <div class="collapse-content text-gray-400 peer-checked:bg-primary/5">
+                        <p class="pt-2">Đôi khi cổng thanh toán sẽ phản hồi chậm từ 1-3 phút. Nếu sau 5 phút vẫn chưa nhận được game, vui lòng gửi Ticket hỗ trợ kèm mã giao dịch để chúng tôi xử lý ngay lập tức.</p>
+                    </div>
+                </div>
+                
+                <div class="collapse collapse-plus bg-[#202020] border border-[#303030] hover:border-primary/50 transition-colors">
+                    <input type="radio" name="faq-accordion" /> 
+                    <div class="collapse-title text-lg font-medium text-white peer-checked:text-primary peer-checked:bg-primary/5 transition-colors">
+                        Chính sách hoàn tiền (Refund) như thế nào?
+                    </div>
+                    <div class="collapse-content text-gray-400 peer-checked:bg-primary/5">
+                        <p class="pt-2">Chúng tôi cam kết hoàn tiền 100% nếu License Key bị lỗi, không thể kích hoạt và bạn báo lỗi trong vòng 48h kể từ khi mua hàng. Các trường hợp mua nhầm nền tảng sẽ không được hỗ trợ hoàn tiền.</p>
+                    </div>
+                </div>
+                
+                <div class="collapse collapse-plus bg-[#202020] border border-[#303030] hover:border-primary/50 transition-colors">
+                    <input type="radio" name="faq-accordion" /> 
+                    <div class="collapse-title text-lg font-medium text-white peer-checked:text-primary peer-checked:bg-primary/5 transition-colors">
+                        Cách kích hoạt game trên Steam/Epic Games?
+                    </div>
+                    <div class="collapse-content text-gray-400 peer-checked:bg-primary/5">
+                        <p class="pt-2">Bạn mở nền tảng tương ứng (Steam, Epic, Origin...), chọn mục "Redeem Code" hoặc "Activate a Product", nhập mã Key gồm 15-25 ký tự được cấp và ấn Xác nhận. Game sẽ tự động tải vào thư viện của bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Ticket Form *@
+        <div>
+            <div class="bg-base-200 rounded-3xl border border-base-300 shadow-[0_8px_30px_rgb(0,0,0,0.3)] overflow-hidden transition-all hover:shadow-[0_8px_40px_rgba(0,120,242,0.15)] hover:-translate-y-1">
+                <div class="p-6 border-b border-base-300 bg-base-300/30">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <Icon Name="HeroiconName.Envelope" Class="w-6 h-6 text-primary" />
+                        Gửi Yêu Cầu Hỗ Trợ
+                    </h2>
+                </div>
+                
+                <div class="p-6">
+                    @if (_isTicketSubmitted)
+                    {
+                        <div class="alert alert-success">
+                            <Icon Name="HeroiconName.CheckCircle" Class="w-6 h-6" IconType="HeroiconType.Solid" />
+                            <div>
+                                <h3 class="font-bold">Đã gửi yêu cầu thành công!</h3>
+                                <div class="text-sm">Chúng tôi đã nhận được thông tin và sẽ phản hồi vào email của bạn trong thời gian sớm nhất (tối đa 24h làm việc).</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block mt-6" @onclick="ResetForm">Gửi thêm yêu cầu khác</button>
+                    }
+                    else
+                    {
+                        <form @onsubmit="SubmitTicket" class="space-y-4">
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-bold">Chủ đề cần hỗ trợ</span></label>
+                                <select @bind="_ticketTopic" required class="select select-bordered w-full bg-base-300">
+                                    <option value="" disabled selected>Chọn chủ đề...</option>
+                                    <option value="payment">Lỗi thanh toán / Chưa nhận được Key</option>
+                                    <option value="key_error">Key bị lỗi / Đã qua sử dụng</option>
+                                    <option value="account">Tài khoản & Bảo mật</option>
+                                    <option value="other">Hỗ trợ kỹ thuật / Khác</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-bold">Địa chỉ Email liên hệ</span></label>
+                                <input type="email" @bind="_ticketEmail" required placeholder="email@example.com" class="input input-bordered w-full bg-base-300" />
+                            </div>
+                            
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-bold">Mã Đơn Hàng (Nếu có)</span>
+                                    <span class="label-text-alt text-gray-500">Tùy chọn</span>
+                                </label>
+                                <input type="text" @bind="_ticketOrderId" placeholder="VD: ORD-12345" class="input input-bordered w-full bg-base-300" />
+                            </div>
+                            
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-bold">Mô tả chi tiết vấn đề</span></label>
+                                <textarea @bind="_ticketContent" required class="textarea textarea-bordered bg-base-300 h-32" placeholder="Vui lòng mô tả chi tiết vấn đề bạn đang gặp phải..."></textarea>
+                            </div>
+                            
+                            
+                            @if (!string.IsNullOrEmpty(_errorMessage))
+                            {
+                                <div class="text-error mt-2">@_errorMessage</div>
+                            }
+
+                            <button type="submit" class="relative overflow-hidden btn bg-[#0078F2] hover:bg-[#005bb5] text-white border-none w-full mt-4 h-14 rounded-xl shadow-[0_4px_15px_rgba(0,120,242,0.4)] hover:shadow-[0_4px_25px_rgba(0,120,242,0.6)] transition-all hover:-translate-y-0.5" disabled="@_isSubmitting">
+                                @if (_isSubmitting)
+                                {
+                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-45deg] animate-[shimmer_1.5s_infinite]"></div>
+                                    <span class="loading loading-spinner"></span>
+                                    <span class="ml-2">Đang gửi...</span>
+                                }
+                                else
+                                {
+                                    <Icon Name="HeroiconName.PaperAirplane" Class="w-5 h-5 mr-2" />
+                                    <span class="font-bold text-lg">Gửi Yêu Cầu</span>
+                                }
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _ticketTopic = "";
+    private string _ticketEmail = "";
+    private string _ticketOrderId = "";
+    private string _ticketContent = "";
+    
+    private bool _isSubmitting = false;
+    private bool _isTicketSubmitted = false;
+    private string _errorMessage = "";
+
+    private async Task SubmitTicket()
+    {
+        _isSubmitting = true;
+        _errorMessage = "";
+        
+        var request = new Frontend.Services.CreateSupportTicketDto
+        {
+            Topic = _ticketTopic,
+            Email = _ticketEmail,
+            OrderId = string.IsNullOrWhiteSpace(_ticketOrderId) ? null : _ticketOrderId,
+            Content = _ticketContent
+        };
+
+        var success = await SupportService.CreateTicketAsync(request);
+        
+        _isSubmitting = false;
+        
+        if (success)
+        {
+            _isTicketSubmitted = true;
+        }
+        else
+        {
+            _errorMessage = "Có lỗi xảy ra (hoặc bạn chưa đăng nhập). Vui lòng thử lại.";
+        }
+    }
+    
+    private void ResetForm()
+    {
+        _ticketTopic = "";
+        _ticketEmail = "";
+        _ticketOrderId = "";
+        _ticketContent = "";
+        _isTicketSubmitted = false;
+    }
+}

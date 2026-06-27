@@ -55,6 +55,47 @@ namespace GameStore.API.Endpoints
             })
             // Configure upload sizes if needed
             .DisableAntiforgery();
+
+            // GET list of uploaded files
+            group.MapGet("/", () =>
+            {
+                var uploadDir = @"D:\DA\MediaStorage";
+                if (!Directory.Exists(uploadDir)) return Results.Ok(new string[0]);
+
+                var files = Directory.GetFiles(uploadDir)
+                    .Select(f => new 
+                    {
+                        FileName = Path.GetFileName(f),
+                        Url = $"http://localhost:5021/media/{Path.GetFileName(f)}",
+                        Size = new FileInfo(f).Length,
+                        CreatedAt = new FileInfo(f).CreationTime
+                    })
+                    .OrderByDescending(f => f.CreatedAt)
+                    .ToList();
+
+                return Results.Ok(files);
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+
+            // DELETE file
+            group.MapDelete("/{fileName}", (string fileName) =>
+            {
+                var uploadDir = @"D:\DA\MediaStorage";
+                var filePath = Path.Combine(uploadDir, fileName);
+                
+                // Prevent directory traversal
+                if (filePath != Path.GetFullPath(filePath) || !filePath.StartsWith(uploadDir))
+                {
+                    return Results.BadRequest("Invalid file path.");
+                }
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    return Results.NoContent();
+                }
+
+                return Results.NotFound();
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
         }
     }
 }

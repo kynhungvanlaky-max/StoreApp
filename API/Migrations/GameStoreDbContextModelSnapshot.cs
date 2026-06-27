@@ -69,6 +69,42 @@ namespace GameStore.API.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("GameStore.API.Entities.Coupon", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentUsage")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxUsage")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Coupons");
+                });
+
             modelBuilder.Entity("GameStore.API.Entities.License", b =>
                 {
                     b.Property<int>("Id")
@@ -231,6 +267,37 @@ namespace GameStore.API.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("GameStore.API.Entities.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("GameStore.API.Entities.PaymentGatewayConfig", b =>
@@ -580,6 +647,55 @@ namespace GameStore.API.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("GameStore.API.Entities.SupportTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminReply")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RepliedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportTickets");
+                });
+
             modelBuilder.Entity("GameStore.API.Entities.SystemRequirement", b =>
                 {
                     b.Property<int>("Id")
@@ -836,6 +952,17 @@ namespace GameStore.API.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("GameStore.API.Entities.PasswordResetToken", b =>
+                {
+                    b.HasOne("GameStore.API.Entities.User", "User")
+                        .WithMany("PasswordResetTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GameStore.API.Entities.Product", b =>
                 {
                     b.HasOne("GameStore.API.Entities.User", "Developer")
@@ -974,6 +1101,17 @@ namespace GameStore.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GameStore.API.Entities.SupportTicket", b =>
+                {
+                    b.HasOne("GameStore.API.Entities.User", "User")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GameStore.API.Entities.SystemRequirement", b =>
                 {
                     b.HasOne("GameStore.API.Entities.Product", "Product")
@@ -1101,11 +1239,15 @@ namespace GameStore.API.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("PasswordResetTokens");
+
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("ReviewComments");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("SupportTickets");
 
                     b.Navigation("Transactions");
 

@@ -1,0 +1,121 @@
+@page "/orders"
+@inject Frontend.ViewModels.OrderViewModel VM
+@layout Frontend.Components.Layout.ProfileLayout
+@implements IDisposable
+
+<PageTitle>Lịch Sử Đơn Hàng — NexusKeys</PageTitle>
+
+<div class="w-full">
+            @if (VM.IsLoading && VM.Orders.Count == 0)
+            {
+                <div class="space-y-4">
+                    @for (int i = 0; i < 3; i++)
+                    {
+                        <div class="bg-base-200 rounded-xl p-6 border border-base-300">
+                            <div class="flex justify-between mb-4">
+                                <div class="skeleton h-6 w-32"></div>
+                                <div class="skeleton h-6 w-24 rounded-full"></div>
+                            </div>
+                            <div class="skeleton h-4 w-3/4 mb-2"></div>
+                            <div class="skeleton h-4 w-1/2"></div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (VM.Orders.Count == 0)
+            {
+                <div class="bg-[#202020] rounded-2xl border border-[#303030] p-12 text-center shadow-xl">
+                    <h2 class="text-2xl font-bold text-white mb-2">Bạn chưa có đơn hàng nào</h2>
+                    <p class="text-gray-400 mb-6">Hãy đặt mua tựa game đầu tiên để nhận ngay ưu đãi từ Nexus Store.</p>
+                    <a href="/products" class="btn btn-primary btn-lg">
+                        <Icon Name="HeroiconName.BuildingStorefront" Class="w-5 h-5 inline-block mr-2" /> Mua Sắm Ngay
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="space-y-4">
+                    @foreach (var order in VM.Orders)
+                    {
+                        string badgeClass = order.Status switch
+                        {
+                            "Completed" => "badge-success",
+                            "Pending" => "badge-warning",
+                            "Failed" => "badge-error",
+                            _ => "badge-ghost"
+                        };
+                        string statusText = order.Status switch
+                        {
+                            "Completed" => "Đã hoàn thành",
+                            "Pending" => "Chờ thanh toán",
+                            "Failed" => "Thất bại",
+                            _ => order.Status
+                        };
+
+                        <div class="bg-[#202020] rounded-xl border border-[#303030] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                            <div class="bg-[#252525] p-4 border-b border-[#303030] flex flex-wrap justify-between items-center gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div>
+                                        <div class="text-sm text-gray-400 font-medium">Mã đơn hàng</div>
+                                        <div class="font-mono text-white font-bold">#@order.Id</div>
+                                    </div>
+                                    <div class="hidden sm:block w-px h-8 bg-[#303030]"></div>
+                                    <div class="hidden sm:block">
+                                        <div class="text-sm text-gray-400 font-medium">Ngày đặt</div>
+                                        <div class="text-white">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4">
+                                    <div class="text-right">
+                                        <div class="text-sm text-gray-400 font-medium">Tổng tiền</div>
+                                        <div class="text-primary font-bold">@order.TotalAmount.ToString("N0") đ</div>
+                                    </div>
+                                    <a href="/orders/@order.Id" class="btn btn-outline btn-sm">Xem chi tiết</a>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <div class="text-white font-medium mb-1">
+                                        @if (order.Items.Count > 0)
+                                        {
+                                            <span>@order.Items[0]</span>
+                                            if (order.Items.Count > 1)
+                                            {
+                                                <span class="text-gray-400 text-sm ml-1">và @(order.Items.Count - 1) sản phẩm khác</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span>Không có sản phẩm</span>
+                                        }
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="badge @badgeClass badge-sm badge-outline font-bold">@statusText</span>
+                                    </div>
+                                </div>
+                                
+                                @if (order.Status == "Pending")
+                                {
+                                    <button class="btn btn-primary btn-sm shrink-0 shadow-lg shadow-primary/30">Thanh toán ngay</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadOrdersAsync();
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

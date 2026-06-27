@@ -1,0 +1,105 @@
+@page "/news/{Id:int}"
+@inject Frontend.ViewModels.NewsViewModel VM
+@implements IDisposable
+
+<PageTitle>@(VM.CurrentArticle?.Title ?? "Chi tiết bài viết") — Nexus Store</PageTitle>
+
+@if (VM.IsLoading)
+{
+    <div class="max-w-4xl mx-auto px-6 py-12 min-h-[70vh]">
+        <div class="animate-pulse">
+            <div class="h-10 w-3/4 bg-[#202020] rounded mb-6"></div>
+            <div class="h-4 w-1/4 bg-[#202020] rounded mb-8"></div>
+            <div class="aspect-video w-full bg-[#202020] rounded-xl mb-10"></div>
+            <div class="space-y-4">
+                <div class="h-4 w-full bg-[#202020] rounded"></div>
+                <div class="h-4 w-full bg-[#202020] rounded"></div>
+                <div class="h-4 w-5/6 bg-[#202020] rounded"></div>
+            </div>
+        </div>
+    </div>
+}
+else if (VM.CurrentArticle == null)
+{
+    <div class="flex flex-col items-center justify-center py-32 text-center px-6 min-h-[70vh]">
+        <Icon Name="HeroiconName.ExclamationCircle" Class="w-20 h-20 text-[#303030] mb-6" />
+        <h2 class="text-2xl font-bold text-white mb-2 tracking-tight">Không tìm thấy bài viết</h2>
+        <p class="text-gray-400 mb-8">Bài viết này không tồn tại hoặc đã bị gỡ bỏ khỏi hệ thống.</p>
+        <a href="/news" class="px-8 py-3 text-sm font-bold text-white bg-transparent border border-gray-500 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Quay lại tin tức</a>
+    </div>
+}
+else
+{
+    var article = VM.CurrentArticle;
+
+    <div class="max-w-4xl mx-auto px-6 py-12 min-h-[70vh]">
+        <article>
+            <header class="mb-8">
+                <div class="flex items-center gap-2 mb-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <span>Tin Tức</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1.5">
+                        <Icon Name="HeroiconName.CalendarDays" Class="w-4 h-4" />
+                        @article.PublishedAt.ToString("dd/MM/yyyy")
+                    </span>
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-8 tracking-tight">@article.Title</h1>
+                
+                <div class="flex items-center gap-3 border-t border-b border-[#303030] py-4 mb-10">
+                    <div class="w-10 h-10 rounded-full bg-[#202020] flex items-center justify-center border border-[#303030]">
+                        <Icon Name="HeroiconName.UserCircle" Class="w-6 h-6 text-gray-400" />
+                    </div>
+                    <div>
+                        <div class="font-bold text-white text-sm">@article.AuthorName</div>
+                        <div class="text-xs text-gray-500">Biên tập viên Nexus</div>
+                    </div>
+                </div>
+            </header>
+
+            <figure class="mb-12 rounded-xl overflow-hidden bg-[#202020]">
+                <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-game.jpg" : article.CoverImageUrl)" class="w-full object-cover aspect-video" alt="@article.Title" />
+            </figure>
+
+            <div class="prose prose-invert prose-lg max-w-none text-gray-300 prose-headings:text-white prose-a:text-[#0078F2] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl leading-relaxed">
+                <p class="text-xl text-white font-medium mb-8 leading-snug">@article.Summary</p>
+                
+                @((MarkupString)article.Content)
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-[#303030] flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-4">
+                    <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Chia sẻ:</span>
+                    <button class="w-10 h-10 rounded-full bg-[#202020] flex items-center justify-center text-white hover:bg-[#0078F2] transition-colors">
+                        <Icon Name="HeroiconName.Share" Class="w-5 h-5" />
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-[#202020] flex items-center justify-center text-white hover:bg-[#0078F2] transition-colors">
+                        <Icon Name="HeroiconName.Link" Class="w-5 h-5" />
+                    </button>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center gap-2 px-6 py-2 rounded bg-transparent border border-gray-600 text-white hover:bg-[#202020] hover:border-gray-400 transition-colors">
+                        <Icon Name="HeroiconName.HandThumbUp" Class="w-5 h-5" />
+                        <span class="text-sm font-bold">Thích (24)</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadArticleDetailsAsync(Id);
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

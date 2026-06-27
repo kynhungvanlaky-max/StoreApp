@@ -1,0 +1,236 @@
+@page "/profile/wallet"
+@inject Frontend.ViewModels.ProfileViewModel VM
+@inject Frontend.Services.ToastService ToastService
+@inject Frontend.Services.WalletService WalletService
+@layout Frontend.Components.Layout.ProfileLayout
+
+<PageTitle>Ví Nexus — NexusKeys</PageTitle>
+
+<div class="space-y-6 w-full">
+    @if (VM.IsLoading && VM.Profile == null)
+    {
+        <div class="flex items-center justify-center h-64">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+    }
+    else if (VM.Profile != null)
+    {
+        @* Balance Card *@
+        <div class="relative overflow-hidden rounded-3xl p-8 mb-8 border border-white/10 shadow-[0_0_30px_rgba(0,120,242,0.3)] bg-gradient-to-br from-[#1a1a2e]/90 to-[#0f3460]/90 backdrop-blur-xl group transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,120,242,0.5)]">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-[#0078F2] rounded-full mix-blend-screen filter blur-[80px] opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500 rounded-full mix-blend-screen filter blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+            <div class="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-[-45deg] animate-[shimmer_3s_infinite]"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-blue-200/80 font-medium text-sm tracking-widest uppercase mb-3 flex items-center gap-2">
+                        <Icon Name="HeroiconName.Wallet" Class="w-5 h-5 text-[#0078F2]" />
+                        Thẻ thành viên Nexus
+                    </h2>
+                    <div class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100 tracking-tight drop-shadow-sm mb-1">
+                        @VM.Profile.WalletBalance.ToString("N0") <span class="text-3xl text-blue-300/50 font-medium">VNĐ</span>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-auto mt-4 md:mt-0">
+                    <button @onclick="ShowTopUpModal" class="relative overflow-hidden btn bg-white/10 hover:bg-white/20 text-white font-black btn-lg w-full md:w-auto rounded-xl border border-white/20 uppercase tracking-wider text-sm transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:-translate-y-1">
+                        <span class="relative z-10 flex items-center gap-2">
+                            <Icon Name="HeroiconName.PlusCircle" Class="w-5 h-5" />
+                            Nạp Tiền Ngay
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @* Recent Transactions *@
+        <div class="bg-base-200 rounded-2xl border border-base-300 shadow-xl overflow-hidden mt-8">
+            <div class="p-6 border-b border-base-300 bg-base-300/30 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <Icon Name="HeroiconName.ListBullet" Class="w-6 h-6 text-gray-400" />
+                    Lịch sử giao dịch
+                </h3>
+                <div class="badge badge-primary">Tháng này</div>
+            </div>
+            
+            <div class="p-0">
+                @if (_transactions.Any())
+                {
+                    <div class="overflow-x-auto">
+                        <table class="table w-full">
+                            <thead class="bg-base-300/50 text-gray-400">
+                                <tr>
+                                    <th class="font-medium text-sm rounded-none">Mã GD</th>
+                                    <th class="font-medium text-sm">Thời gian</th>
+                                    <th class="font-medium text-sm">Nội dung</th>
+                                    <th class="font-medium text-sm text-right rounded-none">Số tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var tx in _transactions)
+                                {
+                                    <tr class="hover:bg-base-300/30 border-b border-base-300/50 transition-colors">
+                                        <td class="font-mono text-xs text-gray-500">TXN-@tx.Id</td>
+                                        <td class="text-sm text-gray-400 whitespace-nowrap">@tx.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="text-sm font-medium text-gray-300">
+                                            @if(tx.TransactionType == "Deposit") { @("Nạp tiền vào ví") } else { @tx.TransactionType }
+                                            @if (tx.Status == "Pending")
+                                            {
+                                                <span class="badge badge-warning badge-sm ml-2">Đang xử lý</span>
+                                            }
+                                        </td>
+                                        <td class="text-right whitespace-nowrap">
+                                            @if (tx.Amount > 0)
+                                            {
+                                                <div class="flex items-center justify-end gap-1 font-bold text-success">
+                                                    <Icon Name="HeroiconName.ArrowUpRight" Class="w-4 h-4" />
+                                                    <span>@tx.Amount.ToString("N0") đ</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="flex items-center justify-end gap-1 font-bold text-error">
+                                                    <Icon Name="HeroiconName.ArrowDownRight" Class="w-4 h-4" />
+                                                    <span>@Math.Abs(tx.Amount).ToString("N0") đ</span>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-12 text-center text-gray-500">
+                        <Icon Name="HeroiconName.Inbox" Class="w-12 h-12 mx-auto text-gray-600 mb-4" />
+                        <p>Chưa có giao dịch nào phát sinh.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@* Top-up Modal *@
+@if (_isTopUpModalOpen)
+{
+    <div class="modal modal-open">
+        <div class="modal-box bg-base-200 border border-base-300 max-w-md">
+            <h3 class="font-bold text-xl mb-6 text-white text-center">Nạp Ví Nexus</h3>
+            
+            <div class="space-y-4">
+                <label class="label pt-0 pb-1"><span class="label-text font-bold text-gray-300">Chọn mệnh giá</span></label>
+                <div class="grid grid-cols-2 gap-3">
+                    @foreach (var amount in _topUpOptions)
+                    {
+                        <button type="button" @onclick="() => SelectAmount(amount)" 
+                                class="btn @(_selectedAmount == amount ? "bg-[#0078F2] border-[#0078F2] text-white shadow-[0_0_15px_rgba(0,120,242,0.4)] scale-105" : "bg-[#202020] border-[#303030] text-gray-400 hover:border-gray-500 hover:text-white hover:-translate-y-1") h-auto py-4 rounded-xl transition-all duration-300">
+                            <div class="flex flex-col items-center">
+                                <span class="font-black text-xl mb-1">@(amount / 1000)K</span>
+                                <span class="text-xs opacity-70 font-medium">@amount.ToString("N0") đ</span>
+                            </div>
+                        </button>
+                    }
+                </div>
+                
+                <div class="divider my-4 text-gray-500 text-xs uppercase tracking-wider">Hoặc</div>
+                
+                <div class="form-control">
+                    <label class="label pt-0"><span class="label-text text-gray-400">Nhập số tiền khác</span></label>
+                    <div class="input-group flex">
+                        <input type="number" @bind="_customAmount" @bind:event="oninput" min="50000" step="10000" 
+                               class="input input-bordered bg-base-300 w-full focus:border-primary flex-1 !rounded-r-none" 
+                               placeholder="VD: 500000" />
+                        <span class="bg-base-300 border border-base-300 border-l-0 px-4 flex items-center text-gray-400 font-bold rounded-r-lg">VNĐ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-action mt-8 flex gap-3">
+                <button class="btn btn-ghost flex-1" @onclick="CloseTopUpModal">Hủy</button>
+                <button class="btn btn-primary flex-1" disabled="@(!IsValidAmount)" @onclick="ProcessTopUp">
+                    @if (_isProcessing)
+                    {
+                        <span class="loading loading-spinner loading-sm"></span>
+                    }
+                    Xác nhận nạp
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _isTopUpModalOpen = false;
+    private bool _isProcessing = false;
+    private int _selectedAmount = 0;
+    private int? _customAmount = null;
+    
+    private readonly int[] _topUpOptions = { 50000, 100000, 200000, 500000, 1000000, 2000000 };
+    
+    // Mock transactions
+    private List<Frontend.Services.TransactionDto> _transactions = new();
+
+    private bool IsValidAmount => _selectedAmount > 0 || (_customAmount.HasValue && _customAmount.Value >= 50000);
+    
+    private int AmountToCharge => _customAmount.HasValue && _customAmount.Value >= 50000 ? _customAmount.Value : _selectedAmount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadProfileAsync();
+        
+        if (VM.Profile != null)
+        {
+            _transactions = await WalletService.GetTransactionsAsync();
+        }
+    }
+
+    private void ShowTopUpModal()
+    {
+        _selectedAmount = 100000;
+        _customAmount = null;
+        _isTopUpModalOpen = true;
+    }
+
+    private void CloseTopUpModal()
+    {
+        _isTopUpModalOpen = false;
+    }
+
+    private void SelectAmount(int amount)
+    {
+        _selectedAmount = amount;
+        _customAmount = null;
+    }
+
+    private async Task ProcessTopUp()
+    {
+        if (!IsValidAmount) return;
+        
+        _isProcessing = true;
+        
+        var success = await WalletService.DepositAsync(AmountToCharge);
+        
+        if (success)
+        {
+            await VM.LoadProfileAsync();
+            _transactions = await WalletService.GetTransactionsAsync();
+            ToastService.ShowSuccess($"Nạp thành công {AmountToCharge.ToString("N0")}đ vào ví!");
+        }
+        else
+        {
+            ToastService.ShowError("Có lỗi xảy ra khi nạp tiền, vui lòng thử lại.");
+        }
+        
+        _isProcessing = false;
+        _isTopUpModalOpen = false;
+    }
+
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

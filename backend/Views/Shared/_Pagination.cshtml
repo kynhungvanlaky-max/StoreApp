@@ -1,0 +1,45 @@
+@{
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int totalItems = ViewBag.TotalItems ?? 0;
+    string actionName = ViewBag.PaginationAction ?? "?";
+}
+
+@if (totalPages > 1)
+{
+    <div class="flex items-center justify-between mt-6 px-2">
+        <div class="text-sm text-gray-400">
+            Hiển thị @((currentPage - 1) * pageSize + 1) - 
+            @(Math.Min(currentPage * pageSize, totalItems)) 
+            trong tổng số @totalItems kết quả
+        </div>
+        <div class="flex items-center gap-2">
+            @if (currentPage > 1)
+            {
+                <a href="@($"{actionName}page={currentPage - 1}")" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/10">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </a>
+            }
+
+            @for (int i = 1; i <= totalPages && i <= 10; i++)
+            {
+                if (i == currentPage)
+                {
+                    <span class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-bold">@i</span>
+                }
+                else
+                {
+                    <a href="@($"{actionName}page={i}")" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-lg text-sm font-medium transition-colors">@i</a>
+                }
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <a href="@($"{actionName}page={currentPage + 1}")" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/10">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+            }
+        </div>
+    </div>
+}

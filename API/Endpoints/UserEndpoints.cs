@@ -1,6 +1,7 @@
 using GameStore.API.Data;
 using GameStore.API.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.API.Endpoints
@@ -47,7 +48,7 @@ namespace GameStore.API.Endpoints
                     CurrentPage = page,
                     PageSize = pageSize
                 });
-            });
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             group.MapPut("/{id}/toggle-lock", async (int id, GameStoreDbContext db) =>
             {
@@ -58,7 +59,7 @@ namespace GameStore.API.Endpoints
                 await db.SaveChangesAsync();
 
                 return Results.Ok(new { message = user.IsLocked ? "Đã khoá tài khoản." : "Đã mở khoá tài khoản.", isLocked = user.IsLocked });
-            });
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             group.MapPut("/{id}", async (int id, AdminUpdateUserDto dto, GameStoreDbContext db) =>
             {
@@ -71,7 +72,21 @@ namespace GameStore.API.Endpoints
 
                 await db.SaveChangesAsync();
                 return Results.Ok(new { message = "Cập nhật thành công!" });
-            });
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+
+            group.MapPut("/{id}/role", async (int id, ChangeRoleDto dto, GameStoreDbContext db) =>
+            {
+                var user = await db.Users.FindAsync(id);
+                if (user == null) return Results.NotFound();
+
+                var role = await db.Set<Role>().FirstOrDefaultAsync(r => r.RoleName == dto.RoleName);
+                if (role == null) return Results.BadRequest(new { message = "Role không tồn tại." });
+
+                user.RoleId = role.Id;
+                await db.SaveChangesAsync();
+
+                return Results.Ok(new { message = $"Đã thay đổi quyền thành {role.RoleName}." });
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             // Lấy thông tin cá nhân của User đang đăng nhập
             group.MapGet("/profile", async (GameStoreDbContext db, System.Security.Claims.ClaimsPrincipal userClaim) =>
@@ -99,16 +114,14 @@ namespace GameStore.API.Endpoints
             // Cập nhật thông tin cá nhân (Tên, Avatar)
             group.MapPut("/profile", async (UpdateProfileDto dto, GameStoreDbContext db, System.Security.Claims.ClaimsPrincipal userClaim) =>
             {
-                var userIdStr = userClaim.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? 
-                                userClaim.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
-                if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
-                    return Results.Unauthorized();
+                var userId = userClaim.GetUserId();
+                if (userId == null) return Results.Unauthorized();
 
-                var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
                 if (user == null) return Results.NotFound();
 
                 if (!string.IsNullOrEmpty(dto.Username)) user.Username = dto.Username;
-                if (dto.AvatarUrl != null) user.AvatarUrl = dto.AvatarUrl; // Allow empty string to clear avatar
+                if (dto.AvatarUrl != null) user.AvatarUrl = dto.AvatarUrl; // Allow null to keep current
 
                 await db.SaveChangesAsync();
                 return Results.Ok(new { message = "Cập nhật thành công!" });
@@ -117,12 +130,10 @@ namespace GameStore.API.Endpoints
             // Đổi mật khẩu
             group.MapPost("/change-password", async (ChangePasswordDto dto, GameStoreDbContext db, System.Security.Claims.ClaimsPrincipal userClaim) =>
             {
-                var userIdStr = userClaim.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? 
-                                userClaim.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
-                if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
-                    return Results.Unauthorized();
+                var userId = userClaim.GetUserId();
+                if (userId == null) return Results.Unauthorized();
 
-                var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
                 if (user == null) return Results.NotFound();
 
                 if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash))
@@ -148,7 +159,7 @@ namespace GameStore.API.Endpoints
                     CreatedAt = u.CreatedAt,
                     AvatarUrl = u.AvatarUrl
                 });
-            });
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
         }
     }
 
@@ -181,5 +192,10 @@ namespace GameStore.API.Endpoints
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
+    }
+
+    public class ChangeRoleDto
+    {
+        public string RoleName { get; set; } = string.Empty;
     }
 }

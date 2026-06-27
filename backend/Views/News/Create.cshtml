@@ -26,18 +26,34 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label asp-for="CoverImageUrl" class="text-sm font-bold text-gray-300">Link Ảnh Bìa (Cover Image)</label>
-                    <input asp-for="CoverImageUrl" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="https://..." />
+                    <label asp-for="CoverImageUrl" class="text-sm font-bold text-gray-300">Ảnh Bìa (Cover Image)</label>
+                    <div class="flex gap-2">
+                        <input asp-for="CoverImageUrl" id="coverImageUrlInput" class="flex-1 bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="https://... hoặc tải ảnh lên" />
+                        <button type="button" onclick="document.getElementById('coverImageFile').click()" class="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-blue-400 font-bold transition-colors whitespace-nowrap">
+                            <i class="fas fa-upload mr-2"></i>Tải Ảnh Lên
+                        </button>
+                        <input type="file" id="coverImageFile" accept="image/*" class="hidden" onchange="uploadCoverImage(this)" />
+                    </div>
+                    <p id="coverUploading" class="text-xs text-blue-400 font-bold hidden mt-2"><i class="fas fa-spinner fa-spin mr-1"></i> Đang tải lên...</p>
                 </div>
 
                 <div class="space-y-2">
                     <label asp-for="Content" class="text-sm font-bold text-gray-300">Nội Dung Chi Tiết <span class="text-red-500">*</span></label>
-                    <div class="p-2 bg-white/5 border border-white/10 rounded-t-xl flex gap-2">
-                        <button type="button" class="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-blue-400" title="Bold">B</button>
-                        <button type="button" class="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-blue-400" title="Italic">I</button>
-                        <button type="button" class="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-blue-400" title="Link">Link</button>
+                    <div class="p-2 bg-white/5 border border-white/10 rounded-t-xl flex gap-1 flex-wrap">
+                        <button type="button" onclick="insertMarkdown('**', '**')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 font-bold transition-colors" title="In đậm (Bold)">B</button>
+                        <button type="button" onclick="insertMarkdown('*', '*')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 italic transition-colors" title="In nghiêng (Italic)">I</button>
+                        <div class="w-px h-6 bg-white/10 mx-1 self-center"></div>
+                        <button type="button" onclick="insertMarkdown('# ', '')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 font-bold transition-colors" title="Tiêu đề 1">H1</button>
+                        <button type="button" onclick="insertMarkdown('## ', '')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 font-bold transition-colors" title="Tiêu đề 2">H2</button>
+                        <button type="button" onclick="insertMarkdown('### ', '')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 font-bold transition-colors" title="Tiêu đề 3">H3</button>
+                        <div class="w-px h-6 bg-white/10 mx-1 self-center"></div>
+                        <button type="button" onclick="insertMarkdown('> ', '')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-colors" title="Trích dẫn (Quote)"><i class="fas fa-quote-right"></i> Quote</button>
+                        <button type="button" onclick="insertMarkdown('- ', '')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-colors" title="Danh sách"><i class="fas fa-list-ul"></i> List</button>
+                        <div class="w-px h-6 bg-white/10 mx-1 self-center"></div>
+                        <button type="button" onclick="insertMarkdown('[', '](https://url-tai-day)')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-colors" title="Chèn Link"><i class="fas fa-link"></i> Link</button>
+                        <button type="button" onclick="insertMarkdown('![Mô tả ảnh](', 'https://url-anh)')" class="px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-colors" title="Chèn Ảnh"><i class="fas fa-image"></i> Ảnh</button>
                     </div>
-                    <textarea asp-for="Content" rows="15" class="w-full bg-[#050505] border border-white/10 border-t-0 rounded-b-xl px-4 py-4 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Nhập nội dung bài viết vào đây..." required></textarea>
+                    <textarea asp-for="Content" id="newsContent" rows="18" class="w-full bg-[#050505] border border-white/10 border-t-0 rounded-b-xl px-4 py-4 text-white focus:outline-none focus:border-blue-500 transition-colors custom-scrollbar" placeholder="Nhập nội dung bài viết vào đây (Hỗ trợ định dạng Markdown)..." required></textarea>
                 </div>
             </div>
         </div>
@@ -51,3 +67,62 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+<script>
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    const authToken = getCookie('access_token');
+    const authHeaders = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+
+    async function uploadCoverImage(input) {
+        if (!input.files || input.files.length === 0) return;
+        
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('files', file);
+
+        document.getElementById('coverUploading').classList.remove('hidden');
+        
+        try {
+            const res = await fetch('http://localhost:5021/api/upload', {
+                method: 'POST',
+                headers: authHeaders,
+                body: formData
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                if (result.urls && result.urls.length > 0) {
+                    document.getElementById('coverImageUrlInput').value = result.urls[0];
+                }
+            } else {
+                alert("Lỗi khi tải ảnh lên!");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Lỗi kết nối API Upload");
+        } finally {
+            document.getElementById('coverUploading').classList.add('hidden');
+            input.value = ""; 
+        }
+    }
+
+    function insertMarkdown(prefix, suffix) {
+        const textarea = document.getElementById('newsContent');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = textarea.value.substring(start, end);
+        
+        const newText = prefix + selectedText + suffix;
+        textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+        
+        textarea.focus();
+        textarea.selectionStart = start + prefix.length;
+        textarea.selectionEnd = start + prefix.length + selectedText.length;
+    }
+</script>
+}

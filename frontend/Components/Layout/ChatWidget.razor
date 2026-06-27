@@ -1,0 +1,120 @@
+@inject Frontend.ViewModels.AssistantViewModel VM
+@implements IDisposable
+
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
+    
+    @* Chat Window Popup *@
+    @if (_isOpen)
+    {
+        <div class="w-80 sm:w-96 h-[500px] max-h-[70vh] bg-[#1a1a1a]/80 backdrop-blur-xl rounded-2xl shadow-[0_0_40px_rgba(0,120,242,0.15)] border border-[#333] flex flex-col overflow-hidden pointer-events-auto transform transition-all origin-bottom-right">
+            @* Header *@
+            <div class="bg-gradient-to-r from-[#0078F2]/90 to-[#005bb5]/90 backdrop-blur-sm px-5 py-4 flex items-center gap-3 border-b border-[#0078F2]/50 shadow-lg">
+                <div class="avatar relative">
+                    <div class="w-10 h-10 rounded-full bg-white text-[#0078F2] flex items-center justify-center shadow-md">
+                        <Icon Name="HeroiconName.CpuChip" Class="w-6 h-6" />
+                    </div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#0078F2]"></div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-base leading-none mb-1 shadow-sm">Nexus Assistant</h3>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs text-blue-100 font-medium">Sẵn sàng hỗ trợ</span>
+                    </div>
+                </div>
+                <div class="ml-auto flex gap-1">
+                    <button class="btn btn-ghost btn-xs btn-square text-blue-100 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Mở trang đầy đủ">
+                        <a href="/assistant"><Icon Name="HeroiconName.ArrowTopRightOnSquare" Class="w-4 h-4" /></a>
+                    </button>
+                    <button @onclick="ToggleChat" class="btn btn-ghost btn-xs btn-square text-blue-100 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Đóng">
+                        <Icon Name="HeroiconName.XMark" Class="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+            
+            @* Messages *@
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar" id="chat-widget-messages">
+                @foreach (var msg in VM.Messages)
+                {
+                    <Frontend.Components.Shared.ChatBubble Message="msg" />
+                }
+                @if (VM.IsTyping)
+                {
+                    <div class="chat chat-start">
+                        <div class="chat-image avatar">
+                            <div class="w-8 h-8 rounded-full bg-[#0078F2]/20 border border-[#0078F2]/30 text-[#0078F2] flex items-center justify-center">
+                                <Icon Name="HeroiconName.CpuChip" Class="w-5 h-5" />
+                            </div>
+                        </div>
+                        <div class="chat-bubble bg-[#252525]/90 border border-[#333] text-gray-200 px-4 py-2 shadow-sm">
+                            <span class="loading loading-dots loading-sm text-[#0078F2]"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            @* Input *@
+            <div class="p-4 border-t border-[#333] bg-[#1a1a1a]/95 backdrop-blur-md">
+                <form @onsubmit="VM.SendMessageAsync" class="flex gap-2 relative">
+                    <input @bind="VM.InputText" @bind:event="oninput"
+                           class="w-full bg-[#2a2a2a] text-white placeholder-gray-400 text-sm rounded-full pl-5 pr-12 py-3 outline-none focus:ring-2 focus:ring-[#0078F2]/50 border border-[#444] transition-all shadow-inner"
+                           placeholder="Hỏi về game, đơn hàng..." />
+                    <button type="submit" disabled="@(string.IsNullOrWhiteSpace(VM.InputText) || VM.IsTyping)" 
+                            class="absolute right-1.5 top-1.5 btn btn-primary bg-[#0078F2] hover:bg-[#005bb5] border-none btn-sm btn-circle h-8 w-8 min-h-0 flex items-center justify-center disabled:bg-gray-700 disabled:text-gray-500 transition-colors shadow-md">
+                        <Icon Name="HeroiconName.PaperAirplane" Class="w-4 h-4 transform -rotate-45 ml-0.5" />
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+    
+    @* Toggle Button *@
+    <button @onclick="ToggleChat"
+            class="btn btn-circle btn-lg pointer-events-auto transform hover:scale-110 transition-all duration-300 relative group border-none shadow-[0_10px_25px_rgba(0,120,242,0.4)]
+                   @(_isOpen ? "bg-[#252525] hover:bg-[#333] text-gray-300" : "bg-gradient-to-r from-[#0078F2] to-[#005bb5] hover:from-[#006bd6] hover:to-[#004b96] text-white")">
+        @if (!_isOpen)
+        {
+            <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-[#121212] flex items-center justify-center animate-bounce">
+                <span class="text-[10px] font-bold text-white">1</span>
+            </div>
+        }
+        <span class="flex items-center justify-center w-full h-full relative z-10">
+            @if (_isOpen)
+            {
+                <Icon Name="HeroiconName.ChevronDown" Class="w-7 h-7" />
+            }
+            else
+            {
+                <Icon Name="HeroiconName.ChatBubbleLeftEllipsis" Class="w-7 h-7" />
+            }
+        </span>
+    </button>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.2);
+    }
+</style>
+
+@code {
+    private bool _isOpen;
+    
+    protected override void OnInitialized()
+    {
+        VM.StateChanged += StateHasChanged;
+    }
+    
+    void ToggleChat() => _isOpen = !_isOpen;
+    
+    public void Dispose() => VM.StateChanged -= StateHasChanged;
+}

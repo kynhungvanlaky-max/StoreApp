@@ -1,0 +1,619 @@
+@page "/products/{Id:int}"
+@inject Frontend.ViewModels.ProductDetailViewModel ViewModel
+@inject Frontend.ViewModels.AuthViewModel AuthViewModel
+@inject Frontend.ViewModels.CartViewModel CartViewModel
+@inject Frontend.ViewModels.WishlistViewModel WishlistViewModel
+@inject Frontend.ViewModels.ProfileViewModel ProfileViewModel
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject Frontend.Services.RecentlyViewedService RecentlyViewedService
+@implements IDisposable
+
+<PageTitle>@(ViewModel.Product?.Name ?? "Chi tiết sản phẩm") — Nexus Store</PageTitle>
+
+@if (ViewModel.IsLoading)
+{
+    <div class="max-w-[1600px] mx-auto px-6 py-8">
+        <div class="h-10 w-1/3 bg-[#202020] rounded mb-8 animate-pulse"></div>
+        <div class="flex flex-col lg:flex-row gap-10">
+            <div class="w-full lg:w-[70%] space-y-4">
+                <div class="aspect-[16/9] w-full bg-[#202020] rounded-xl animate-pulse"></div>
+                <div class="flex gap-4">
+                    <div class="h-24 w-40 bg-[#202020] rounded-lg animate-pulse"></div>
+                    <div class="h-24 w-40 bg-[#202020] rounded-lg animate-pulse"></div>
+                </div>
+            </div>
+            <div class="w-full lg:w-[30%]">
+                <div class="space-y-4 pt-12">
+                    <div class="h-16 w-full bg-[#202020] rounded animate-pulse"></div>
+                    <div class="h-12 w-full bg-[#202020] rounded animate-pulse"></div>
+                    <div class="h-12 w-full bg-[#202020] rounded animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (ViewModel.Product == null)
+{
+    <div class="flex flex-col items-center justify-center py-32 text-center">
+        <Icon Name="HeroiconName.ExclamationCircle" Class="w-20 h-20 text-[#303030] mb-6" />
+        <h2 class="text-2xl font-bold text-white mb-2 tracking-tight">Không tìm thấy sản phẩm</h2>
+        <p class="text-gray-400 mb-8">Sản phẩm này không tồn tại hoặc đã bị gỡ bỏ khỏi hệ thống.</p>
+        <a href="/products" class="px-8 py-3 text-sm font-bold text-white bg-transparent border border-gray-500 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Trở về cửa hàng</a>
+    </div>
+}
+else
+{
+    var product = ViewModel.Product;
+
+    <div class="max-w-[1600px] mx-auto px-6 py-8">
+        
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight">@product.Name</h1>
+
+        <div class="flex flex-col lg:flex-row gap-12">
+            @* Left Column: Gallery & Description *@
+            <div class="w-full lg:w-[65%] xl:w-[70%]">
+                
+                @* Main Media Gallery *@
+                <div class="bg-[#121212] rounded-xl overflow-hidden aspect-[16/9] relative mb-4 group">
+                    @if ((_selectedMediaType ?? "Image") == "Video")
+                    {
+                        <video id="mainProductVideo" src="@(_selectedMediaUrl)" class="w-full h-full object-cover" autoplay muted loop playsinline controls></video>
+                    }
+                    else
+                    {
+                        <img src="@(_selectedMediaUrl ?? product.ImageUrl)" alt="@product.Name" class="w-full h-full object-cover" />
+                    }
+                </div>
+                
+                @* Thumbnails Carousel *@
+                <div class="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
+                    <button @onclick='() => SelectMedia(product.ImageUrl, "Image")' class="flex-shrink-0 w-32 md:w-48 aspect-[16/9] rounded-lg overflow-hidden border-2 @(_selectedMediaUrl == null || _selectedMediaUrl == product.ImageUrl ? "border-[#0078F2]" : "border-transparent opacity-60 hover:opacity-100") transition-all">
+                        <img src="@product.ImageUrl" alt="" class="w-full h-full object-cover" />
+                    </button>
+                    @foreach (var media in product.Media.Take(4))
+                    {
+                        <button @onclick="() => SelectMedia(media.Url, media.Type)" class="flex-shrink-0 w-32 md:w-48 aspect-[16/9] rounded-lg overflow-hidden border-2 @(_selectedMediaUrl == media.Url ? "border-[#0078F2]" : "border-transparent opacity-60 hover:opacity-100") transition-all relative">
+                            @if (media.Type == "Video")
+                            {
+                                <video src="@media.Url" class="w-full h-full object-cover" muted loop playsinline></video>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <Icon Name="HeroiconName.Play" Class="w-8 h-8 text-white drop-shadow-md" IconType="HeroiconType.Solid" />
+                                </div>
+                            }
+                            else
+                            {
+                                <img src="@media.Url" alt="" class="w-full h-full object-cover" />
+                            }
+                        </button>
+                    }
+                </div>
+
+                @* Description Text *@
+                <div class="mt-12 text-gray-300 text-base leading-relaxed max-w-4xl space-y-6 font-normal">
+                    @((MarkupString)product.Description.Replace("\n", "<br/>"))
+                </div>
+                
+                @* System Requirements *@
+                <div class="mt-16">
+                    <h2 class="text-xl font-bold text-white mb-6">Yêu cầu hệ thống</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#202020] p-8 rounded-xl">
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Tối thiểu</h3>
+                            <ul class="space-y-4 text-sm text-gray-300">
+                                <li><span class="text-gray-500 block mb-1">HĐH</span> Windows 10 64-bit</li>
+                                <li><span class="text-gray-500 block mb-1">Bộ xử lý</span> Intel Core i5-4460 / AMD FX-6300</li>
+                                <li><span class="text-gray-500 block mb-1">Bộ nhớ</span> 8 GB RAM</li>
+                                <li><span class="text-gray-500 block mb-1">Đồ họa</span> NVIDIA GeForce GTX 960 / AMD Radeon R9 280</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Khuyến nghị</h3>
+                            <ul class="space-y-4 text-sm text-gray-300">
+                                <li><span class="text-gray-500 block mb-1">HĐH</span> Windows 11 64-bit</li>
+                                <li><span class="text-gray-500 block mb-1">Bộ xử lý</span> Intel Core i7-8700K / AMD Ryzen 5 3600</li>
+                                <li><span class="text-gray-500 block mb-1">Bộ nhớ</span> 16 GB RAM</li>
+                                <li><span class="text-gray-500 block mb-1">Đồ họa</span> NVIDIA GeForce RTX 2070 / AMD Radeon RX 5700 XT</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                @* Reviews Section *@
+                <div class="mt-16 border-t border-[#303030] pt-12">
+                    <h2 class="text-2xl font-bold text-white mb-8">Đánh giá từ người dùng</h2>
+                    
+                    @* Review Form *@
+                    <div class="bg-[#202020] rounded-xl p-6 mb-10">
+                        <h3 class="text-lg font-bold text-white mb-4">Viết đánh giá của bạn</h3>
+                        @if (AuthViewModel.IsLoggedIn)
+                        {
+                            bool hasPurchased = ProfileViewModel.Library.Any(l => l.Id == Id);
+                            bool hasReviewed = ViewModel.Reviews != null && ViewModel.Reviews.Any(r => r.Username == AuthViewModel.Username);
+
+                            if (hasReviewed)
+                            {
+                                <div class="text-[#0078F2] font-bold">
+                                    Bạn đã đánh giá sản phẩm này. Cảm ơn phản hồi của bạn!
+                                </div>
+                            }
+                            else if (hasPurchased)
+                            {
+                                <div class="space-y-5">
+                                    <div class="relative group">
+                                        <textarea @bind="newReviewContent" class="w-full bg-[#121212] text-white p-4 rounded-xl border border-[#303030] focus:border-[#0078F2] focus:ring-2 focus:ring-[#0078F2]/30 outline-none min-h-[120px] transition-all shadow-inner resize-none" placeholder="Bạn nghĩ gì về sản phẩm này?"></textarea>
+                                    </div>
+                                    
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div class="flex items-center gap-3">
+                                            <button @onclick="() => newReviewIsPositive = true" class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border-2 transition-all duration-300 @(newReviewIsPositive == true ? "bg-[#0078F2]/10 border-[#0078F2] text-[#0078F2] shadow-[0_0_15px_rgba(0,120,242,0.4)] scale-105" : "border-[#303030] bg-[#1a1a1a] text-gray-400 hover:text-white hover:border-gray-500 hover:bg-[#252525]")">
+                                                <Icon Name="HeroiconName.HandThumbUp" Class="w-5 h-5" IconType="newReviewIsPositive == true ? HeroiconType.Solid : HeroiconType.Outline" />
+                                                <span class="font-medium">Tích cực</span>
+                                            </button>
+                                            <button @onclick="() => newReviewIsPositive = false" class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border-2 transition-all duration-300 @(newReviewIsPositive == false ? "bg-red-500/10 border-red-500 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-105" : "border-[#303030] bg-[#1a1a1a] text-gray-400 hover:text-white hover:border-gray-500 hover:bg-[#252525]")">
+                                                <Icon Name="HeroiconName.HandThumbDown" Class="w-5 h-5" IconType="newReviewIsPositive == false ? HeroiconType.Solid : HeroiconType.Outline" />
+                                                <span class="font-medium">Tiêu cực</span>
+                                            </button>
+                                        </div>
+                                        
+                                        <button @onclick="SubmitReview" disabled="@(string.IsNullOrWhiteSpace(newReviewContent) || newReviewIsPositive == null || isSubmittingReview)" class="relative overflow-hidden group px-8 py-3 bg-[#0078F2] text-white font-bold rounded-full hover:bg-[#005bb5] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(0,120,242,0.3)] hover:shadow-[0_0_25px_rgba(0,120,242,0.5)]">
+                                            @if(isSubmittingReview) { <span class="loading loading-spinner loading-sm mr-2"></span> }
+                                            <span class="relative z-10">Gửi đánh giá</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-gray-400">
+                                    Bạn cần <span class="text-[#0078F2] font-bold">mua sản phẩm</span> này để có thể viết đánh giá.
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-gray-400">
+                                Vui lòng <a href="/login" class="text-[#0078F2] hover:underline font-bold">đăng nhập</a> để viết đánh giá.
+                            </div>
+                        }
+                    </div>
+
+                    @* Reviews Summary & Filters *@
+                    @if (ViewModel.Reviews != null && ViewModel.Reviews.Any())
+                    {
+                        var totalReviews = ViewModel.Reviews.Count;
+                        var positiveReviews = ViewModel.Reviews.Count(r => r.IsPositive);
+                        var positivePercentage = (int)((double)positiveReviews / totalReviews * 100);
+                        
+                        <div class="bg-[#202020] rounded-xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#303030]">
+                            <div class="flex items-center gap-6">
+                                <div class="text-5xl font-black text-white">@positivePercentage%</div>
+                                <div>
+                                    <div class="text-lg font-bold text-white mb-1">Tỉ lệ đánh giá tích cực</div>
+                                    <div class="text-sm text-gray-400">Dựa trên @totalReviews đánh giá từ người dùng</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2 bg-[#121212] p-1 rounded-lg">
+                                <button @onclick='() => SetReviewFilter("All")' class="px-4 py-2 rounded-md text-sm font-medium transition-colors @(reviewFilter == "All" ? "bg-[#303030] text-white" : "text-gray-400 hover:text-white hover:bg-[#202020]")">Tất cả</button>
+                                <button @onclick='() => SetReviewFilter("Positive")' class="px-4 py-2 rounded-md text-sm font-medium transition-colors @(reviewFilter == "Positive" ? "bg-[#303030] text-white" : "text-gray-400 hover:text-white hover:bg-[#202020]")">Tích cực</button>
+                                <button @onclick='() => SetReviewFilter("Negative")' class="px-4 py-2 rounded-md text-sm font-medium transition-colors @(reviewFilter == "Negative" ? "bg-[#303030] text-white" : "text-gray-400 hover:text-white hover:bg-[#202020]")">Tiêu cực</button>
+                            </div>
+                        </div>
+                    }
+
+                    @* Review List *@
+                    <div class="space-y-6">
+                        @if (ViewModel.Reviews != null && ViewModel.Reviews.Any())
+                        {
+                            var filteredReviews = ViewModel.Reviews.Where(r => reviewFilter == "All" || (reviewFilter == "Positive" && r.IsPositive) || (reviewFilter == "Negative" && !r.IsPositive)).ToList();
+                            
+                            @if (filteredReviews.Any())
+                            {
+                                @foreach (var review in filteredReviews)
+                                {
+                                    <div class="bg-[#202020] rounded-2xl p-6 border border-[#303030]/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                        <div class="flex items-start justify-between mb-4">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 p-0.5 shadow-inner">
+                                                    <div class="w-full h-full rounded-full bg-[#121212] flex items-center justify-center text-gray-300">
+                                                        <span class="font-bold text-lg">@review.Username.Substring(0, 1).ToUpper()</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold text-white text-lg leading-tight">@review.Username</div>
+                                                    <div class="text-xs text-gray-500 mt-0.5">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 px-4 py-1.5 rounded-full border @(review.IsPositive ? "bg-[#0078F2]/10 border-[#0078F2]/30 text-[#0078F2]" : "bg-red-500/10 border-red-500/30 text-red-500")">
+                                                <Icon Name="@(review.IsPositive ? "HeroiconName.HandThumbUp" : "HeroiconName.HandThumbDown")" Class="w-4 h-4" IconType="HeroiconType.Solid" />
+                                                <span class="text-sm font-bold">@(review.IsPositive ? "Khuyên dùng" : "Không khuyên dùng")</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-gray-300 mb-4">
+                                            @review.Content
+                                        </div>
+                                        
+                                        @* Action Bar *@
+                                        <div class="flex items-center gap-4 pt-4 border-t border-[#303030]/50">
+                                            <button @onclick="() => ToggleReplyForm(review.Id)" class="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                                                <Icon Name="HeroiconName.ChatBubbleLeft" Class="w-4 h-4" />
+                                                Trả lời
+                                            </button>
+                                        </div>
+                                        
+                                        @* Reply Form *@
+                                        @if (replyingToReviewId == review.Id)
+                                        {
+                                            <div class="mt-4 bg-[#121212] p-4 rounded-xl border border-[#303030]">
+                                                @if (AuthViewModel.IsLoggedIn)
+                                                {
+                                                    <div class="flex gap-3">
+                                                        <div class="w-8 h-8 rounded-full bg-[#303030] shrink-0 flex items-center justify-center text-xs font-bold text-gray-400">
+                                                            @AuthViewModel.Username?.Substring(0, 1).ToUpper()
+                                                        </div>
+                                                        <div class="flex-1 space-y-3">
+                                                            <textarea @bind="replyContent" class="w-full bg-[#1a1a1a] text-white p-3 rounded-lg border border-[#404040] focus:border-[#0078F2] focus:ring-1 focus:ring-[#0078F2] outline-none text-sm resize-none" rows="2" placeholder="Viết câu trả lời..."></textarea>
+                                                            <div class="flex justify-end gap-2">
+                                                                <button @onclick="() => ToggleReplyForm(review.Id)" class="px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white transition-colors">Hủy</button>
+                                                                <button @onclick="() => SubmitReply(review.Id)" disabled="@(string.IsNullOrWhiteSpace(replyContent) || isSubmittingReply)" class="px-4 py-1.5 text-sm font-medium text-white bg-[#0078F2] rounded-md hover:bg-[#005bb5] transition-colors disabled:opacity-50">
+                                                                    @if(isSubmittingReply) { <span class="loading loading-spinner loading-xs mr-1"></span> }
+                                                                    Trả lời
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="text-sm text-gray-400 text-center py-2">
+                                                        Vui lòng <a href="/login" class="text-[#0078F2] hover:underline font-bold">đăng nhập</a> để trả lời.
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+
+                                        @* Replies List *@
+                                        @if (review.Replies != null && review.Replies.Any())
+                                        {
+                                            <div class="mt-4 pl-4 md:pl-8 space-y-4 border-l-2 border-[#303030]">
+                                                @foreach (var reply in review.Replies)
+                                                {
+                                                    <div class="flex items-start gap-3">
+                                                        <div class="w-8 h-8 rounded-full bg-[#303030] shrink-0 flex items-center justify-center text-xs font-bold text-gray-400">
+                                                            @reply.Username.Substring(0, 1).ToUpper()
+                                                        </div>
+                                                        <div class="flex-1 bg-[#1a1a1a] p-3 rounded-lg border border-[#303030]/50">
+                                                            <div class="flex justify-between items-baseline mb-1">
+                                                                <span class="font-bold text-white text-sm">@reply.Username</span>
+                                                                <span class="text-xs text-gray-500">@reply.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                                            </div>
+                                                            <div class="text-sm text-gray-300">@reply.Content</div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-8 text-gray-500 bg-[#202020] rounded-xl border border-[#303030]">
+                                    Không có đánh giá nào phù hợp với bộ lọc hiện tại.
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-8 text-gray-500 bg-[#202020] rounded-xl border border-[#303030]">
+                                Chưa có đánh giá nào cho sản phẩm này.
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* Related Products *@
+                @if (ViewModel.RelatedProducts != null && ViewModel.RelatedProducts.Any())
+                {
+                    <div class="mt-16 border-t border-[#303030] pt-12">
+                        <h2 class="text-2xl font-bold text-white mb-8">Sản phẩm liên quan</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            @foreach (var related in ViewModel.RelatedProducts)
+                            {
+                                <a href="/products/@related.Id" class="block bg-[#202020] rounded-xl overflow-hidden border border-[#303030] hover:border-gray-500 hover:scale-[1.02] transition-all duration-300 group">
+                                    <div class="aspect-[3/4] relative overflow-hidden">
+                                        <img src="@related.ImageUrl" alt="@related.Name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-bold text-white text-sm line-clamp-1 mb-1 group-hover:text-[#0078F2] transition-colors">@related.Name</h3>
+                                        <div class="text-white font-bold text-sm">@related.BasePrice.ToString("N0") đ</div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            @* Right Column: Buy Panel (Epic Style) *@
+            <div class="w-full lg:w-[35%] xl:w-[30%]">
+                <div class="sticky top-24">
+                    <div class="flex items-center justify-center py-6 mb-4">
+                        <Icon Name="HeroiconName.PuzzlePiece" Class="w-24 h-24 text-[#303030]" IconType="HeroiconType.Solid" />
+                    </div>
+                    
+                    <div class="flex flex-col items-center text-center mb-6">
+                        @if (product.Pricing == "Khuyến mãi" && product.BasePrice > 0)
+                        {
+                            <div class="flex items-center justify-center gap-3 w-full">
+                                <span class="px-2 py-1 text-sm font-bold text-[#121212] bg-[#0078F2] rounded">-20%</span>
+                                <span class="text-sm text-gray-500 line-through">@product.BasePrice.ToString("N0") đ</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-6">
+                        @if (product.Pricing == "Miễn phí")
+                        {
+                            <span class="text-3xl font-bold text-white">Miễn phí</span>
+                        }
+                        else if (product.Pricing == "Khuyến mãi")
+                        {
+                            <span class="text-3xl font-bold text-white">@((product.BasePrice * 0.8m).ToString("N0")) đ</span>
+                        }
+                        else
+                        {
+                            <span class="text-3xl font-bold text-white">@product.BasePrice.ToString("N0") đ</span>
+                        }
+                    </div>
+                    
+                    <div class="space-y-3 mb-8">
+                        @if (product.IsOutOfStock)
+                        {
+                            <button disabled class="w-full py-4 px-6 text-sm font-bold text-white bg-red-600/50 cursor-not-allowed rounded uppercase tracking-wider">
+                                Hết Hàng
+                            </button>
+                        }
+                        else
+                        {
+                            <button @onclick="BuyNow" class="w-full py-4 px-6 text-sm font-bold text-[#121212] bg-[#0078F2] rounded hover:bg-[#005bb5] transition-colors uppercase tracking-wider">
+                                Mua Ngay
+                            </button>
+                            <button @onclick="AddToCart" class="w-full py-4 px-6 text-sm font-bold text-white bg-transparent border border-gray-500 rounded hover:bg-white/10 transition-colors uppercase tracking-wider flex items-center justify-center gap-2">
+                                <Icon Name="HeroiconName.ShoppingCart" Class="w-5 h-5" />
+                                @(CartViewModel.Items.Any(i => i.ProductId == product.Id) ? "Đã Thêm Vào Giỏ" : "Thêm Vào Giỏ")
+                            </button>
+                        }
+                        
+                        @{
+                            bool isInWishlist = WishlistViewModel.Items.Any(i => i.ProductId == product.Id);
+                        }
+                        <button @onclick="ToggleWishlist" class="w-full py-4 px-6 text-sm font-bold text-white bg-transparent border border-gray-500 rounded hover:bg-white/10 transition-colors uppercase tracking-wider flex items-center justify-center gap-2">
+                            <Icon Name="HeroiconName.Heart" Class="w-5 h-5" IconType="@(isInWishlist ? HeroiconType.Solid : HeroiconType.Outline)" />
+                            @(isInWishlist ? "Đã Yêu Thích" : "Thêm Vào Danh Sách Yêu Thích")
+                        </button>
+                    </div>
+                    
+                    <div class="border-t border-[#303030] pt-4 space-y-3 text-sm">
+                        <div class="flex justify-between py-2 border-b border-[#202020]">
+                            <span class="text-gray-500">Nhà phát triển</span>
+                            <span class="text-white">@product.DeveloperName</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-[#202020]">
+                            <span class="text-gray-500">Nhà phát hành</span>
+                            <span class="text-white">@product.DeveloperName</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-[#202020]">
+                            <span class="text-gray-500">Ngày phát hành</span>
+                            <span class="text-white">@product.ReleaseDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-[#202020] items-center">
+                            <span class="text-gray-500">Đánh giá</span>
+                            <span class="text-white flex items-center gap-1">
+                                4.5 <Icon Name="HeroiconName.Star" Class="w-4 h-4 text-white" IconType="HeroiconType.Solid" />
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (var cat in product.Categories)
+                            {
+                                <a href="/products" class="px-3 py-1.5 text-xs font-medium text-white bg-[#202020] rounded hover:bg-[#303030] transition-colors">@cat</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    window.toggleVideoMute = function(id, isMuted) {
+        var vid = document.getElementById(id);
+        if (vid) vid.muted = isMuted;
+    }
+    window.toggleVideoPlay = function(id, isPlaying) {
+        var vid = document.getElementById(id);
+        if (vid) {
+            if (isPlaying) vid.play();
+            else vid.pause();
+        }
+    }
+</script>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string newReviewContent = "";
+    private bool? newReviewIsPositive = null;
+    private bool isSubmittingReview = false;
+    private string? _selectedMediaUrl = null;
+    private string? _selectedMediaType = null;
+    private bool _isVideoMuted = true;
+    private bool _isVideoPlaying = true;
+
+    // Review filtering & replying state
+    private string reviewFilter = "All"; // "All", "Positive", "Negative"
+    private int? replyingToReviewId = null;
+    private string replyContent = "";
+    private bool isSubmittingReply = false;
+
+    private void SetReviewFilter(string filter) => reviewFilter = filter;
+
+    private void ToggleReplyForm(int reviewId)
+    {
+        if (replyingToReviewId == reviewId)
+        {
+            replyingToReviewId = null;
+            replyContent = "";
+        }
+        else
+        {
+            replyingToReviewId = reviewId;
+            replyContent = "";
+        }
+    }
+
+    private async Task SubmitReply(int reviewId)
+    {
+        if (string.IsNullOrWhiteSpace(replyContent)) return;
+        
+        isSubmittingReply = true;
+        var request = new Frontend.Models.Review.ReplyReviewDto { Content = replyContent };
+        
+        var success = await ViewModel.SubmitReplyAsync(reviewId, request);
+        if (success)
+        {
+            replyingToReviewId = null;
+            replyContent = "";
+        }
+        
+        isSubmittingReply = false;
+        StateHasChanged();
+    }
+
+    private void SelectMedia(string url, string type)
+    {
+        _selectedMediaUrl = url;
+        _selectedMediaType = type;
+        
+        // Reset video state when changing media
+        if (type == "Video")
+        {
+            _isVideoMuted = true;
+            _isVideoPlaying = true;
+        }
+    }
+
+    private async Task ToggleMute()
+    {
+        _isVideoMuted = !_isVideoMuted;
+        await JS.InvokeVoidAsync("toggleVideoMute", "mainProductVideo", _isVideoMuted);
+    }
+
+    private async Task TogglePlay()
+    {
+        _isVideoPlaying = !_isVideoPlaying;
+        await JS.InvokeVoidAsync("toggleVideoPlay", "mainProductVideo", _isVideoPlaying);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ViewModel.StateChanged += StateHasChanged;
+        CartViewModel.StateChanged += StateHasChanged;
+        WishlistViewModel.StateChanged += StateHasChanged;
+        ProfileViewModel.StateChanged += StateHasChanged;
+        await ViewModel.LoadProductAsync(Id);
+        
+        if (AuthViewModel.IsLoggedIn)
+        {
+            await WishlistViewModel.LoadWishlistAsync();
+            await ProfileViewModel.LoadLibraryAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && ViewModel.Product != null)
+        {
+            await RecentlyViewedService.AddRecentlyViewedAsync(
+                ViewModel.Product.Id,
+                ViewModel.Product.Name,
+                ViewModel.Product.ImageUrl,
+                ViewModel.Product.BasePrice
+            );
+        }
+    }
+
+    private async Task AddToCart()
+    {
+        if (ViewModel.Product == null) return;
+        var p = ViewModel.Product;
+        var price = p.Pricing == "Khuyến mãi" ? p.BasePrice * 0.8m : p.BasePrice;
+        
+        await CartViewModel.AddToCartAsync(new Frontend.Models.Cart.CartItem
+        {
+            ProductId = p.Id,
+            Name = p.Name,
+            Price = price,
+            ImageUrl = p.ImageUrl
+        });
+    }
+
+    private async Task BuyNow()
+    {
+        await AddToCart();
+        await CartViewModel.SelectOnlyAsync(Id);
+        NavigationManager.NavigateTo("/cart");
+    }
+
+    private async Task ToggleWishlist()
+    {
+        if (ViewModel.Product == null) return;
+        
+        bool isInWishlist = WishlistViewModel.Items.Any(i => i.ProductId == Id);
+        if (isInWishlist)
+        {
+            await WishlistViewModel.RemoveFromWishlistAsync(Id);
+        }
+        else
+        {
+            await WishlistViewModel.AddToWishlistAsync(Id, ViewModel.Product.Name);
+        }
+    }
+
+    private async Task SubmitReview()
+    {
+        if (string.IsNullOrWhiteSpace(newReviewContent) || newReviewIsPositive == null) return;
+        
+        isSubmittingReview = true;
+        var request = new Frontend.Models.Review.CreateReviewDto
+        {
+            ProductId = Id,
+            Content = newReviewContent,
+            IsRecommended = newReviewIsPositive.Value
+        };
+        
+        var success = await ViewModel.SubmitReviewAsync(request);
+        if (success)
+        {
+            newReviewContent = "";
+            newReviewIsPositive = null;
+        }
+        
+        isSubmittingReview = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        ViewModel.StateChanged -= StateHasChanged;
+        CartViewModel.StateChanged -= StateHasChanged;
+        WishlistViewModel.StateChanged -= StateHasChanged;
+        ProfileViewModel.StateChanged -= StateHasChanged;
+    }
+}

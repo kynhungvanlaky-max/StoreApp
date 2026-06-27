@@ -1,28 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Models
-{
-    public class ProductKeyViewModel
-    {
-        public int Id { get; set; }
-        public string ProductName { get; set; } = string.Empty;
-        public string KeyCode { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty; 
-        public bool IsSold { get; set; }
-        public int ProductId { get; set; }
-        public int? OrderId { get; set; }
-    }
-
-
-}
-
 namespace Backend.Controllers
 {
     using Backend.Models;
     using System.Text.Json;
     using System.Text;
 
-    public class KeysController : Controller
+    public class KeysController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -31,34 +15,37 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
+            var response = await client.GetAsync($"/api/keys?page={page}&pageSize={pageSize}");
 
-            var response = await client.GetAsync("/api/keys");
-
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             var viewModel = new KeyListViewModel();
 
             if (response.IsSuccessStatusCode)
             {
-                var keys = await response.Content.ReadFromJsonAsync<List<ProductKeyViewModel>>();
-                if (keys != null)
+                try
                 {
-                    foreach (var k in keys)
+                    var pagedResult = await response.Content.ReadFromJsonAsync<PagedResponse<ProductKeyViewModel>>();
+                    ViewBag.CurrentPage = pagedResult?.CurrentPage ?? page;
+                    ViewBag.TotalPages = pagedResult?.TotalPages ?? 1;
+                    ViewBag.TotalItems = pagedResult?.TotalItems ?? 0;
+                    ViewBag.PageSize = pagedResult?.PageSize ?? pageSize;
+                    if (pagedResult?.Data != null)
                     {
-                        k.Status = k.IsSold ? "Đã bán" : "Chưa bán";
+                        foreach (var k in pagedResult.Data)
+                        {
+                            k.Status = k.IsSold ? "Đã bán" : "Chưa bán";
+                        }
+                        viewModel.Keys = pagedResult.Data;
                     }
-                    viewModel.Keys = keys;
+                }
+                catch (Exception ex)
+                {
+                    SetErrorMessage("Lỗi khi tải dữ liệu mã game: " + ex.Message);
                 }
             }
 
@@ -76,12 +63,6 @@ namespace Backend.Controllers
         public async Task<IActionResult> Generate(int productId, int quantity)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
             int successCount = 0;
             for (int i = 0; i < quantity; i++)
             {
@@ -91,10 +72,8 @@ namespace Backend.Controllers
                 var jsonContent = new StringContent(JsonSerializer.Serialize(new { ProductId = productId, KeyCode = formattedKey, IsSold = false }), Encoding.UTF8, "application/json");
                 var response = await client.PostAsync("/api/keys", jsonContent);
                 
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                {
-                    return Redirect("http://localhost:3000/Auth/Login");
-                }
+                var redirectResult = HandleApiResponse(response);
+                if (redirectResult != null) return redirectResult;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -102,7 +81,7 @@ namespace Backend.Controllers
                 }
             }
 
-            TempData["SuccessMessage"] = $"Đã tạo thành công {successCount}/{quantity} key mới.";
+            SetSuccessMessage($"Đã tạo thành công {successCount}/{quantity} key mới.");
             return RedirectToAction("Index");
         }
 
@@ -110,26 +89,18 @@ namespace Backend.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
             var response = await client.DeleteAsync($"/api/keys/{id}");
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] = "Đã xóa mã game thành công!";
+                SetSuccessMessage("Đã xóa mã game thành công!");
             }
             else
             {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa mã game.";
+                SetErrorMessage("Có lỗi xảy ra khi xóa mã game.");
             }
 
             return RedirectToAction("Index");

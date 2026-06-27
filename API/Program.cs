@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using GameStore.API.Data;
 using GameStore.API.Endpoints;
 using GameStore.API.Hubs;
+using GameStore.API.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -36,7 +37,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowNextjs", builder =>
     {
-        builder.WithOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:5000")
+        builder.WithOrigins("http://localhost:5205", "http://localhost:5000", "http://localhost:3001")
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -47,6 +48,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<GameStore.API.Services.Payment.VnPayService>();
 builder.Services.AddScoped<GameStore.API.Services.Payment.MoMoService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -91,6 +93,15 @@ app.MapAssistantEndpoints();
 app.MapPaymentGatewayEndpoints();
 app.MapNewsEndpoints();
 app.MapReviewEndpoints();
+app.MapWishlistEndpoints();
+app.MapDebugEndpoints();
+app.MapSupportEndpoints();
+app.MapWalletEndpoints();
+app.MapPromotionEndpoints();
+app.MapCouponEndpoints();
+app.MapAdminEndpoints();
+app.MapAdminAuditEndpoints();
+app.MapRecommendationEndpoints();
 app.MapHub<NexusHub>("/hubs/nexus");
 
 using (var scope = app.Services.CreateScope())
@@ -100,9 +111,28 @@ using (var scope = app.Services.CreateScope())
         db.Database.ExecuteSqlRaw("ALTER TABLE Reviews ADD CreatedAt datetime2 NOT NULL DEFAULT GETDATE();");
         db.Database.ExecuteSqlRaw("ALTER TABLE Reviews ADD UpdatedAt datetime2 NULL;");
     } catch {}
+    try {
+        db.Database.ExecuteSqlRaw("ALTER TABLE SupportTickets ADD AdminReply nvarchar(max) NULL;");
+        db.Database.ExecuteSqlRaw("ALTER TABLE SupportTickets ADD RepliedAt datetime2 NULL;");
+    } catch {}
+    try {
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE Coupons (
+                Id int NOT NULL IDENTITY,
+                Code nvarchar(max) NOT NULL,
+                DiscountPercent decimal(18,2) NOT NULL,
+                MaxUsage int NOT NULL,
+                CurrentUsage int NOT NULL,
+                ExpiryDate datetime2 NOT NULL,
+                IsActive bit NOT NULL,
+                CreatedAt datetime2 NOT NULL,
+                CONSTRAINT PK_Coupons PRIMARY KEY (Id)
+            );
+        ");
+    } catch {}
 }
 
 // Seed Database
-DbSeeder.Seed(app.Services);
+// DbSeeder.Seed(app.Services);
 
 app.Run();

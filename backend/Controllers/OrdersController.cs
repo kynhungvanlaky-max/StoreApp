@@ -1,32 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Models
-{
-    public class OrderViewModel
-    {
-        public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public decimal TotalAmount { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public DateTime OrderDate { get; set; }
-        public List<string> Items { get; set; } = new();
-        public List<OrderKeyDto> Keys { get; set; } = new();
-    }
-
-    public class OrderKeyDto
-    {
-        public int Id { get; set; }
-        public string KeyCode { get; set; } = string.Empty;
-        public string ProductName { get; set; } = string.Empty;
-    }
-}
-
 namespace Backend.Controllers
 {
     using Backend.Models;
 
-    public class OrdersController : Controller
+    public class OrdersController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -35,26 +14,30 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            var response = await client.GetAsync("/api/orders");
+            var response = await client.GetAsync($"/api/orders?page={page}&pageSize={pageSize}");
             
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                var orders = await response.Content.ReadFromJsonAsync<List<OrderViewModel>>();
-                return View(new OrderListViewModel { Orders = orders ?? new List<OrderViewModel>() });
+                try
+                {
+                    var pagedResult = await response.Content.ReadFromJsonAsync<PagedResponse<OrderViewModel>>();
+                    ViewBag.CurrentPage = pagedResult?.CurrentPage ?? page;
+                    ViewBag.TotalPages = pagedResult?.TotalPages ?? 1;
+                    ViewBag.TotalItems = pagedResult?.TotalItems ?? 0;
+                    ViewBag.PageSize = pagedResult?.PageSize ?? pageSize;
+                    return View(new OrderListViewModel { Orders = pagedResult?.Data ?? new List<OrderViewModel>() });
+                }
+                catch (Exception ex)
+                {
+                    SetErrorMessage("Lỗi khi tải dữ liệu đơn hàng: " + ex.Message);
+                    return View(new OrderListViewModel());
+                }
             }
 
             return View(new OrderListViewModel());
@@ -63,18 +46,10 @@ namespace Backend.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
             var response = await client.GetAsync($"/api/orders/{id}");
             
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
@@ -86,32 +61,24 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteKey(int orderId, int keyId)
+        public async Task<IActionResult> UpdateStatus(int id, string status)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            var response = await client.DeleteAsync($"/api/orders/{orderId}/keys/{keyId}");
+            var response = await client.PutAsJsonAsync($"/api/orders/{id}/status", new { Status = status });
             
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] = "Đã xóa mã game khỏi đơn hàng thành công!";
+                SetSuccessMessage("Cập nhật trạng thái đơn hàng thành công!");
             }
             else
             {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa mã game.";
+                SetErrorMessage("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
             }
 
-            return RedirectToAction("Details", new { id = orderId });
+            return RedirectToAction("Details", new { id = id });
         }
     }
 }

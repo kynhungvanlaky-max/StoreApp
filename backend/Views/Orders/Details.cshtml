@@ -59,6 +59,15 @@
                     <span class="text-gray-500">Ngày đặt:</span>
                     <span class="text-white">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
                 </div>
+                <form asp-action="UpdateStatus" method="post" class="mt-4 pt-4 border-t border-white/10 flex items-center gap-2">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <select name="status" class="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <option value="Pending" selected="@(Model.Status == "Pending" ? "selected" : null)" class="bg-gray-800">Chờ Xử Lý</option>
+                        <option value="Completed" selected="@(Model.Status == "Completed" ? "selected" : null)" class="bg-gray-800">Hoàn Thành (Cấp Key)</option>
+                        <option value="Failed" selected="@(Model.Status == "Failed" ? "selected" : null)" class="bg-gray-800">Thất Bại (Thu Hồi)</option>
+                    </select>
+                    <button type="submit" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500/100 text-white rounded text-sm font-bold transition-colors">Cập nhật</button>
+                </form>
             </div>
         </div>
 
@@ -80,7 +89,6 @@
                 <tr class="bg-[#050505] border-b border-white/10">
                     <th class="p-4 text-gray-500 font-medium">Sản phẩm</th>
                     <th class="p-4 text-gray-500 font-medium">Mã kích hoạt (Key)</th>
-                    <th class="p-4 text-gray-500 font-medium text-right">Hành động</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/10">
@@ -91,22 +99,13 @@
                         <tr class="hover:bg-white/5 transition-colors">
                             <td class="p-4 text-white">@key.ProductName</td>
                             <td class="p-4 text-blue-400 font-mono tracking-wider">@key.KeyCode</td>
-                            <td class="p-4 text-right">
-                                <form asp-action="DeleteKey" method="post" class="m-0 inline-block" onsubmit="return confirm('Bạn có chắc chắn muốn xóa mã game này khỏi đơn hàng? Mã này sẽ được đưa trở lại kho.');">
-                                    <input type="hidden" name="orderId" value="@Model.Id" />
-                                    <input type="hidden" name="keyId" value="@key.Id" />
-                                    <button type="submit" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/100/40 text-red-400 rounded-md text-sm transition-colors border border-red-500/30">
-                                        <i class="fa-solid fa-trash"></i> Xóa Mã
-                                    </button>
-                                </form>
-                            </td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="3" class="p-8 text-center text-gray-500">Đơn hàng này không có mã game nào (chưa thanh toán hoặc là lỗi).</td>
+                        <td colspan="2" class="p-8 text-center text-gray-500">Đơn hàng này không có mã game nào (chưa thanh toán hoặc là lỗi).</td>
                     </tr>
                 }
             </tbody>

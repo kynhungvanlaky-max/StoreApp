@@ -1,0 +1,28 @@
+@using System.Text.RegularExpressions
+<Heroicon Name="@KebabCaseName" Type="@IconType" class="@Class" />
+
+@code {
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Class { get; set; } = "w-5 h-5";
+
+    [Parameter]
+    public HeroiconType IconType { get; set; } = HeroiconType.Outline;
+
+    private string KebabCaseName => ConvertToKebabCase(Name);
+
+    private string ConvertToKebabCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
+        
+        var name = input.Replace("HeroiconName.", "");
+        
+        // Handle special cases with numbers
+        if (name == "Bars3") return "bars-3";
+        if (name == "Squares2x2") return "squares-2x2";
+        
+        return Regex.Replace(name, "([a-z])([A-Z])", "$1-$2").ToLower();
+    }
+}

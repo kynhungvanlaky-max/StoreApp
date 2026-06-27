@@ -32,6 +32,10 @@ namespace GameStore.API.Data
         public DbSet<Transaction> Transactions { get; set; } = null!;
         public DbSet<NewsArticle> NewsArticles { get; set; } = null!;
         public DbSet<PaymentGatewayConfig> PaymentGatewayConfigs { get; set; } = null!;
+        public DbSet<SupportTicket> SupportTickets { get; set; } = null!;
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
+        public DbSet<Coupon> Coupons { get; set; } = null!;
+        public DbSet<AuditLog> AuditLogs { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -100,6 +104,12 @@ namespace GameStore.API.Data
                 .HasOne(r => r.User)
                 .WithMany(u => u.Reviews)
                 .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SupportTicket>()
+                .HasOne(st => st.User)
+                .WithMany(u => u.SupportTickets)
+                .HasForeignKey(st => st.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

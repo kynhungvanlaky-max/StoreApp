@@ -1,0 +1,282 @@
+@page "/profile"
+@inject Frontend.ViewModels.ProfileViewModel VM
+@inject Frontend.ViewModels.AuthViewModel AuthVM
+@inject Frontend.Services.AuthService AuthService
+@inject Microsoft.JSInterop.IJSRuntime JS
+@layout Frontend.Components.Layout.ProfileLayout
+@implements IDisposable
+
+<PageTitle>Hồ Sơ Của Tôi — NexusKeys</PageTitle>
+
+<div class="space-y-6 w-full">
+            @if (VM.IsLoading && VM.Profile == null)
+            {
+                <div class="flex items-center justify-center h-64">
+                    <span class="loading loading-spinner loading-lg text-primary"></span>
+                </div>
+            }
+            else if (VM.Profile != null)
+            {
+                @* Wallet Summary *@
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gradient-to-br from-primary/20 to-secondary/20 p-6 rounded-2xl border border-primary/30 relative overflow-hidden">
+                        <Icon Name="HeroiconName.Wallet" Class="absolute -bottom-6 -right-6 w-32 h-32 text-primary/10" IconType="HeroiconType.Solid" />
+                        <h4 class="text-gray-300 font-medium mb-1">Số dư Ví Nexus</h4>
+                        <div class="text-3xl font-black text-white mb-4">@VM.Profile.WalletBalance.ToString("N0") đ</div>
+                        <button class="btn btn-primary btn-sm shadow-lg shadow-primary/30 text-white">
+                            <Icon Name="HeroiconName.Plus" Class="w-4 h-4" /> Nạp Tiền
+                        </button>
+                    </div>
+                    
+                    <div class="bg-[#202020] p-6 rounded-2xl border border-[#303030] flex flex-col justify-center">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-success/20 text-success flex items-center justify-center">
+                                <Icon Name="HeroiconName.ShieldCheck" Class="w-6 h-6" IconType="HeroiconType.Solid" />
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold">Bảo mật tài khoản</h4>
+                                <p class="text-sm text-gray-400">Đã kích hoạt xác thực 2 bước (2FA)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Edit Profile Form *@
+                <div class="bg-[#202020] rounded-2xl border border-[#303030] shadow-xl overflow-hidden">
+                    <div class="p-6 border-b border-[#303030] bg-[#252525]">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <Icon Name="HeroiconName.DocumentText" Class="w-6 h-6 text-primary" />
+                            Cập nhật thông tin
+                        </h2>
+                    </div>
+                    
+                    <div class="p-6">
+                        @if (!string.IsNullOrEmpty(VM.SuccessMessage))
+                        {
+                            <div class="alert alert-success mb-6">
+                                <Icon Name="HeroiconName.CheckCircle" Class="w-5 h-5" IconType="HeroiconType.Solid" />
+                                <span>@VM.SuccessMessage</span>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(VM.ErrorMessage))
+                        {
+                            <div class="alert alert-error mb-6">
+                                <Icon Name="HeroiconName.ExclamationCircle" Class="w-5 h-5" IconType="HeroiconType.Solid" />
+                                <span>@VM.ErrorMessage</span>
+                            </div>
+                        }
+
+                        <form @onsubmit="HandleUpdate" class="space-y-4 max-w-2xl">
+                            <div class="form-control">
+                                <label class="label"><span class="label-text">Tên đăng nhập (Username)</span></label>
+                                <input type="text" value="@VM.Profile.Username" disabled class="input input-bordered w-full bg-[#252525] text-gray-500 cursor-not-allowed" />
+                                <label class="label"><span class="label-text-alt text-gray-500">Tên đăng nhập không thể thay đổi</span></label>
+                            </div>
+                            
+                            <div class="form-control">
+                                <label class="label"><span class="label-text">Email</span></label>
+                                <input type="email" value="@VM.Profile.Email" disabled class="input input-bordered w-full bg-[#252525] text-gray-500 cursor-not-allowed" />
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label"><span class="label-text">Họ và Tên</span></label>
+                                    <input type="text" @bind="_fullName" class="input input-bordered w-full bg-[#252525]" placeholder="Nguyễn Văn A" />
+                                </div>
+                                
+                                <div class="form-control">
+                                    <label class="label"><span class="label-text">Số điện thoại</span></label>
+                                    <input type="tel" @bind="_phone" class="input input-bordered w-full bg-[#252525]" placeholder="090..." />
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button type="submit" class="btn btn-primary" disabled="@VM.IsLoading">
+                                    @if (VM.IsLoading)
+                                    {
+                                        <span class="loading loading-spinner"></span>
+                                    }
+                                    Lưu Thay Đổi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="bg-[#202020] rounded-3xl border border-[#303030] shadow-[0_8px_30px_rgb(0,0,0,0.3)] overflow-hidden mt-8 transition-shadow hover:shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
+                    <div class="p-6 border-b border-[#303030] bg-[#252525]">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <Icon Name="HeroiconName.Key" Class="w-6 h-6 text-warning" />
+                            Đổi Mật Khẩu
+                        </h2>
+                    </div>
+                    
+                    <div class="p-6">
+                        @if (!string.IsNullOrEmpty(_pwdSuccessMessage))
+                        {
+                            <div class="alert alert-success mb-6">
+                                <Icon Name="HeroiconName.CheckCircle" Class="w-5 h-5" IconType="HeroiconType.Solid" />
+                                <span>@_pwdSuccessMessage</span>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(_pwdErrorMessage))
+                        {
+                            <div class="alert alert-error mb-6">
+                                <Icon Name="HeroiconName.ExclamationCircle" Class="w-5 h-5" IconType="HeroiconType.Solid" />
+                                <span>@_pwdErrorMessage</span>
+                            </div>
+                        }
+
+                        <form @onsubmit="HandleChangePassword" class="space-y-5 max-w-2xl">
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-medium text-gray-300">Mật khẩu hiện tại</span></label>
+                                <div class="relative group">
+                                    <Icon Name="HeroiconName.Key" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-warning transition-colors" />
+                                    <input type="password" @bind="_currentPassword" required class="input input-bordered w-full bg-[#252525] pl-12 focus:border-warning focus:ring-1 focus:ring-warning transition-all shadow-inner" placeholder="••••••••" />
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="form-control">
+                                    <label class="label"><span class="label-text font-medium text-gray-300">Mật khẩu mới</span></label>
+                                    <div class="relative group">
+                                        <Icon Name="HeroiconName.LockClosed" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-warning transition-colors" />
+                                        <input type="password" @bind="_newPassword" required minlength="6" class="input input-bordered w-full bg-[#252525] pl-12 focus:border-warning focus:ring-1 focus:ring-warning transition-all shadow-inner" placeholder="••••••••" />
+                                    </div>
+                                </div>
+                                
+                                <div class="form-control">
+                                    <label class="label"><span class="label-text font-medium text-gray-300">Xác nhận mật khẩu mới</span></label>
+                                    <div class="relative group">
+                                        <Icon Name="HeroiconName.CheckBadge" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-warning transition-colors" />
+                                        <input type="password" @bind="_confirmPassword" required minlength="6" class="input input-bordered w-full bg-[#252525] pl-12 focus:border-warning focus:ring-1 focus:ring-warning transition-all shadow-inner" placeholder="••••••••" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8">
+                                <button type="submit" class="relative overflow-hidden btn btn-warning text-warning-content font-bold px-8 shadow-[0_4px_15px_rgba(251,191,36,0.3)] hover:shadow-[0_4px_25px_rgba(251,191,36,0.5)] transition-all hover:-translate-y-0.5 border-none" disabled="@_isChangingPwd">
+                                    @if (_isChangingPwd)
+                                    {
+                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-45deg] animate-[shimmer_1.5s_infinite]"></div>
+                                        <span class="loading loading-spinner"></span>
+                                        <span class="ml-2">Đang xử lý...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cập Nhật Mật Khẩu</span>
+                                    }
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+@code {
+    private string _fullName = "";
+    private string _phone = "";
+    
+    // Password fields
+    private string _currentPassword = "";
+    private string _newPassword = "";
+    private string _confirmPassword = "";
+    private string _pwdSuccessMessage = "";
+    private string _pwdErrorMessage = "";
+    private bool _isChangingPwd = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadProfileAsync();
+        
+        if (VM.Profile != null)
+        {
+            _fullName = VM.Profile.FullName;
+            _phone = VM.Profile.PhoneNumber;
+        }
+    }
+    
+    private async Task HandleUpdate()
+    {
+        await VM.UpdateProfileAsync(_fullName, _phone, VM.Profile?.AvatarUrl ?? "");
+    }
+    
+    private async Task HandleChangePassword()
+    {
+        _pwdSuccessMessage = "";
+        _pwdErrorMessage = "";
+        
+        if (string.IsNullOrEmpty(_currentPassword) || string.IsNullOrEmpty(_newPassword) || string.IsNullOrEmpty(_confirmPassword))
+        {
+            _pwdErrorMessage = "Vui lòng nhập đầy đủ thông tin.";
+            return;
+        }
+        
+        if (_newPassword != _confirmPassword)
+        {
+            _pwdErrorMessage = "Mật khẩu xác nhận không khớp.";
+            return;
+        }
+        
+        if (_newPassword.Length < 6)
+        {
+            _pwdErrorMessage = "Mật khẩu mới phải có ít nhất 6 ký tự.";
+            return;
+        }
+        
+        _isChangingPwd = true;
+        
+        var request = new Frontend.Models.Auth.ChangePasswordRequest
+        {
+            CurrentPassword = _currentPassword,
+            NewPassword = _newPassword,
+            ConfirmPassword = _confirmPassword
+        };
+
+        var response = await AuthService.ChangePasswordAsync(request);
+        
+        if (response.IsSuccessStatusCode)
+        {
+            _pwdSuccessMessage = "Đổi mật khẩu thành công!";
+            _currentPassword = "";
+            _newPassword = "";
+            _confirmPassword = "";
+        }
+        else
+        {
+            var errorResult = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+            if (errorResult.TryGetProperty("message", out var msgProp))
+            {
+                _pwdErrorMessage = msgProp.GetString() ?? "Lỗi khi đổi mật khẩu.";
+            }
+            else
+            {
+                _pwdErrorMessage = "Đã xảy ra lỗi hệ thống khi đổi mật khẩu.";
+            }
+        }
+
+        _isChangingPwd = false;
+    }
+    
+    private async Task GoToAdminPanel()
+    {
+        var token = await AuthVM.GetTokenAsync();
+        if (!string.IsNullOrEmpty(token))
+        {
+            await JS.InvokeVoidAsync("open", $"http://localhost:3001/Auth/AutoLogin?token={token}", "_blank");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy token xác thực. Vui lòng đăng nhập lại.");
+        }
+    }
+
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

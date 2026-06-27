@@ -1,0 +1,77 @@
+@model Backend.Models.AuditLogListViewModel
+
+@{
+    ViewData["Title"] = "Lịch Sử Hoạt Động (Audit Log)";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">Lịch Sử Hoạt Động</h1>
+            <p class="text-gray-400 text-sm">Theo dõi tất cả hành động quản trị trong hệ thống</p>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-16 text-center">ID</th>
+                    <th class="pb-4 font-medium">Quản Trị Viên</th>
+                    <th class="pb-4 font-medium">Hành Động</th>
+                    <th class="pb-4 font-medium">Đối Tượng</th>
+                    <th class="pb-4 font-medium">Mã Đối Tượng</th>
+                    <th class="pb-4 font-medium">Chi Tiết</th>
+                    <th class="pb-4 font-medium">Thời Gian</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm">
+                @if (Model.Logs != null && Model.Logs.Any())
+                {
+                    foreach (var log in Model.Logs)
+                    {
+                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                            <td class="py-4 text-gray-400 text-center">#@log.Id</td>
+                            <td class="py-4 font-bold text-white">@log.AdminUsername</td>
+                            <td class="py-4">
+                                @if (log.Action == "Create")
+                                {
+                                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Tạo</span>
+                                }
+                                else if (log.Action == "Update")
+                                {
+                                    <span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-bold border border-blue-500/20">Sửa</span>
+                                }
+                                else if (log.Action == "Delete")
+                                {
+                                    <span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Xóa</span>
+                                }
+                                else
+                                {
+                                    <span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">@log.Action</span>
+                                }
+                            </td>
+                            <td class="py-4 text-gray-300 font-medium">@log.EntityType</td>
+                            <td class="py-4 text-gray-400 font-mono text-sm">@log.EntityId</td>
+                            <td class="py-4 text-gray-300 max-w-xs truncate" title="@log.Details">@log.Details</td>
+                            <td class="py-4 text-gray-400 text-sm whitespace-nowrap">@log.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-gray-500">Chưa có hoạt động nào được ghi nhận.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="mt-8 border-t border-white/10 pt-6">
+            @await Html.PartialAsync("_Pagination")
+        </div>
+    }
+</div>

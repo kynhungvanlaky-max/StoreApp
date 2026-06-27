@@ -1,0 +1,166 @@
+@page "/login"
+@inject Frontend.ViewModels.AuthViewModel AuthViewModel
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Frontend.Models.Auth
+
+<PageTitle>Đăng Nhập — Nexus Store</PageTitle>
+
+<div class="flex items-center justify-center min-h-[calc(100vh-200px)] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-[#202020] p-8 rounded-xl border border-[#303030]">
+        <div class="text-center">
+            <Icon Name="HeroiconName.PuzzlePiece" Class="w-12 h-12 text-white mx-auto mb-4" IconType="HeroiconType.Solid" />
+            <h2 class="mt-2 text-2xl font-bold text-white tracking-tight uppercase">
+                Đăng Nhập
+            </h2>
+            <p class="mt-2 text-sm text-gray-400">
+                Chưa có tài khoản?
+                <a href="/register" class="font-bold text-white hover:underline uppercase tracking-wider text-xs ml-1">
+                    Đăng ký
+                </a>
+            </p>
+        </div>
+        <form class="mt-8 space-y-6" @onsubmit="HandleLogin">
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="p-4 bg-error/20 border border-error/50 rounded flex items-center gap-3 text-error text-sm">
+                    <Icon Name="HeroiconName.ExclamationTriangle" Class="w-5 h-5 shrink-0" />
+                    <span>@ErrorMessage</span>
+                </div>
+            }
+
+            <div class="space-y-4">
+                <div>
+                    <label class="sr-only">Email</label>
+                    <input type="email" @bind="LoginRequest.Email" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Địa chỉ email">
+                </div>
+                <div>
+                    <label class="sr-only">Mật khẩu</label>
+                    <input type="password" @bind="LoginRequest.Password" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mật khẩu">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-600 bg-[#121212] text-[#0078F2] focus:ring-offset-[#202020]">
+                    <label for="remember-me" class="ml-2 block text-sm text-gray-400">
+                        Ghi nhớ tôi
+                    </label>
+                </div>
+
+                <div class="text-sm">
+                    <a href="/forgot-password" class="font-medium text-gray-400 hover:text-white transition-colors">Quên mật khẩu?</a>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="w-full py-4 px-6 text-sm font-bold text-[#121212] bg-[#0078F2] rounded hover:bg-[#005bb5] transition-colors uppercase tracking-wider flex items-center justify-center gap-2" disabled="@IsLoading">
+                    @if (IsLoading)
+                    {
+                        <div class="w-4 h-4 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
+                    }
+                    Đăng Nhập NGAY
+                </button>
+            </div>
+            
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-[#303030]"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-[#202020] text-gray-500 uppercase font-bold text-xs">Hoặc</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center hidden">
+                <div id="google-button-container"></div>
+            </div>
+            
+            @* Beautiful custom Google button *@
+            <button type="button" @onclick="TriggerGoogleLogin" class="w-full py-3 px-4 text-sm font-bold text-white bg-transparent border border-gray-600 rounded hover:bg-white/10 transition-colors flex items-center justify-center gap-3">
+                <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
+                Đăng nhập với Google
+            </button>
+        </form>
+    </div>
+</div>
+
+@code {
+    private LoginRequest LoginRequest = new();
+    private bool IsLoading = false;
+    private string? ErrorMessage;
+    
+    private DotNetObjectReference<Login>? _objRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (AuthViewModel.IsLoggedIn)
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
+            _objRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("googleAuthInterop.initialize", "86985055083-mfhejhujniaiu0k8qki84l8jialv9mc7.apps.googleusercontent.com", _objRef);
+        }
+    }
+
+    private async Task TriggerGoogleLogin()
+    {
+        // Kích hoạt popup chọn tài khoản của Google
+        await JSRuntime.InvokeVoidAsync("googleAuthInterop.prompt");
+    }
+
+    [JSInvokable]
+    public async Task HandleGoogleLogin(string credential)
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        StateHasChanged();
+
+        var success = await AuthViewModel.HandleExternalLoginAsync("Google", credential);
+        if (success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = "Đăng nhập Google thất bại.";
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrWhiteSpace(LoginRequest.Email) || string.IsNullOrWhiteSpace(LoginRequest.Password))
+        {
+            ErrorMessage = "Vui lòng nhập đầy đủ email và mật khẩu.";
+            return;
+        }
+
+        IsLoading = true;
+        ErrorMessage = null;
+        
+        var success = await AuthViewModel.LoginAsync(LoginRequest);
+        if (success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = "Email hoặc mật khẩu không đúng.";
+        }
+        
+        IsLoading = false;
+    }
+    
+    public void Dispose()
+    {
+        _objRef?.Dispose();
+    }
+}

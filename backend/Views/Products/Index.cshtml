@@ -4,11 +4,13 @@
 
 <div class="glassmorphism rounded-3xl p-8 mb-8" x-data="productManagement()">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div class="relative w-full md:w-96">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
-            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <div class="flex flex-col lg:flex-row gap-3 w-full flex-1">
+            <div class="relative w-full lg:w-80">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 shrink-0">
             <button onclick="openModal()" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center gap-2 transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Thêm Game Mới
@@ -125,8 +127,14 @@
 
 @section Scripts {
 <script>
+    const authToken = '@ViewData["Token"]';
+    const authHeaders = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+
     let currentPage = 1;
     let currentSearch = '';
+    let currentStatus = '';
+    let currentPricing = '';
+    let currentType = '';
     let currentDeveloperId = 1; // Mặc định do auth chưa làm hoàn chỉnh trên backend MVC (lấy id 1 cho admin)
 
     const DOM = {
@@ -142,9 +150,14 @@
         alert(message); // Temporary
     }
 
-    async function loadProducts(page = 1, search = '') {
+    async function loadProducts(page = 1) {
         try {
-            const res = await fetch(`http://localhost:5021/api/products?page=${page}&pageSize=10&search=${encodeURIComponent(search)}`);
+            let url = `http://localhost:5021/api/products?page=${page}&pageSize=10`;
+            if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+
+            const res = await fetch(url, {
+                headers: authHeaders
+            });
             if (!res.ok) throw new Error("Lỗi kết nối");
             const result = await res.json();
             
@@ -210,11 +223,11 @@
         DOM.pageInfo.innerText = `Tổng cộng ${totalItems} kết quả (Trang ${current}/${totalPages || 1})`;
         if (totalPages <= 1) { DOM.paginationContainer.innerHTML = ''; return; }
 
-        let html = `<button onclick="loadProducts(${current - 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === 1 ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
+        let html = `<button onclick="loadProducts(${current - 1})" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === 1 ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
         for (let i = 1; i <= totalPages; i++) {
-            html += `<button onclick="loadProducts(${i}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center ${i === current ? 'bg-blue-600 font-bold shadow-lg shadow-blue-500/20 text-white' : 'border border-white/10 hover:bg-white/10 text-gray-400 hover:text-blue-400'} transition-colors">${i}</button>`;
+            html += `<button onclick="loadProducts(${i})" class="w-10 h-10 rounded-xl flex items-center justify-center ${i === current ? 'bg-blue-600 font-bold shadow-lg shadow-blue-500/20 text-white' : 'border border-white/10 hover:bg-white/10 text-gray-400 hover:text-blue-400'} transition-colors">${i}</button>`;
         }
-        html += `<button onclick="loadProducts(${current + 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === totalPages ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
+        html += `<button onclick="loadProducts(${current + 1})" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === totalPages ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
         DOM.paginationContainer.innerHTML = html;
     }
 
@@ -267,6 +280,7 @@
         try {
             const res = await fetch('http://localhost:5021/api/upload', {
                 method: 'POST',
+                headers: authHeaders,
                 body: formData
             });
 
@@ -304,6 +318,7 @@
         try {
             const res = await fetch('http://localhost:5021/api/upload', {
                 method: 'POST',
+                headers: authHeaders,
                 body: formData
             });
 
@@ -383,14 +398,17 @@
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...authHeaders
+                },
                 body: JSON.stringify(payload)
             });
 
             if (res.ok) {
                 showToast(isUpdate ? "Đã cập nhật sản phẩm!" : "Đã thêm sản phẩm mới!");
                 closeModal();
-                loadProducts(currentPage, currentSearch);
+                loadProducts(currentPage);
             } else {
                 showToast("Có lỗi xảy ra khi lưu!");
             }
@@ -404,10 +422,13 @@
         if (!confirm("Bạn có chắc chắn muốn xoá sản phẩm này? Thao tác không thể hoàn tác!")) return;
 
         try {
-            const res = await fetch(`http://localhost:5021/api/products/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://localhost:5021/api/products/${id}`, { 
+                method: 'DELETE',
+                headers: authHeaders
+            });
             if (res.ok) {
                 showToast("Đã xoá sản phẩm!");
-                loadProducts(currentPage, currentSearch);
+                loadProducts(currentPage);
             } else {
                 showToast("Không thể xoá sản phẩm này.");
             }
@@ -416,16 +437,16 @@
         }
     }
 
-    // Search debounce
+    // Search event listener
     let searchTimeout;
     DOM.searchInput.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             currentSearch = e.target.value;
-            loadProducts(1, currentSearch);
+            loadProducts(1);
         }, 500);
     });
 
-    document.addEventListener('DOMContentLoaded', () => loadProducts(1, ''));
+    document.addEventListener('DOMContentLoaded', () => loadProducts(1));
 </script>
 }

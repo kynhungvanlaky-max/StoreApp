@@ -3,24 +3,9 @@ using System.Text.Json;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace Backend.Models
-{
-    public class ProductViewModel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public decimal BasePrice { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string DeveloperName { get; set; } = string.Empty;
-        public string ImageUrl { get; set; } = string.Empty;
-    }
-}
-
 namespace Backend.Controllers
 {
-    public class ProductsController : Controller
+    public class ProductsController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -31,6 +16,7 @@ namespace Backend.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Token"] = Request.Cookies["access_token"];
             return View();
         }
 
@@ -47,25 +33,16 @@ namespace Backend.Controllers
                 return View(model);
             }
 
-            var token = Request.Cookies["access_token"];
             var client = _httpClientFactory.CreateClient("API");
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-            
             var jsonContent = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
-            
             var response = await client.PostAsync("/api/products", jsonContent);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] = "Thêm mới sản phẩm thành công!";
+                SetSuccessMessage("Thêm mới sản phẩm thành công!");
                 return RedirectToAction("Index");
             }
 

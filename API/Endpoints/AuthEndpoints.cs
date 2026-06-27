@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using GameStore.API.Data;
 using GameStore.API.Entities;
+using GameStore.API.Services;
 using BCrypt.Net;
 
 namespace GameStore.API.Endpoints
@@ -121,15 +122,69 @@ namespace GameStore.API.Endpoints
             });
 
             // FORGOT PASSWORD
-            group.MapPost("/forgot-password", async (ForgotPasswordRequest req, GameStoreDbContext db) =>
+            group.MapPost("/forgot-password", async (ForgotPasswordRequest req, GameStoreDbContext db, IEmailService emailService, IConfiguration config) =>
             {
                 var user = await db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
                 if (user == null)
                     return Results.Ok(new { message = "Nếu email tồn tại, một liên kết khôi phục sẽ được gửi." });
 
-                // MOCK: Giả lập gửi email
-                Console.WriteLine($"[EMAIL MOCK] Gửi email khôi phục mật khẩu tới {user.Email}");
+                // Tạo token reset password (hết hạn sau 1 giờ)
+                var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("=", "").Replace("+", "").Replace("/", "");
+                var resetToken = new PasswordResetToken
+                {
+                    UserId = user.Id,
+                    Token = token,
+                    CreatedAt = DateTime.UtcNow,
+                    ExpiresAt = DateTime.UtcNow.AddHours(1),
+                    IsUsed = false
+                };
+                db.Set<PasswordResetToken>().Add(resetToken);
+                await db.SaveChangesAsync();
+
+                // Gửi email reset password
+                try
+                {
+                    var frontendBaseUrl = config["AppSettings:FrontendBaseUrl"] ?? "http://localhost:5205";
+                    var resetLink = $"{frontendBaseUrl}/reset-password?token={Uri.EscapeDataString(token)}";
+                    var emailBody = $@"
+                        <h2>Đặt lại mật khẩu - Nexus Store</h2>
+                        <p>Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng nhấp vào link bên dưới để đặt lại mật khẩu:</p>
+                        <p><a href='{resetLink}' style='display:inline-block;padding:12px 24px;background:#0078F2;color:white;text-decoration:none;border-radius:6px;'>Đặt lại mật khẩu</a></p>
+                        <p>Link có hiệu lực trong 1 giờ. Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
+                        <p><small>{resetLink}</small></p>";
+                    await emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu - Nexus Store", emailBody);
+                    Console.WriteLine($"[EMAIL] Gửi email reset password tới {user.Email}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[EMAIL ERROR] Không thể gửi email tới {user.Email}: {ex.Message}");
+                    // Vẫn trả về thành công để không lộ thông tin tồn tại email
+                }
+                
                 return Results.Ok(new { message = "Nếu email tồn tại, một liên kết khôi phục sẽ được gửi." });
+            });
+
+            // RESET PASSWORD
+            group.MapPost("/reset-password", async (ResetPasswordRequest req, GameStoreDbContext db) =>
+            {
+                var resetToken = await db.Set<PasswordResetToken>()
+                    .Include(rt => rt.User)
+                    .FirstOrDefaultAsync(rt => rt.Token == req.Token && !rt.IsUsed && rt.ExpiresAt > DateTime.UtcNow);
+
+                if (resetToken == null)
+                    return Results.BadRequest(new { message = "Token không hợp lệ hoặc đã hết hạn." });
+
+                if (string.IsNullOrWhiteSpace(req.NewPassword) || req.NewPassword.Length < 6)
+                    return Results.BadRequest(new { message = "Mật khẩu phải có ít nhất 6 ký tự." });
+
+                // Cập nhật mật khẩu
+                resetToken.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
+                
+                // Đánh dấu token đã dùng
+                resetToken.IsUsed = true;
+                await db.SaveChangesAsync();
+
+                return Results.Ok(new { message = "Mật khẩu đã được thay đổi thành công." });
             });
 
             // EXTERNAL LOGIN (Google / Facebook MOCK & REAL)
@@ -155,7 +210,8 @@ namespace GameStore.API.Endpoints
                         {
                             // Validate Google Access Token by calling UserInfo endpoint
                             using var httpClient = new HttpClient();
-                            var response = await httpClient.GetAsync($"https://www.googleapis.com/oauth2/v3/userinfo?access_token={req.AccessToken}");
+                            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", req.AccessToken);
+                            var response = await httpClient.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
@@ -169,7 +225,8 @@ namespace GameStore.API.Endpoints
                             }
                             else
                             {
-                                throw new Exception("Failed to verify access token with Google UserInfo API.");
+                                var errorContent = await response.Content.ReadAsStringAsync();
+                                throw new Exception($"Failed to verify access token with Google UserInfo API. Status: {response.StatusCode}, Content: {errorContent}");
                             }
                         }
                     }
@@ -239,6 +296,28 @@ namespace GameStore.API.Endpoints
                     Role = user.Role.RoleName
                 });
             });
+
+            // CHANGE PASSWORD
+            group.MapPost("/change-password", async (ChangePasswordRequest req, ClaimsPrincipal userClaims, GameStoreDbContext db) =>
+            {
+                var userIdString = userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                                   ?? userClaims.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                
+                if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+                    return Results.Unauthorized();
+
+                var user = await db.Users.FindAsync(userId);
+                if (user == null)
+                    return Results.Unauthorized();
+
+                if (!BCrypt.Net.BCrypt.Verify(req.CurrentPassword, user.PasswordHash))
+                    return Results.BadRequest(new { message = "Mật khẩu hiện tại không chính xác." });
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
+                await db.SaveChangesAsync();
+
+                return Results.Ok(new { message = "Đổi mật khẩu thành công!" });
+            }).RequireAuthorization();
         }
 
         private static string GenerateJwtToken(User user, IConfiguration config)
@@ -280,6 +359,8 @@ namespace GameStore.API.Endpoints
     public class RefreshRequest { public string RefreshToken { get; set; } = string.Empty; }
     public class ForgotPasswordRequest { public string Email { get; set; } = string.Empty; }
     public class ExternalLoginRequest { public string Provider { get; set; } = string.Empty; public string AccessToken { get; set; } = string.Empty; }
+    public class ChangePasswordRequest { public string CurrentPassword { get; set; } = string.Empty; public string NewPassword { get; set; } = string.Empty; }
+    public class ResetPasswordRequest { public string Token { get; set; } = string.Empty; public string NewPassword { get; set; } = string.Empty; }
     
     public class AuthResponse 
     { 

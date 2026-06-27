@@ -1,26 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Models
-{
-    public class NewsViewModel
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Summary { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
-        public string CoverImageUrl { get; set; } = string.Empty;
-        public DateTime PublishedAt { get; set; }
-        public string AuthorName { get; set; } = string.Empty;
-    }
-}
-
 namespace Backend.Controllers
 {
     using Backend.Models;
     using System.Text.Json;
     using System.Text;
 
-    public class NewsController : Controller
+    public class NewsController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -29,15 +15,35 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index()
+        public class NewsResponseDto
+        {
+            public List<NewsViewModel> Data { get; set; } = new List<NewsViewModel>();
+        }
+
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.GetAsync("/api/news");
+            var response = await client.GetAsync($"/api/news?page={page}&pageSize={pageSize}");
+            
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                var news = await response.Content.ReadFromJsonAsync<List<NewsViewModel>>();
-                return View(new NewsListViewModel { NewsArticles = news ?? new List<NewsViewModel>() });
+                try
+                {
+                    var pagedResult = await response.Content.ReadFromJsonAsync<PagedResponse<NewsViewModel>>();
+                    ViewBag.CurrentPage = pagedResult?.CurrentPage ?? page;
+                    ViewBag.TotalPages = pagedResult?.TotalPages ?? 1;
+                    ViewBag.TotalItems = pagedResult?.TotalItems ?? 0;
+                    ViewBag.PageSize = pagedResult?.PageSize ?? pageSize;
+                    return View(new NewsListViewModel { NewsArticles = pagedResult?.Data ?? new List<NewsViewModel>() });
+                }
+                catch (Exception ex)
+                {
+                    SetErrorMessage("Lỗi khi tải dữ liệu tin tức: " + ex.Message);
+                    return View(new NewsListViewModel());
+                }
             }
 
             return View(new NewsListViewModel());
@@ -52,23 +58,15 @@ namespace Backend.Controllers
         public async Task<IActionResult> Create(NewsViewModel model)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
             var jsonContent = new StringContent(JsonSerializer.Serialize(new { Title = model.Title, Summary = model.Summary, Content = model.Content, CoverImageUrl = model.CoverImageUrl }), Encoding.UTF8, "application/json");
             var response = await client.PostAsync("/api/news", jsonContent);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] = "Đăng tin tức mới thành công!";
+                SetSuccessMessage("Đăng tin tức mới thành công!");
                 return RedirectToAction("Index");
             }
 
@@ -80,29 +78,59 @@ namespace Backend.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
             var response = await client.DeleteAsync($"/api/news/{id}");
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] = "Đã xóa tin tức thành công!";
+                SetSuccessMessage("Đã xóa tin tức thành công!");
             }
             else
             {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa tin tức.";
+                SetErrorMessage("Có lỗi xảy ra khi xóa tin tức.");
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var client = _httpClientFactory.CreateClient("API");
+            var response = await client.GetAsync($"/api/news/{id}");
+
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var article = await response.Content.ReadFromJsonAsync<NewsViewModel>();
+                return View(article);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, NewsViewModel model)
+        {
+            var client = _httpClientFactory.CreateClient("API");
+            var jsonContent = new StringContent(JsonSerializer.Serialize(new { Title = model.Title, Summary = model.Summary, Content = model.Content, CoverImageUrl = model.CoverImageUrl }), Encoding.UTF8, "application/json");
+            var response = await client.PutAsync($"/api/news/{id}", jsonContent);
+
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
+
+            if (response.IsSuccessStatusCode)
+            {
+                SetSuccessMessage("Cập nhật tin tức thành công!");
+                return RedirectToAction("Index");
+            }
+
+            ModelState.AddModelError("", "Lỗi khi cập nhật tin tức vào API.");
+            return View(model);
         }
     }
 }

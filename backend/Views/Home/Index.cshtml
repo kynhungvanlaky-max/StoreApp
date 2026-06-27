@@ -6,7 +6,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
     <!-- Stat 1 -->
-    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-shadow duration-300">
         <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-all"></div>
         <div class="flex justify-between items-start">
             <div>
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Stat 2 -->
-    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] transition-shadow duration-300">
         <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-purple-500/20 transition-all"></div>
         <div class="flex justify-between items-start">
             <div>
@@ -42,14 +42,14 @@
     </div>
 
     <!-- Stat 3 -->
-    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] transition-shadow duration-300">
         <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-all"></div>
         <div class="flex justify-between items-start">
             <div>
-                <p class="text-gray-400 font-medium mb-1">Tổng Game</p>
-                <h3 class="text-3xl font-black text-white mb-2">@Model.ActiveKeys.ToString("N0")</h3>
+                <p class="text-gray-400 font-medium mb-1">Tổng Sản Phẩm</p>
+                <h3 class="text-3xl font-black text-white mb-2">@Model.TotalProducts.ToString("N0")</h3>
                 <p class="text-sm text-gray-500 flex items-center gap-1 font-bold">
-                    Đang được bán
+                    Còn @Model.AvailableKeys key có sẵn
                 </p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Stat 4 -->
-    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group">
+    <div class="glassmorphism rounded-2xl p-6 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(244,63,94,0.15)] transition-shadow duration-300">
         <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-pink-500/20 transition-all"></div>
         <div class="flex justify-between items-start">
             <div>
@@ -67,7 +67,7 @@
                 <h3 class="text-3xl font-black text-white mb-2">@((8549 + Model.NewUsers).ToString("N0"))</h3>
                 <p class="text-sm text-green-400 flex items-center gap-1 font-bold">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    +@Model.NewUsers user mới
+                    @Model.PendingSupportTickets hỗ trợ mới
                 </p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center text-pink-400 border border-pink-500/20">
@@ -77,7 +77,46 @@
     </div>
 </div>
 
-<!-- Giao dịch gần đây & Cảnh báo -->
+<!-- Chart Dashboard -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+    <div class="xl:col-span-2 glassmorphism rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-white">Doanh Thu 30 Ngày</h3>
+        </div>
+        <div class="w-full h-[300px]">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    <div class="glassmorphism rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-white">Trạng Thái Đơn Hàng</h3>
+        </div>
+        <div class="w-full h-[300px] flex items-center justify-center">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+    <div class="glassmorphism rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-white">Doanh Thu Theo Tháng</h3>
+        </div>
+        <div class="w-full h-[300px]">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+    <div class="glassmorphism rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-white">Top Sản Phẩm Bán Chạy</h3>
+        </div>
+        <div class="w-full h-[300px]">
+            <canvas id="topProductsChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Feed + Alerts -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 glassmorphism rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6">
@@ -86,7 +125,14 @@
         </div>
         
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
+                <table class="w-full text-left">
+                    <colgroup>
+                        <col class="w-28">
+                        <col class="w-48">
+                        <col class="w-32">
+                        <col class="w-36">
+                        <col class="w-28">
+                    </colgroup>
                 <thead>
                     <tr class="text-gray-500 text-sm border-b border-white/10">
                         <th class="pb-3 font-medium">Mã ĐH</th>
@@ -97,39 +143,54 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm">
-                    <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
-                        <td class="py-4 font-medium text-white">#ORD-001</td>
-                        <td class="py-4 text-gray-300">nguyenvana@gmail.com</td>
-                        <td class="py-4 font-bold text-blue-400">450,000đ</td>
-                        <td class="py-4">
-                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Hoàn Thành</span>
-                        </td>
-                        <td class="py-4 text-right">
-                            <button class="text-gray-400 hover:text-blue-400 transition-colors">Chi tiết</button>
-                        </td>
-                    </tr>
-                    <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
-                        <td class="py-4 font-medium text-white">#ORD-002</td>
-                        <td class="py-4 text-gray-300">tranvanb@gmail.com</td>
-                        <td class="py-4 font-bold text-blue-400">1,200,000đ</td>
-                        <td class="py-4">
-                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">Chờ Xử Lý</span>
-                        </td>
-                        <td class="py-4 text-right">
-                            <button class="text-gray-400 hover:text-blue-400 transition-colors">Chi tiết</button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-white/5 transition-colors">
-                        <td class="py-4 font-medium text-white">#ORD-003</td>
-                        <td class="py-4 text-gray-300">lethic@gmail.com</td>
-                        <td class="py-4 font-bold text-blue-400">150,000đ</td>
-                        <td class="py-4">
-                            <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Thất Bại</span>
-                        </td>
-                        <td class="py-4 text-right">
-                            <button class="text-gray-400 hover:text-blue-400 transition-colors">Chi tiết</button>
-                        </td>
-                    </tr>
+                    @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                    {
+                        int rowIndex = 0;
+                        foreach (var order in Model.RecentOrders)
+                        {
+                            var rowBg = rowIndex % 2 == 0 ? "bg-transparent" : "bg-white/[0.02]";
+                            rowIndex++;
+                            <tr class="border-b border-white/5 @rowBg hover:bg-blue-500/10 transition-all duration-200 group">
+                                <td class="py-4 font-mono font-medium text-white group-hover:text-blue-400 transition-colors">#ORD-@(order.Id.ToString("D3"))</td>
+                                <td class="py-4 text-gray-300 group-hover:text-white transition-colors">@order.CustomerEmail</td>
+                                <td class="py-4 font-bold text-blue-400 tabular-nums">@order.TotalAmount.ToString("N0")đ</td>
+                                <td class="py-4">
+                                    @if (order.Status == "Completed")
+                                    {
+                                        <span class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-full text-xs font-bold border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]">Hoàn Thành</span>
+                                    }
+                                    else if (order.Status == "Pending")
+                                    {
+                                        <span class="px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]">Chờ Xử Lý</span>
+                                    }
+                                    else if (order.Status == "Processing")
+                                    {
+                                        <span class="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">Đang Xử Lý</span>
+                                    }
+                                    else if (order.Status == "Failed" || order.Status == "Cancelled")
+                                    {
+                                        <span class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-full text-xs font-bold border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]">@order.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="px-3 py-1.5 bg-gray-500/20 text-gray-400 rounded-full text-xs font-bold border border-gray-500/30">@order.Status</span>
+                                    }
+                                </td>
+                                <td class="py-4 text-right">
+                                    <a href="/Orders/Details/@order.Id" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold border border-blue-500/20 transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="py-4 text-center text-gray-400">Chưa có giao dịch nào</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -139,67 +200,125 @@
         <h3 class="text-lg font-bold text-white mb-6">Cảnh Báo Hệ Thống</h3>
         
         <div class="space-y-4">
-            <div class="flex gap-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-                <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex-shrink-0 flex items-center justify-center text-yellow-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            @if (Model.LowStockAlerts != null && Model.LowStockAlerts.Any())
+            {
+                foreach (var alert in Model.LowStockAlerts)
+                {
+                    <div class="flex gap-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                        <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex-shrink-0 flex items-center justify-center text-yellow-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-yellow-400 mb-1">Sắp hết hàng</h4>
+                            <p class="text-sm text-gray-400">Sản phẩm "@alert.ProductName" chỉ còn lại @alert.KeyCount key. Vui lòng nhập thêm.</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="flex gap-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+                    <div class="w-10 h-10 rounded-full bg-green-500/20 flex-shrink-0 flex items-center justify-center text-green-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-green-400 mb-1">Hệ thống ổn định</h4>
+                        <p class="text-sm text-gray-400">Không có cảnh báo nào tại thời điểm này.</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-bold text-yellow-400 mb-1">Key sắp hết</h4>
-                    <p class="text-sm text-gray-400">Sản phẩm "Cyberpunk 2077" chỉ còn lại 3 key. Vui lòng import thêm.</p>
-                </div>
-            </div>
-            
-            <div class="flex gap-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-                <div class="w-10 h-10 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center text-red-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div>
-                    <h4 class="font-bold text-red-400 mb-1">Lỗi Đồng Bộ API</h4>
-                    <p class="text-sm text-gray-400">Kết nối với cổng thanh toán Stripe bị gián đoạn 5 phút trước.</p>
-                </div>
-            </div>
+            }
         </div>
     </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Khởi tạo kết nối SignalR
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5021/hubs/nexus")
-            .withAutomaticReconnect()
-            .build();
+        function getToken(){return document.cookie.split('; ').find(r=>r.startsWith('access_token='))?.split('=')[1];}
 
-        // Lắng nghe sự kiện "ReceiveNewOrder"
-        connection.on("ReceiveNewOrder", function () {
-            // Lấy element đang chứa Đơn hàng
-            const orderCountEl = document.getElementById("stat-orders");
-            
-            if(orderCountEl) {
-                // Nhảy số
-                let currentVal = parseInt(orderCountEl.innerText) || 0;
-                orderCountEl.innerText = currentVal + 1;
-
-                // Hiệu ứng nhấp nháy báo hiệu có thay đổi
-                orderCountEl.classList.add("text-yellow-400");
-                orderCountEl.classList.add("scale-125");
-                orderCountEl.classList.add("transition-all");
-
-                setTimeout(() => {
-                    orderCountEl.classList.remove("text-yellow-400");
-                    orderCountEl.classList.remove("scale-125");
-                }, 1000);
-            }
-            
-            // Có thể thêm Pop-up thông báo nhỏ ở góc màn hình ở đây
-            console.log("Real-time: Nhận được 1 đơn hàng mới!");
+        // SIGNALR
+        const connection=new signalR.HubConnectionBuilder().withUrl("http://localhost:5021/hubs/nexus").withAutomaticReconnect().build();
+        connection.on("ReceiveNewOrder",function(){
+            const el=document.getElementById("stat-orders");
+            if(el){el.innerText=(parseInt(el.innerText)||0)+1;el.classList.add("text-yellow-400","scale-125");setTimeout(()=>el.classList.remove("text-yellow-400","scale-125"),1000);}
+            const t=document.getElementById('orderToast');if(t){t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),5000);}
         });
+        connection.start().catch(e=>console.error(e));
 
-        // Bắt đầu kết nối
-        connection.start().then(function () {
-            console.log("Đã kết nối SignalR tới NexusHub!");
-        }).catch(function (err) {
-            console.error("Lỗi kết nối SignalR:", err.toString());
-        });
+        // CHARTS
+        async function loadAllCharts(){
+            const t=getToken();if(!t)return;
+            await Promise.all([loadRevenue(t),loadStatus(t),loadMonthly(t),loadTop(t)]);
+        }
+
+        async function loadRevenue(t){
+            try{
+                const r=await fetch('http://localhost:5021/api/admin/chart-data',{headers:{'Authorization':'Bearer '+t}});
+                if(!r.ok)return;const d=await r.json();
+                new Chart(document.getElementById('revenueChart').getContext('2d'),{
+                    type:'line',
+                    data:{
+                        labels:d.map(x=>x.date),
+                        datasets:[{label:'Doanh Thu (VNĐ)',data:d.map(x=>x.revenue),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',borderWidth:3,fill:true,tension:0.4,yAxisID:'y'},
+                                 {label:'Số Đơn Hàng',data:d.map(x=>x.ordersCount),borderColor:'#10b981',borderWidth:3,borderDash:[5,5],tension:0.4,yAxisID:'y1'}]
+                    },
+                    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9ca3af'}}},
+                        scales:{x:{grid:{color:'rgba(255,255,255,0.1)'},ticks:{color:'#9ca3af'}},
+                                y:{grid:{color:'rgba(255,255,255,0.1)'},ticks:{color:'#9ca3af'}},
+                                y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#9ca3af'}}}}
+                });
+            }catch(e){console.error(e)}
+        }
+
+        async function loadStatus(t){
+            try{
+                const r=await fetch('http://localhost:5021/api/admin/orders-by-status',{headers:{'Authorization':'Bearer '+t}});
+                if(!r.ok)return;const d=await r.json();
+                const clr={'Completed':'#10b981','Pending':'#f59e0b','Processing':'#3b82f6','Failed':'#ef4444','Cancelled':'#6b7280'};
+                const lb={'Completed':'Hoàn thành','Pending':'Chờ xử lý','Processing':'Đang xử lý','Failed':'Thất bại','Cancelled':'Đã hủy'};
+                new Chart(document.getElementById('statusChart').getContext('2d'),{
+                    type:'doughnut',
+                    data:{labels:d.map(x=>lb[x.status]||x.status),datasets:[{data:d.map(x=>x.count),backgroundColor:d.map(x=>clr[x.status]||'#6b7280'),borderColor:'#1a1a1f',borderWidth:2}]},
+                    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#9ca3af',padding:12}}}}
+                });
+            }catch(e){console.error(e)}
+        }
+
+        async function loadMonthly(t){
+            try{
+                const r=await fetch('http://localhost:5021/api/admin/monthly-revenue',{headers:{'Authorization':'Bearer '+t}});
+                if(!r.ok)return;const d=await r.json();
+                new Chart(document.getElementById('monthlyChart').getContext('2d'),{
+                    type:'bar',data:{labels:d.map(x=>x.month),datasets:[{label:'Doanh Thu (VNĐ)',data:d.map(x=>x.revenue),backgroundColor:'rgba(59,130,246,0.7)',borderColor:'#3b82f6',borderWidth:1,borderRadius:4}]},
+                    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9ca3af'}}},
+                        scales:{x:{grid:{color:'rgba(255,255,255,0.1)'},ticks:{color:'#9ca3af'}},y:{grid:{color:'rgba(255,255,255,0.1)'},ticks:{color:'#9ca3af'}}}}
+                });
+            }catch(e){console.error(e)}
+        }
+
+        async function loadTop(t){
+            try{
+                const r=await fetch('http://localhost:5021/api/admin/top-products?top=5',{headers:{'Authorization':'Bearer '+t}});
+                if(!r.ok)return;const d=await r.json();
+                new Chart(document.getElementById('topProductsChart').getContext('2d'),{
+                    type:'bar',indexAxis:'y',
+                    data:{labels:d.map(x=>x.productName),datasets:[{label:'Đã bán',data:d.map(x=>x.totalSold),backgroundColor:'rgba(16,185,129,0.7)',borderColor:'#10b981',borderWidth:1,borderRadius:4}]},
+                    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9ca3af'}}},
+                        scales:{x:{grid:{color:'rgba(255,255,255,0.1)'},ticks:{color:'#9ca3af'}},y:{grid:{display:false},ticks:{color:'#9ca3af'}}}}
+                });
+            }catch(e){console.error(e)}
+        }
+
+        document.addEventListener('DOMContentLoaded',loadAllCharts);
     </script>
+
+    <!-- Toast notification for new orders -->
+    <div id="orderToast" class="hidden fixed bottom-6 right-6 z-50 bg-blue-600/90 backdrop-blur-xl text-white px-6 py-4 rounded-2xl shadow-2xl border border-blue-400/30 flex items-center gap-3 animate-slide-up">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+        </div>
+        <div>
+            <p class="font-bold">Đơn hàng mới!</p>
+            <p class="text-sm text-blue-200">Có đơn hàng mới vừa được đặt</p>
+        </div>
+    </div>
 }
-</div>

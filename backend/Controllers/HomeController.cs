@@ -4,19 +4,33 @@ using Backend.Models;
 
 namespace Backend.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
-    public IActionResult Index()
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public HomeController(IHttpClientFactory httpClientFactory)
     {
-        var viewModel = new Backend.Models.DashboardViewModel
+        _httpClientFactory = httpClientFactory;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var client = _httpClientFactory.CreateClient("API");
+        var response = await client.GetAsync("/api/admin/dashboard");
+        
+        var apiResponse = HandleApiResponse(response);
+        if (apiResponse != null) return apiResponse;
+
+        if (response.IsSuccessStatusCode)
         {
-            TotalRevenue = 1245000,
-            NewUsers = 241,
-            TotalOrders = 24,
-            ActiveKeys = 1402,
-            PendingComments = 5
-        };
-        return View(viewModel);
+            var data = await response.Content.ReadFromJsonAsync<DashboardViewModel>();
+            if (data != null)
+            {
+                return View(data);
+            }
+        }
+
+        return View(new DashboardViewModel());
     }
 
     public IActionResult Privacy()

@@ -1,0 +1,230 @@
+@page "/checkout"
+@inject Frontend.ViewModels.CheckoutViewModel CheckoutVM
+@inject Frontend.ViewModels.CartViewModel CartVM
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Thanh Toán — NexusKeys</PageTitle>
+
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+    <div class="text-sm breadcrumbs mb-6 text-gray-400">
+        <ul>
+            <li><a href="/cart">Giỏ hàng</a></li>
+            <li class="text-white font-medium">Thanh toán</li>
+        </ul>
+    </div>
+    
+    <div class="flex items-center gap-3 mb-8">
+        <Icon Name="HeroiconName.CreditCard" Class="w-10 h-10 text-primary" IconType="HeroiconType.Solid" />
+        <h1 class="text-3xl font-black text-white">Thanh Toán</h1>
+    </div>
+
+    @if (CartVM.Items.Count == 0 && !CheckoutVM.IsProcessing)
+    {
+        <div class="alert alert-warning">
+            <Icon Name="HeroiconName.ExclamationTriangle" Class="w-5 h-5 inline-block mr-1" />
+            <span>Giỏ hàng trống. Không thể tiến hành thanh toán.</span>
+            <a href="/products" class="btn btn-sm">Quay lại cửa hàng</a>
+        </div>
+    }
+    else
+    {
+        <div class="flex flex-col lg:flex-row gap-8">
+            @* Payment Methods *@
+            <div class="flex-1 space-y-6">
+                <div class="bg-[#202020] rounded-2xl border border-[#303030] p-6 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <Icon Name="HeroiconName.Wallet" Class="w-6 h-6 text-primary" IconType="HeroiconType.Solid" />
+                        Chọn phương thức thanh toán
+                    </h2>
+                    
+                    @if (!string.IsNullOrEmpty(CheckoutVM.ErrorMessage))
+                    {
+                        <div class="alert alert-error mb-6 text-sm">
+                            <Icon Name="HeroiconName.ExclamationCircle" Class="w-5 h-5 inline-block mr-1" />
+                            <span>@CheckoutVM.ErrorMessage</span>
+                        </div>
+                    }
+                    
+                    <div class="space-y-4">
+                        @* VNPay *@
+                        <label class="cursor-pointer block my-2">
+                            <div class="flex items-center gap-4 p-4 rounded-xl border transition-all @(CheckoutVM.SelectedPaymentMethod == "VNPay" ? "border-primary bg-primary/10" : "border-[#303030] bg-[#303030] hover:border-gray-500")">
+                                <input type="radio" name="paymentMethod" class="radio radio-primary" 
+                                       checked="@(CheckoutVM.SelectedPaymentMethod == "VNPay")" 
+                                       @onchange="@(() => CheckoutVM.SelectedPaymentMethod = "VNPay")" />
+                                <div class="w-12 h-12 bg-white rounded flex items-center justify-center p-1">
+                                    <img src="/images/vnpay.png" alt="VNPay" class="w-full h-full object-contain" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-white">Ví điện tử / Cổng thanh toán VNPay</h3>
+                                    <p class="text-xs text-gray-400">Thanh toán qua thẻ ATM, Visa, MasterCard, JCB, QR Pay</p>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        @* MoMo *@
+                        <label class="cursor-pointer block my-2">
+                            <div class="flex items-center gap-4 p-4 rounded-xl border transition-all @(CheckoutVM.SelectedPaymentMethod == "MoMo" ? "border-primary bg-primary/10" : "border-[#303030] bg-[#303030] hover:border-gray-500")">
+                                <input type="radio" name="paymentMethod" class="radio radio-primary" 
+                                       checked="@(CheckoutVM.SelectedPaymentMethod == "MoMo")" 
+                                       @onchange="@(() => CheckoutVM.SelectedPaymentMethod = "MoMo")" />
+                                <div class="w-12 h-12 rounded flex items-center justify-center overflow-hidden">
+                                    <img src="/images/momo.png" alt="MoMo" class="w-full h-full object-contain" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-white">Ví điện tử MoMo</h3>
+                                    <p class="text-xs text-gray-400">Thanh toán nhanh bằng ứng dụng MoMo</p>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        @* Mock Gateway (Dev) *@
+                        <label class="cursor-pointer block my-2">
+                            <div class="flex items-center gap-4 p-4 rounded-xl border transition-all @(CheckoutVM.SelectedPaymentMethod == "MockGateway" ? "border-primary bg-primary/10" : "border-[#303030] bg-[#303030] hover:border-gray-500")">
+                                <input type="radio" name="paymentMethod" class="radio radio-primary" 
+                                       checked="@(CheckoutVM.SelectedPaymentMethod == "MockGateway")" 
+                                       @onchange="@(() => CheckoutVM.SelectedPaymentMethod = "MockGateway")" />
+                                <div class="w-12 h-12 bg-gray-700 rounded flex items-center justify-center">
+                                    <Icon Name="HeroiconName.BugAnt" Class="w-6 h-6 text-white" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-white">Cổng Test (Developer)</h3>
+                                    <p class="text-xs text-gray-400">Giả lập thanh toán thành công ngay lập tức</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            @* Order Summary *@
+            <div class="w-full lg:w-96 flex-shrink-0">
+                <div class="sticky top-24 bg-[#202020] rounded-2xl border border-[#303030] shadow-xl overflow-hidden">
+                    <div class="p-6 border-b border-[#303030] bg-[#303030]/30">
+                        <h2 class="text-xl font-bold text-white">Đơn Hàng Của Bạn</h2>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="space-y-4 max-h-60 overflow-y-auto mb-6 pr-2 custom-scrollbar">
+                            @foreach (var item in CartVM.Items)
+                            {
+                                <div class="flex gap-3 items-center">
+                                    <div class="w-12 aspect-video rounded overflow-hidden bg-[#303030] flex-shrink-0">
+                                        <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder-game.jpg" : item.ImageUrl)" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-sm font-medium text-white truncate">@item.Name</h4>
+                                    </div>
+                                    <div class="text-primary font-bold text-sm whitespace-nowrap">@item.Price.ToString("N0") đ</div>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="divider my-0 mb-4"></div>
+                        
+                        @* Coupon Section *@
+                        <div class="mb-6">
+                            <label class="text-sm font-medium text-gray-400 mb-2 block">Mã giảm giá</label>
+                            <div class="flex gap-2">
+                                <input type="text" @bind="CheckoutVM.CouponCodeInput" placeholder="Nhập mã..." class="input input-bordered flex-1 bg-[#303030] border-[#404040] text-white focus:border-primary uppercase" disabled="@CheckoutVM.IsProcessing" />
+                                <button @onclick="CheckoutVM.ApplyCouponAsync" disabled="@CheckoutVM.IsProcessing" class="btn btn-primary">Áp dụng</button>
+                            </div>
+                            @if (!string.IsNullOrEmpty(CheckoutVM.CouponMessage))
+                            {
+                                <p class="text-sm mt-2 @(CheckoutVM.IsCouponSuccess ? "text-green-400" : "text-red-400")">
+                                    @CheckoutVM.CouponMessage
+                                </p>
+                            }
+                        </div>
+                        
+                        <div class="divider my-0 mb-4"></div>
+                        
+                        @{
+                            var subtotal = CartVM.SelectedTotalAmount;
+                            var discountAmount = subtotal * (CheckoutVM.DiscountPercent / 100m);
+                            var finalTotal = subtotal - discountAmount;
+                        }
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-gray-400 text-sm">
+                                <span>Tạm tính</span>
+                                <span>@subtotal.ToString("N0") đ</span>
+                            </div>
+                            @if (discountAmount > 0)
+                            {
+                                <div class="flex justify-between text-green-400 text-sm font-medium">
+                                    <span>Giảm giá (@CheckoutVM.DiscountPercent%)</span>
+                                    <span>-@discountAmount.ToString("N0") đ</span>
+                                </div>
+                            }
+                            <div class="flex justify-between text-gray-400 text-sm">
+                                <span>Phí giao dịch</span>
+                                <span>Miễn phí</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mb-6 p-4 bg-[#303030]/50 rounded-xl">
+                            <span class="font-bold text-white">Tổng thanh toán</span>
+                            <span class="text-2xl font-black text-primary">@finalTotal.ToString("N0") đ</span>
+                        </div>
+                        
+                        <button @onclick="ProcessPayment" disabled="@CheckoutVM.IsProcessing" class="btn btn-primary w-full btn-lg font-bold shadow-lg shadow-primary/30">
+                            @if (CheckoutVM.IsProcessing)
+                            {
+                                <span class="loading loading-spinner"></span>
+                                <span>Đang xử lý...</span>
+                            }
+                            else
+                            {
+                                <span>Hoàn Tất Thanh Toán</span>
+                            }
+                        </button>
+                        
+                        <p class="text-xs text-gray-500 text-center mt-4">Bằng việc thanh toán, bạn đồng ý với Điều khoản dịch vụ của Nexus Store.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        CheckoutVM.StateChanged += StateHasChanged;
+        CartVM.StateChanged += StateHasChanged;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CartVM.InitializeAsync();
+        }
+    }
+    
+    private async Task ProcessPayment()
+    {
+        var response = await CheckoutVM.ProcessCheckoutAsync();
+        if (response != null)
+        {
+            if (!string.IsNullOrEmpty(response.PaymentUrl))
+            {
+                // Navigate to external payment gateway
+                NavigationManager.NavigateTo(response.PaymentUrl, true);
+            }
+            else
+            {
+                // Mock gateway success
+                NavigationManager.NavigateTo($"/checkout/success?orderId={response.OrderId}");
+            }
+        }
+    }
+    
+    public void Dispose()
+    {
+        CheckoutVM.StateChanged -= StateHasChanged;
+        CartVM.StateChanged -= StateHasChanged;
+    }
+}

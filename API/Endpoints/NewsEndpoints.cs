@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using GameStore.API.Data;
 using GameStore.API.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 namespace GameStore.API.Endpoints
@@ -13,12 +14,19 @@ namespace GameStore.API.Endpoints
         {
             var group = app.MapGroup("/api/news");
 
-            group.MapGet("/", async (GameStoreDbContext db) =>
+            group.MapGet("/", async (GameStoreDbContext db, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
             {
-                var news = await db.NewsArticles
+                var query = db.NewsArticles
                     .Include(n => n.Author)
                     .Where(n => n.IsPublished)
-                    .OrderByDescending(n => n.PublishedAt)
+                    .OrderByDescending(n => n.PublishedAt);
+
+                var totalItems = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var news = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(n => new
                     {
                         n.Id,
@@ -30,7 +38,14 @@ namespace GameStore.API.Endpoints
                     })
                     .ToListAsync();
                 
-                return Results.Ok(news);
+                return Results.Ok(new
+                {
+                    Data = news,
+                    TotalItems = totalItems,
+                    TotalPages = totalPages,
+                    CurrentPage = page,
+                    PageSize = pageSize
+                });
             });
 
             group.MapGet("/{id}", async (int id, GameStoreDbContext db) =>
@@ -57,14 +72,19 @@ namespace GameStore.API.Endpoints
             });
             group.MapPost("/", async (CreateNewsDto dto, HttpContext httpContext, GameStoreDbContext db) =>
             {
-                var role = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-                if (role != "Administrator" && role != "Developer") return Results.Forbid();
-
                 var authorIdStr = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? 
                                   httpContext.User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
                 
-                if (string.IsNullOrEmpty(authorIdStr) || !int.TryParse(authorIdStr, out int authorId))
-                    return Results.Unauthorized();
+                int authorId = 1;
+                if (!string.IsNullOrEmpty(authorIdStr) && int.TryParse(authorIdStr, out int parsedId))
+                {
+                    authorId = parsedId;
+                }
+                else
+                {
+                    var firstUser = await db.Users.FirstOrDefaultAsync();
+                    if (firstUser != null) authorId = firstUser.Id;
+                }
 
                 var news = new NewsArticle
                 {
@@ -81,13 +101,10 @@ namespace GameStore.API.Endpoints
                 await db.SaveChangesAsync();
 
                 return Results.Ok(news);
-            }).RequireAuthorization();
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             group.MapPut("/{id}", async (int id, UpdateNewsDto dto, HttpContext httpContext, GameStoreDbContext db) =>
             {
-                var role = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-                if (role != "Administrator" && role != "Developer") return Results.Forbid();
-
                 var news = await db.NewsArticles.FindAsync(id);
                 if (news == null) return Results.NotFound();
 
@@ -98,20 +115,17 @@ namespace GameStore.API.Endpoints
 
                 await db.SaveChangesAsync();
                 return Results.Ok(news);
-            }).RequireAuthorization();
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             group.MapDelete("/{id}", async (int id, HttpContext httpContext, GameStoreDbContext db) =>
             {
-                var role = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-                if (role != "Administrator" && role != "Developer") return Results.Forbid();
-
                 var news = await db.NewsArticles.FindAsync(id);
                 if (news == null) return Results.NotFound();
 
                 db.NewsArticles.Remove(news);
                 await db.SaveChangesAsync();
                 return Results.Ok();
-            }).RequireAuthorization();
+            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
         }
     }
 

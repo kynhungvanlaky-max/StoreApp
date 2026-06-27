@@ -1,13 +1,20 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<Backend.Filters.AdminAuthorizeFilter>();
+});
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<Backend.HttpHandlers.TokenHandler>();
+builder.Services.AddScoped<Backend.Services.ApiService>();
 
 builder.Services.AddHttpClient("API", client =>
 {
     var baseUrl = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "http://localhost:5021/";
     client.BaseAddress = new Uri(baseUrl);
-});
+}).AddHttpMessageHandler<Backend.HttpHandlers.TokenHandler>();
 
 var app = builder.Build();
 

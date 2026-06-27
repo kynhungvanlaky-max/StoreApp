@@ -1,17 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
 
 namespace Backend.Controllers
 {
-    public class PaymentConfigDto
-    {
-        public string GatewayName { get; set; } = string.Empty;
-        public string ConfigKey { get; set; } = string.Empty;
-        public string ConfigValue { get; set; } = string.Empty;
-    }
-
-    public class PaymentConfigsController : Controller
+    public class PaymentConfigsController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -21,26 +13,30 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            var response = await client.GetAsync("/api/payment-configs");
+            var response = await client.GetAsync($"/api/payment-configs?page={page}&pageSize={pageSize}");
             
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                var configs = await response.Content.ReadFromJsonAsync<List<PaymentConfigDto>>();
-                return View(configs ?? new List<PaymentConfigDto>());
+                try
+                {
+                    var result = await response.Content.ReadFromJsonAsync<List<PaymentConfigDto>>();
+                    ViewBag.CurrentPage = page;
+                    ViewBag.TotalPages = 1;
+                    ViewBag.TotalItems = result?.Count ?? 0;
+                    ViewBag.PageSize = pageSize;
+                    return View(result ?? new List<PaymentConfigDto>());
+                }
+                catch (Exception ex)
+                {
+                    SetErrorMessage("Lỗi khi tải dữ liệu cổng thanh toán: " + ex.Message);
+                    return View(new List<PaymentConfigDto>());
+                }
             }
 
             return View(new List<PaymentConfigDto>());
@@ -50,28 +46,20 @@ namespace Backend.Controllers
         public async Task<IActionResult> Save(List<PaymentConfigDto> configs)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var token = Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
             configs = configs.Where(c => !string.IsNullOrEmpty(c.GatewayName) && !string.IsNullOrEmpty(c.ConfigKey)).ToList();
 
             var response = await client.PostAsJsonAsync("/api/payment-configs", configs);
             
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return Redirect("http://localhost:3000/Auth/Login");
-            }
+            var redirectResult = HandleApiResponse(response);
+            if (redirectResult != null) return redirectResult;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["Success"] = "Lưu cấu hình thành công!";
+                SetSuccessMessage("Lưu cấu hình thành công!");
             }
             else
             {
-                TempData["Error"] = "Có lỗi xảy ra khi lưu cấu hình.";
+                SetErrorMessage("Có lỗi xảy ra khi lưu cấu hình.");
             }
 
             return RedirectToAction("Index");

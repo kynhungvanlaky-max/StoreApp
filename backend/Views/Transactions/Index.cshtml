@@ -1,0 +1,147 @@
+@model Backend.Models.TransactionListViewModel
+
+@{
+    ViewData["Title"] = "Quản Lý Giao Dịch";
+    ViewBag.PaginationAction = "?page=";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="relative w-full md:w-96">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo mã giao dịch, tài khoản..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto min-h-[400px]">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/10">
+                    <th class="pb-4 font-medium w-16 text-center">ID</th>
+                    <th class="pb-4 font-medium">Khách Hàng</th>
+                    <th class="pb-4 font-medium">Loại</th>
+                    <th class="pb-4 font-medium">Số Tiền</th>
+                    <th class="pb-4 font-medium">Phương Thức</th>
+                    <th class="pb-4 font-medium">Mã GD Cổng</th>
+                    <th class="pb-4 font-medium">Ngày Tạo</th>
+                    <th class="pb-4 font-medium text-center">Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm" id="transactionsTableBody">
+                <!-- JS data -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
+        <div class="text-sm text-gray-400" id="pageInfo">
+            Hiển thị 0 kết quả
+        </div>
+        <div class="flex items-center gap-2" id="paginationContainer">
+            <!-- Pagination buttons -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const authToken = '@ViewData["Token"]';
+    const authHeaders = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+    let currentPage = 1;
+    let currentSearch = '';
+    let totalPages = 1;
+    let totalItems = 0;
+
+    const DOM = {
+        tbody: document.getElementById('transactionsTableBody'),
+        searchInput: document.getElementById('searchInput'),
+        pageInfo: document.getElementById('pageInfo'),
+        paginationContainer: document.getElementById('paginationContainer')
+    };
+
+    function showToast(message, isError = false) {
+        alert(message);
+    }
+
+    async function loadTransactions(page = 1, search = '') {
+        try {
+            currentPage = page;
+            currentSearch = search;
+            const url = new URL('http://localhost:5021/api/wallet/admin/all');
+            url.searchParams.set('page', page);
+            url.searchParams.set('pageSize', 20);
+            if (search) url.searchParams.set('search', search);
+
+            const res = await fetch(url.toString(), { headers: authHeaders });
+            if (!res.ok) throw new Error("Lỗi kết nối API");
+            const result = await res.json();
+
+            totalPages = result.totalPages;
+            totalItems = result.totalItems;
+            renderTable(result.data);
+            renderPagination(result.totalPages, result.currentPage, result.totalItems);
+        } catch (error) {
+            console.error(error);
+            DOM.tbody.innerHTML = `<tr><td colspan="8" class="py-12 text-center text-red-500">Lỗi khi tải dữ liệu!</td></tr>`;
+        }
+    }
+
+    function renderTable(transactions) {
+        const term = DOM.searchInput.value.toLowerCase();
+        const filtered = (transactions || []).filter(t => {
+            return t.username.toLowerCase().includes(term) ||
+                   (t.gatewayTransactionId && t.gatewayTransactionId.toLowerCase().includes(term));
+        });
+
+        if (filtered.length === 0) {
+            DOM.tbody.innerHTML = `<tr><td colspan="8" class="py-12 text-center text-gray-500">Không tìm thấy giao dịch nào.</td></tr>`;
+            return;
+        }
+
+        DOM.tbody.innerHTML = filtered.map(t => {
+            let statusBadge = '';
+            if (t.status === 'Success') statusBadge = `<span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Thành Công</span>`;
+            else if (t.status === 'Failed') statusBadge = `<span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Thất Bại</span>`;
+            else statusBadge = `<span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">${t.status}</span>`;
+
+            let typeBadge = t.transactionType === 'Deposit'
+                ? `<span class="text-blue-400 font-medium">Nạp Tiền</span>`
+                : `<span class="text-purple-400 font-medium">${t.transactionType}</span>`;
+
+            const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(t.amount);
+
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                    <td class="py-4 text-gray-400 text-center">#${t.id}</td>
+                    <td class="py-4 font-bold text-white">${t.username}</td>
+                    <td class="py-4">${typeBadge}</td>
+                    <td class="py-4 text-green-400 font-bold">${formattedAmount}</td>
+                    <td class="py-4 text-gray-300 font-medium">${t.paymentGateway}</td>
+                    <td class="py-4 text-gray-400 font-mono text-sm">${t.gatewayTransactionId || '-'}</td>
+                    <td class="py-4 text-gray-400 text-sm">${new Date(t.createdAt).toLocaleString('vi-VN')}</td>
+                    <td class="py-4 text-center">${statusBadge}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderPagination(totalPages, current, totalItems) {
+        DOM.pageInfo.innerText = `Tổng cộng ${totalItems} kết quả (Trang ${current}/${totalPages || 1})`;
+        if (totalPages <= 1) { DOM.paginationContainer.innerHTML = ''; return; }
+        let html = `<button onclick="loadTransactions(${current - 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === 1 ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button onclick="loadTransactions(${i}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center ${i === current ? 'bg-blue-600 font-bold shadow-lg shadow-blue-500/20 text-white' : 'border border-white/10 hover:bg-white/10 text-gray-400 hover:text-blue-400'} transition-colors">${i}</button>`;
+        }
+        html += `<button onclick="loadTransactions(${current + 1}, currentSearch)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === totalPages ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
+        DOM.paginationContainer.innerHTML = html;
+    }
+
+    let searchDebounce;
+    DOM.searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => loadTransactions(1, e.target.value), 300);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => loadTransactions(1, ''));
+</script>
+}

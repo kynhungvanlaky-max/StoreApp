@@ -33,6 +33,8 @@ namespace GameStore.API.Entities
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public ICollection<Product> DevelopedProducts { get; set; } = new List<Product>();
         public ICollection<NewsArticle> WrittenArticles { get; set; } = new List<NewsArticle>();
+        public ICollection<SupportTicket> SupportTickets { get; set; } = new List<SupportTicket>();
+        public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
     }
 
     public class Role
@@ -372,5 +374,94 @@ namespace GameStore.API.Entities
         public string ConfigKey { get; set; } = null!;
         public string ConfigValue { get; set; } = null!;
         public DateTime UpdatedAt { get; set; }
+    }
+
+    public class SupportTicket
+    {
+        [Key]
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Topic { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string? OrderId { get; set; }
+        public string Content { get; set; } = null!;
+        public string Status { get; set; } = "Pending"; // "Pending", "Resolved", "Closed"
+        public string? AdminReply { get; set; }
+        public DateTime? RepliedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+
+        [ForeignKey("UserId")]
+        public User User { get; set; } = null!;
+    }
+
+    public class PasswordResetToken
+    {
+        [Key]
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Token { get; set; } = null!;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime ExpiresAt { get; set; }
+        public bool IsUsed { get; set; }
+
+        [ForeignKey("UserId")]
+        public User User { get; set; } = null!;
+    }
+
+    public class Coupon
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Code { get; set; } = null!; // Mã giảm giá
+        public decimal DiscountPercent { get; set; }
+        public int MaxUsage { get; set; } // Giới hạn số lần dùng
+        public int CurrentUsage { get; set; } = 0; // Đã dùng
+        public DateTime ExpiryDate { get; set; }
+        public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public class AuditLog
+    {
+        [Key]
+        public int Id { get; set; }
+        public int AdminId { get; set; }
+        public string AdminUsername { get; set; } = null!;
+        public string Action { get; set; } = null!; // "Create", "Update", "Delete"
+        public string EntityType { get; set; } = null!; // "Order", "User", "Product", "Coupon", etc
+        public string EntityId { get; set; } = null!;
+        public string Details { get; set; } = null!;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("AdminId")]
+        public User Admin { get; set; } = null!;
+    }
+}
+
+public static class ProductExtensions
+{
+    public static decimal? GetActiveDiscountPercent(this GameStore.API.Entities.Product p, DateTime now)
+    {
+        return p.ProductPromotions
+            .Where(pp => pp.Promotion.StartDate <= now && pp.Promotion.EndDate >= now)
+            .OrderByDescending(pp => pp.Promotion.DiscountPercent)
+            .Select(pp => (decimal?)pp.Promotion.DiscountPercent)
+            .FirstOrDefault();
+    }
+
+    public static decimal? GetActiveDiscountPrice(this GameStore.API.Entities.Product p, DateTime now)
+    {
+        var discountPercent = p.GetActiveDiscountPercent(now);
+        if (discountPercent == null) return null;
+        return p.BasePrice * (100 - discountPercent.Value) / 100;
+    }
+
+    public static string GetCoverImageUrl(this GameStore.API.Entities.Product p)
+    {
+        return p.ProductMedia
+            .Where(m => m.MediaType == "Image" || m.MediaType == "Cover")
+            .Select(m => m.MediaUrl)
+            .FirstOrDefault() ?? "";
     }
 }

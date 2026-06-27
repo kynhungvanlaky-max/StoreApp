@@ -1,0 +1,53 @@
+@using Frontend.Models.Assistant
+
+<div class="chat @(Message.Role == "user" ? "chat-end" : "chat-start")">
+    <div class="chat-image avatar">
+        <div class="w-8 h-8 rounded-full border @(Message.Role == "user" ? "bg-[#303030] border-[#444]" : "bg-[#0078F2]/20 border-[#0078F2]/30 text-[#0078F2]") flex items-center justify-center shadow-sm">
+            @if (Message.Role == "user")
+            {
+                <Icon Name="HeroiconName.User" Class="w-5 h-5 text-gray-300" />
+            }
+            else
+            {
+                <Icon Name="HeroiconName.CpuChip" Class="w-5 h-5" />
+            }
+        </div>
+    </div>
+    <div class="chat-header text-[11px] font-medium opacity-60 mb-1.5 ml-1">
+        @(Message.Role == "user" ? "Bạn" : "Nexus Assistant")
+        <time class="text-[10px] opacity-70 ml-1.5">@Message.Timestamp.ToString("HH:mm")</time>
+    </div>
+    <div class="chat-bubble @(Message.Role == "user" ? "bg-[#0078F2] text-white shadow-[0_4px_15px_rgba(0,120,242,0.3)]" : "bg-[#252525]/90 border border-[#333] text-gray-200 shadow-sm") px-4 py-2.5">
+        @if (Message.Role == "assistant")
+        {
+            <div class="prose prose-sm prose-invert max-w-none text-gray-300 leading-relaxed">
+                @((MarkupString)FormatMessage(Message.Content))
+            </div>
+        }
+        else
+        {
+            @Message.Content
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ChatMessage Message { get; set; } = default!;
+
+    // A very basic markdown parser for bold text (**text**) and line breaks
+    private string FormatMessage(string content)
+    {
+        if (string.IsNullOrEmpty(content)) return "";
+        
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+        
+        // Bold: **text** -> <strong>text</strong>
+        encoded = System.Text.RegularExpressions.Regex.Replace(encoded, @"\*\*(.+?)\*\*", "<strong>$1</strong>");
+        
+        // Line breaks
+        encoded = encoded.Replace("\n", "<br/>");
+        
+        return encoded;
+    }
+}

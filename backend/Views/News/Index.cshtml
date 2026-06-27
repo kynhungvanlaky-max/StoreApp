@@ -43,9 +43,9 @@
                             <td class="py-4 text-gray-400">@n.PublishedAt.ToString("dd/MM/yyyy HH:mm")</td>
                             <td class="py-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <button class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/100 hover:text-blue-400 flex items-center justify-center transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                    </button>
+                                     <a href="/News/Edit/@n.Id" class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/100 hover:text-white flex items-center justify-center transition-colors">
+                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                     </a>
                                     <form method="post" asp-action="Delete" asp-controller="News" class="inline">
                                         <input type="hidden" name="id" value="@n.Id" />
                                         <button type="submit" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-blue-400 flex items-center justify-center transition-colors" onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này?');">
@@ -60,4 +60,9 @@
             </tbody>
         </table>
     </div>
+
+    @{
+        ViewBag.PaginationAction = "?";
+    }
+    <partial name="_Pagination" />
 </div>

@@ -86,6 +86,13 @@
                     <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
                     <input type="email" id="uEmail" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Quyền Hạn</label>
+                    <select id="uRole" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none">
+                        <option value="Customer" class="bg-gray-800">Customer</option>
+                        <option value="Administrator" class="bg-gray-800">Administrator</option>
+                    </select>
+                </div>
             </form>
             
             <div class="p-6 border-t border-white/10 flex justify-end gap-3 bg-white/5">
@@ -98,6 +105,9 @@
 
 @section Scripts {
 <script>
+    const authToken = '@ViewData["Token"]';
+    const authHeaders = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+
     let currentPage = 1;
     let currentSearch = '';
 
@@ -116,7 +126,9 @@
 
     async function loadUsers(page = 1, search = '') {
         try {
-            const res = await fetch(`http://localhost:5021/api/users?page=${page}&pageSize=10&search=${encodeURIComponent(search)}`);
+            const res = await fetch(`http://localhost:5021/api/users?page=${page}&pageSize=10&search=${encodeURIComponent(search)}`, {
+                headers: authHeaders
+            });
             if (!res.ok) throw new Error("Lỗi kết nối API");
             const result = await res.json();
             
@@ -198,7 +210,10 @@
     async function toggleLock(id) {
         if (!confirm("Bạn có chắc chắn muốn thay đổi trạng thái khoá của tài khoản này?")) return;
         try {
-            const res = await fetch(`http://localhost:5021/api/users/${id}/toggle-lock`, { method: 'PUT' });
+            const res = await fetch(`http://localhost:5021/api/users/${id}/toggle-lock`, { 
+                method: 'PUT',
+                headers: authHeaders
+            });
             if (res.ok) {
                 const result = await res.json();
                 showToast(result.message);
@@ -218,6 +233,7 @@
         document.getElementById('userId').value = u.id;
         document.getElementById('uUsername').value = u.username;
         document.getElementById('uEmail').value = u.email;
+        document.getElementById('uRole').value = u.roleName || 'Customer';
         document.getElementById('uAvatarUrl').value = u.avatarUrl || '';
         
         if (u.avatarUrl) {
@@ -249,6 +265,7 @@
         try {
             const res = await fetch('http://localhost:5021/api/upload', {
                 method: 'POST',
+                headers: authHeaders,
                 body: formData
             });
 
@@ -279,6 +296,7 @@
         }
 
         const id = document.getElementById('userId').value;
+        const newRole = document.getElementById('uRole').value;
         const payload = {
             username: document.getElementById('uUsername').value,
             email: document.getElementById('uEmail').value,
@@ -288,11 +306,24 @@
         try {
             const res = await fetch(`http://localhost:5021/api/users/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...authHeaders
+                },
                 body: JSON.stringify(payload)
             });
 
             if (res.ok) {
+                // Change role after updating user info
+                await fetch(`http://localhost:5021/api/users/${id}/role`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        ...authHeaders
+                    },
+                    body: JSON.stringify({ RoleName: newRole })
+                });
+
                 showToast("Cập nhật khách hàng thành công!");
                 closeUserModal();
                 loadUsers(currentPage, currentSearch);

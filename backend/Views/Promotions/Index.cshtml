@@ -1,0 +1,347 @@
+@{
+    ViewData["Title"] = "Chương Trình Khuyến Mãi";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <h2 class="text-2xl font-bold text-white">Quản Lý Khuyến Mãi</h2>
+        <button onclick="openPromoModal()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-bold flex items-center gap-2 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Thêm Chương Trình
+        </button>
+    </div>
+
+    <div class="overflow-x-auto min-h-[400px]">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
+                    <th class="pb-4 font-medium w-16">ID</th>
+                    <th class="pb-4 font-medium">Tên Chương Trình</th>
+                    <th class="pb-4 font-medium">Giảm Giá</th>
+                    <th class="pb-4 font-medium">Thời Gian</th>
+                    <th class="pb-4 font-medium">Trạng thái</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm" id="promosTableBody">
+                <tr>
+                    <td colspan="6" class="py-12 text-center text-gray-500">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Promotion -->
+<div id="promoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closePromoModal()"></div>
+    <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h3 id="modalTitle" class="text-xl font-bold text-white">Thêm Khuyến Mãi</h3>
+            <button onclick="closePromoModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <form id="promoForm" asp-action="Save" method="post" class="p-6 space-y-4">
+            <input type="hidden" name="Id" id="pId" value="" />
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-1">Tên Chương Trình</label>
+                <input type="text" name="Name" id="pName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-1">Mô tả chi tiết</label>
+                <textarea name="Description" id="pDesc" rows="2" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-1">Mức Giảm (%)</label>
+                <input type="number" name="DiscountPercent" id="pPercent" required min="1" max="100" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Ngày Bắt Đầu</label>
+                    <input type="datetime-local" name="StartDate" id="pStart" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none [color-scheme:dark]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Ngày Kết Thúc</label>
+                    <input type="datetime-local" name="EndDate" id="pEnd" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none [color-scheme:dark]" />
+                </div>
+            </div>
+        </form>
+        
+        <div class="p-6 border-t border-white/10 flex justify-end gap-3 bg-white/5 rounded-b-3xl">
+            <button type="button" onclick="closePromoModal()" class="px-5 py-2.5 text-white hover:bg-white/10 rounded-xl transition-colors">Hủy</button>
+            <button type="submit" form="promoForm" class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-colors">Lưu</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Quản Lý Sản Phẩm Trong Khuyến Mãi -->
+<div id="productPromoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeProductModal()"></div>
+    <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white">Sản phẩm khuyến mãi</h3>
+            <button onclick="closeProductModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto flex-1">
+            <input type="hidden" id="currentPromoId" />
+            
+            <div class="mb-6">
+                <h4 class="text-sm font-bold text-gray-400 mb-3 uppercase">Thêm Sản Phẩm Mới</h4>
+                <div class="flex gap-2">
+                    <select id="newProductId" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none">
+                        <option value="">-- Chọn Game --</option>
+                    </select>
+                    <button onclick="addProductToPromo()" class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-colors">Thêm</button>
+                </div>
+            </div>
+            
+            <h4 class="text-sm font-bold text-gray-400 mb-3 uppercase">Game Đang Áp Dụng (<span id="promoProductCount">0</span>)</h4>
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <ul id="promoProductsList" class="divide-y divide-white/5">
+                    <li class="p-4 text-center text-gray-500 text-sm">Chưa có game nào</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const token = '@ViewData["Token"]';
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+    
+    let allProducts = [];
+    let allPromotions = [];
+
+    async function loadData() {
+        await Promise.all([loadPromotions(), loadAllProducts()]);
+    }
+
+    async function loadAllProducts() {
+        try {
+            const res = await fetch('http://localhost:5021/api/products');
+            const data = await res.json();
+            allProducts = data.items || [];
+            
+            const select = document.getElementById('newProductId');
+            select.innerHTML = '<option value="">-- Chọn Game --</option>' + 
+                allProducts.map(p => `<option value="${p.id}">${p.name} - ${p.basePrice.toLocaleString()} đ</option>`).join('');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function loadPromotions() {
+        try {
+            const res = await fetch('http://localhost:5021/api/promotions', { headers });
+            const data = await res.json();
+            allPromotions = data;
+            const tbody = document.getElementById('promosTableBody');
+            
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-gray-500">Chưa có khuyến mãi nào</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(p => {
+                const isActive = p.isActive ? 
+                    '<span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold">Đang diễn ra</span>' : 
+                    '<span class="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-bold">Không áp dụng</span>';
+                    
+                const isUpcoming = new Date(p.startDate) > new Date() ? 
+                    '<span class="ml-2 px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold">Sắp tới</span>' : '';
+
+                return `
+                    <tr class="border-b border-gray-800 hover:bg-white/[0.02] transition-colors group">
+                        <td class="py-4 text-gray-400">#${p.id}</td>
+                        <td class="py-4 font-bold text-white">
+                            <div>${p.name}</div>
+                            <div class="text-xs text-gray-500 font-normal mt-1">${p.productIds.length} Game được áp dụng</div>
+                        </td>
+                        <td class="py-4 text-emerald-400 font-bold">-${p.discountPercent}%</td>
+                        <td class="py-4 text-gray-300 text-sm">
+                            <div class="mb-1 text-gray-400">Từ: <span class="text-white">${new Date(p.startDate).toLocaleString('vi-VN')}</span></div>
+                            <div class="text-gray-400">Đến: <span class="text-white">${new Date(p.endDate).toLocaleString('vi-VN')}</span></div>
+                        </td>
+                        <td class="py-4">${isActive} ${isUpcoming}</td>
+                        <td class="py-4 text-right">
+                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="openProductModal(${p.id})" class="p-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors" title="Gắn Game">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                </button>
+                                <button onclick="editPromo(${p.id})" class="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-colors" title="Sửa">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <button onclick="deletePromo(${p.id})" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors" title="Xóa">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function toLocalISO(dateString) {
+        const d = new Date(dateString);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+    }
+
+    function openPromoModal() {
+        document.getElementById('promoForm').reset();
+        document.getElementById('pId').value = '';
+        document.getElementById('modalTitle').innerText = 'Thêm Khuyến Mãi';
+        document.getElementById('promoModal').classList.remove('hidden');
+    }
+
+    function closePromoModal() {
+        document.getElementById('promoModal').classList.add('hidden');
+    }
+
+    function editPromo(id) {
+        const p = allPromotions.find(x => x.id === id);
+        if(!p) return;
+        
+        document.getElementById('pId').value = p.id;
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pDesc').value = p.description;
+        document.getElementById('pPercent').value = p.discountPercent;
+        document.getElementById('pStart').value = toLocalISO(p.startDate);
+        document.getElementById('pEnd').value = toLocalISO(p.endDate);
+        
+        document.getElementById('modalTitle').innerText = 'Sửa Khuyến Mãi';
+        document.getElementById('promoModal').classList.remove('hidden');
+    }
+
+    async function savePromo() {
+        const id = document.getElementById('pId').value;
+        const payload = {
+            name: document.getElementById('pName').value,
+            description: document.getElementById('pDesc').value,
+            discountPercent: parseFloat(document.getElementById('pPercent').value),
+            startDate: new Date(document.getElementById('pStart').value).toISOString(),
+            endDate: new Date(document.getElementById('pEnd').value).toISOString()
+        };
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `http://localhost:5021/api/promotions/${id}` : 'http://localhost:5021/api/promotions';
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers,
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                closePromoModal();
+                loadPromotions();
+            } else {
+                alert('Lỗi lưu khuyến mãi!');
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function deletePromo(id) {
+        if(!confirm('Xác nhận xóa khuyến mãi này? (Các game đang áp dụng sẽ tự động hủy KM)')) return;
+        try {
+            const res = await fetch(`http://localhost:5021/api/promotions/${id}`, { method: 'DELETE', headers });
+            if (res.ok) {
+                loadPromotions();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // --- QUẢN LÝ SẢN PHẨM TRONG KHUYẾN MÃI ---
+    
+    function openProductModal(promoId) {
+        document.getElementById('currentPromoId').value = promoId;
+        document.getElementById('productPromoModal').classList.remove('hidden');
+        renderPromoProducts(promoId);
+    }
+    
+    function closeProductModal() {
+        document.getElementById('productPromoModal').classList.add('hidden');
+        loadPromotions(); // reload list if counts changed
+    }
+    
+    function renderPromoProducts(promoId) {
+        const promo = allPromotions.find(x => x.id === promoId);
+        const list = document.getElementById('promoProductsList');
+        document.getElementById('promoProductCount').innerText = promo ? promo.productIds.length : 0;
+        
+        if(!promo || promo.productIds.length === 0) {
+            list.innerHTML = '<li class="p-4 text-center text-gray-500 text-sm">Chưa có game nào</li>';
+            return;
+        }
+        
+        list.innerHTML = promo.productIds.map(pid => {
+            const product = allProducts.find(p => p.id === pid);
+            const name = product ? product.name : `Game #${pid}`;
+            return `
+                <li class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                    <span class="text-white font-medium">${name}</span>
+                    <button onclick="removeProductFromPromo(${promoId}, ${pid})" class="text-red-400 hover:text-red-300 text-sm font-bold">Xóa</button>
+                </li>
+            `;
+        }).join('');
+    }
+    
+    async function addProductToPromo() {
+        const promoId = document.getElementById('currentPromoId').value;
+        const productId = document.getElementById('newProductId').value;
+        if(!productId) return;
+        
+        try {
+            const res = await fetch(`http://localhost:5021/api/promotions/${promoId}/products/${productId}`, {
+                method: 'POST',
+                headers
+            });
+            if(res.ok) {
+                // Update local state and re-render
+                const p = allPromotions.find(x => x.id == promoId);
+                if(p && !p.productIds.includes(parseInt(productId))) p.productIds.push(parseInt(productId));
+                renderPromoProducts(promoId);
+                document.getElementById('newProductId').value = '';
+            } else {
+                alert('Sản phẩm đã có trong khuyến mãi hoặc lỗi.');
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+    
+    async function removeProductFromPromo(promoId, productId) {
+        try {
+            const res = await fetch(`http://localhost:5021/api/promotions/${promoId}/products/${productId}`, {
+                method: 'DELETE',
+                headers
+            });
+            if(res.ok) {
+                const p = allPromotions.find(x => x.id == promoId);
+                if(p) p.productIds = p.productIds.filter(id => id != productId);
+                renderPromoProducts(promoId);
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // Load data on start
+    loadData();
+</script>
+}

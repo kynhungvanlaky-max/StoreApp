@@ -1,0 +1,59 @@
+@page "/checkout/success"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Thanh Toán Thành Công — NexusKeys</PageTitle>
+
+<div class="flex items-center justify-center min-h-[calc(100vh-200px)] py-12 px-4">
+    <div class="max-w-lg w-full bg-base-200 rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-base-300 relative overflow-hidden">
+        @* Decorative background glow *@
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-success/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl"></div>
+        
+        <div class="relative z-10">
+            <div class="w-24 h-24 bg-success/20 text-success rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-success/30">
+                <Icon Name="HeroiconName.CheckCircle" Class="w-12 h-12 text-success" />
+            </div>
+            
+            <h1 class="text-3xl font-black text-white mb-2">Thanh Toán Thành Công!</h1>
+            <p class="text-gray-400 mb-8">Cảm ơn bạn đã mua hàng tại Nexus Store. Giao dịch của bạn đã được xác nhận và license/key đã được chuyển vào thư viện.</p>
+            
+            <div class="bg-base-300/50 rounded-2xl p-6 mb-8 border border-base-300 text-left">
+                <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                    <Icon Name="HeroiconName.InformationCircle" Class="w-5 h-5 text-primary" />
+                    Thông tin đơn hàng
+                </h3>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Mã đơn hàng:</span>
+                        <span class="text-white font-mono bg-base-100 px-2 py-0.5 rounded">#@DisplayOrderId</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Thời gian:</span>
+                        <span class="text-white">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Trạng thái:</span>
+                        <span class="text-success font-bold">Đã hoàn thành</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/profile/library" class="btn btn-primary flex-1">
+                    <Icon Name="HeroiconName.BookOpen" Class="w-5 h-5 mr-2 inline-block" /> Xem Thư Viện Key
+                </a>
+                <a href="/products" class="btn btn-outline flex-1">
+                    Tiếp Tục Mua Sắm
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? OrderId { get; set; }
+
+    public string DisplayOrderId => string.IsNullOrEmpty(OrderId) ? "" : OrderId.Split('_')[0];
+}

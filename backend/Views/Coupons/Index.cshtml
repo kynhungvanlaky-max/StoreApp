@@ -1,0 +1,198 @@
+@{
+    ViewData["Title"] = "Mã Giảm Giá (Coupons)";
+}
+
+<div class="glassmorphism rounded-3xl p-8 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <h2 class="text-2xl font-bold text-white">Quản Lý Mã Giảm Giá</h2>
+        <button onclick="openCouponModal()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-bold flex items-center gap-2 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Tạo Mã Mới
+        </button>
+    </div>
+
+    <div class="overflow-x-auto min-h-[400px]">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
+                    <th class="pb-4 font-medium w-16">ID</th>
+                    <th class="pb-4 font-medium">Mã Giảm Giá (Code)</th>
+                    <th class="pb-4 font-medium">Mức Giảm</th>
+                    <th class="pb-4 font-medium">Lượt dùng</th>
+                    <th class="pb-4 font-medium">Hết hạn</th>
+                    <th class="pb-4 font-medium">Trạng thái</th>
+                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm" id="couponsTableBody">
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-500">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Coupon -->
+<div id="couponModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCouponModal()"></div>
+    <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h3 id="modalTitle" class="text-xl font-bold text-white">Tạo Mã Giảm Giá</h3>
+            <button onclick="closeCouponModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <form id="couponForm" asp-action="Save" method="post" class="p-6 space-y-4">
+            <input type="hidden" name="Id" id="cId" value="" />
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-1">Mã (Code)</label>
+                <input type="text" name="Code" id="cCode" required placeholder="VD: SUMMER2026" style="text-transform:uppercase" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Mức Giảm Giá (%)</label>
+                    <input type="number" name="DiscountPercent" id="cPercent" required min="1" max="100" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Lượt dùng tối đa</label>
+                    <input type="number" name="MaxUsage" id="cMax" required min="0" value="100" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                    <span class="text-xs text-gray-500">0 = Không giới hạn</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-1">Ngày Hết Hạn</label>
+                <input type="datetime-local" name="ExpiryDate" id="cEnd" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none [color-scheme:dark]" />
+            </div>
+            <div class="flex items-center gap-2 mt-4">
+                <input type="checkbox" name="IsActive" id="cActive" checked class="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-500 focus:ring-offset-[#1a1a1f]" />
+                <label for="cActive" class="text-sm font-medium text-gray-400">Kích hoạt mã</label>
+            </div>
+        </form>
+        
+        <div class="p-6 border-t border-white/10 flex justify-end gap-3 bg-white/5 rounded-b-3xl">
+            <button type="button" onclick="closeCouponModal()" class="px-5 py-2.5 text-white hover:bg-white/10 rounded-xl transition-colors">Hủy Bỏ</button>
+            <button type="button" onclick="saveCoupon()" class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-colors">Lưu Mã</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const token = '@ViewData["Token"]';
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    async function loadCoupons() {
+        try {
+            const res = await fetch('http://localhost:5021/api/coupons', { headers });
+            const data = await res.json();
+            const tbody = document.getElementById('couponsTableBody');
+            
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-gray-500">Chưa có mã giảm giá nào</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(c => {
+                const isActive = c.isActive ? 
+                    '<span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold">Kích hoạt</span>' : 
+                    '<span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-bold">Khóa</span>';
+                    
+                const isExpired = new Date(c.expiryDate) < new Date() ? 
+                    '<span class="ml-2 px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-bold">Hết hạn</span>' : '';
+
+                return `
+                    <tr class="border-b border-gray-800 hover:bg-white/[0.02] transition-colors group">
+                        <td class="py-4 text-gray-400">#${c.id}</td>
+                        <td class="py-4 font-bold text-white"><span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-lg tracking-wider">${c.code}</span></td>
+                        <td class="py-4 text-emerald-400 font-bold">-${c.discountPercent}%</td>
+                        <td class="py-4 text-gray-300">${c.currentUsage} / ${c.maxUsage === 0 ? '∞' : c.maxUsage}</td>
+                        <td class="py-4 text-gray-300">${new Date(c.expiryDate).toLocaleString('vi-VN')}</td>
+                        <td class="py-4">${isActive} ${isExpired}</td>
+                        <td class="py-4 text-right">
+                            <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="editCoupon(${c.id}, '${c.code}', ${c.discountPercent}, ${c.maxUsage}, '${c.expiryDate}', ${c.isActive})" class="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-colors" title="Sửa">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <button onclick="deleteCoupon(${c.id})" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors" title="Xóa">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function toLocalISO(dateString) {
+        const d = new Date(dateString);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+    }
+
+    function openCouponModal() {
+        document.getElementById('couponForm').reset();
+        document.getElementById('cId').value = '';
+        document.getElementById('modalTitle').innerText = 'Tạo Mã Giảm Giá';
+        document.getElementById('couponModal').classList.remove('hidden');
+    }
+
+    function closeCouponModal() {
+        document.getElementById('couponModal').classList.add('hidden');
+    }
+
+    function editCoupon(id, code, percent, maxUsage, end, isActive) {
+        document.getElementById('cId').value = id;
+        document.getElementById('cCode').value = code;
+        document.getElementById('cPercent').value = percent;
+        document.getElementById('cMax').value = maxUsage;
+        document.getElementById('cEnd').value = toLocalISO(end);
+        document.getElementById('cActive').checked = isActive;
+        document.getElementById('modalTitle').innerText = 'Sửa Mã Giảm Giá';
+        document.getElementById('couponModal').classList.remove('hidden');
+    }
+
+    async function saveCoupon() {
+        const form = document.getElementById('couponForm');
+        const formData = new FormData(form);
+        const payload = {
+            Id: formData.get('Id') ? parseInt(formData.get('Id')) : 0,
+            Code: formData.get('Code'),
+            DiscountPercent: parseFloat(formData.get('DiscountPercent')),
+            MaxUsage: parseInt(formData.get('MaxUsage')),
+            ExpiryDate: new Date(formData.get('ExpiryDate')).toISOString(),
+            IsActive: formData.get('IsActive') === 'on'
+        };
+
+        const res = await fetch('/Coupons/Save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+            closeCouponModal();
+            loadCoupons();
+        } else {
+            const err = await res.text();
+            alert('Lỗi: ' + err);
+        }
+    }
+
+    async function deleteCoupon(id) {
+        if(!confirm('Chắc chắn muốn xóa mã giảm giá này?')) return;
+        const form = new FormData();
+        form.append('id', id);
+        await fetch(`/Coupons/Delete/${id}`, { method: 'POST', body: form });
+        loadCoupons();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCoupons);
+</script>
+}

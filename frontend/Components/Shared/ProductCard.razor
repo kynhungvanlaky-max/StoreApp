@@ -1,0 +1,180 @@
+@using Frontend.Models.Product
+
+@inject NavigationManager NavigationManager
+
+<div class="group block cursor-pointer" @onclick="NavigateToDetail">
+    <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#1a1a1a] mb-3">
+        @if (!string.IsNullOrEmpty(Product.ImageUrl))
+        {
+            <img src="@Product.ImageUrl" alt="@Product.Name" 
+                 loading="lazy"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out @(Product.IsOutOfStock ? "opacity-40 grayscale" : "")" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="absolute inset-0 items-center justify-center bg-[#1a1a1a]" style="display:none;">
+                <svg class="w-12 h-12 text-[#2a2a2a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V4.5a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v15a1.5 1.5 0 001.5 1.5z"/></svg>
+            </div>
+        }
+        else
+        {
+            <div class="w-full h-full flex items-center justify-center bg-[#1a1a1a]">
+                <svg class="w-12 h-12 text-[#2a2a2a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V4.5a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v15a1.5 1.5 0 001.5 1.5z"/></svg>
+            </div>
+        }
+        
+        @* Hover overlay *@
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        @* Out of stock badge *@
+        @if (Product.IsOutOfStock)
+        {
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span class="px-3 py-1 bg-red-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg shadow-lg uppercase tracking-wider">Hết hàng</span>
+            </div>
+        }
+
+        @* Discount badge *@
+        @if (_discountPercent > 0 && !Product.IsOutOfStock)
+        {
+            <div class="absolute top-2 left-2 z-10">
+                <span class="px-2 py-0.5 bg-[#0078F2] text-white text-[11px] font-bold rounded-md shadow-lg">-@(_discountPercent)%</span>
+            </div>
+        }
+        
+        @* Wishlist actions *@
+        @if (IsWishlistMode)
+        {
+            <button class="absolute top-2 right-2 btn btn-circle btn-sm btn-error shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20" 
+                    @onclick="HandleRemove" @onclick:stopPropagation title="Xóa khỏi yêu thích">
+                <Icon Name="HeroiconName.Trash" Class="w-4 h-4" />
+            </button>
+        }
+    </div>
+    
+    <div class="space-y-1.5">
+        @* Product type/category *@
+        <div class="text-[11px] font-medium text-gray-500 uppercase tracking-wider line-clamp-1">
+            @(Product.Categories?.FirstOrDefault() ?? Product.Type ?? "Sản phẩm")
+        </div>
+        
+        @* Product name *@
+        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white line-clamp-2 transition-colors duration-200 leading-snug">@Product.Name</h3>
+        
+        @* Price section *@
+        <div class="flex items-center justify-between pt-0.5">
+            <div class="flex items-center gap-2">
+                @if (IsFree())
+                {
+                    <span class="text-sm font-semibold text-emerald-400">Miễn phí</span>
+                }
+                else if (_discountPercent > 0)
+                {
+                    <span class="text-xs text-gray-500 line-through">@FormatPrice(Product.BasePrice)</span>
+                    <span class="text-sm font-semibold text-white">@GetDisplayPrice()</span>
+                }
+                else
+                {
+                    <span class="text-sm font-semibold text-white">@GetDisplayPrice()</span>
+                }
+            </div>
+            
+            @if (IsWishlistMode && !Product.IsOutOfStock)
+            {
+                <button class="btn btn-primary btn-sm rounded-lg shadow-lg z-20" 
+                        @onclick="HandleAddToCart" @onclick:stopPropagation title="Thêm vào giỏ">
+                    <Icon Name="HeroiconName.ShoppingCart" Class="w-4 h-4" />
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductDto Product { get; set; } = default!;
+
+    [Parameter]
+    public bool IsWishlistMode { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnAddToCart { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRemoveFromWishlist { get; set; }
+
+    private int _discountPercent;
+
+    private void NavigateToDetail()
+    {
+        NavigationManager.NavigateTo($"/products/{Product.Id}");
+    }
+
+    private async Task HandleRemove()
+    {
+        if (OnRemoveFromWishlist.HasDelegate)
+        {
+            await OnRemoveFromWishlist.InvokeAsync(Product.Id);
+        }
+    }
+
+    private async Task HandleAddToCart()
+    {
+        if (OnAddToCart.HasDelegate)
+        {
+            await OnAddToCart.InvokeAsync(Product.Id);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        _discountPercent = CalculateDiscount();
+    }
+
+    private bool IsFree()
+    {
+        return Product.Pricing?.Trim().Equals("Miễn phí", StringComparison.OrdinalIgnoreCase) == true
+            || Product.Pricing?.Trim() == "0"
+            || Product.BasePrice == 0;
+    }
+
+    private int CalculateDiscount()
+    {
+        if (Product.BasePrice <= 0) return 0;
+        
+        if (decimal.TryParse(Product.Pricing?.Replace(".", "").Replace(",", "").Replace("đ", "").Replace(" ", "").Trim(), out var salePrice))
+        {
+            if (salePrice > 0 && salePrice < Product.BasePrice)
+            {
+                return (int)Math.Round((1 - salePrice / Product.BasePrice) * 100);
+            }
+        }
+        return 0;
+    }
+
+    private string FormatPrice(decimal price)
+    {
+        return price.ToString("N0") + " đ";
+    }
+
+    private string GetDisplayPrice()
+    {
+        // If Pricing is a numeric string, format it
+        if (decimal.TryParse(Product.Pricing?.Replace(".", "").Replace(",", "").Replace("đ", "").Replace(" ", "").Trim(), out var price))
+        {
+            return FormatPrice(price);
+        }
+        
+        // If Pricing already contains formatted text like "150.000 đ", return as-is
+        if (!string.IsNullOrEmpty(Product.Pricing) && Product.Pricing != "Paid" && Product.Pricing != "Free")
+        {
+            return Product.Pricing.Contains("đ") ? Product.Pricing : Product.Pricing + " đ";
+        }
+        
+        // Fallback to BasePrice
+        if (Product.BasePrice > 0)
+        {
+            return FormatPrice(Product.BasePrice);
+        }
+        
+        return "Liên hệ";
+    }
+}

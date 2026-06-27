@@ -1,0 +1,127 @@
+@page "/news"
+@inject Frontend.ViewModels.NewsViewModel VM
+@implements IDisposable
+
+<PageTitle>Tin Tức & Đánh Giá — Nexus Store</PageTitle>
+
+<div class="px-6 py-8 mx-auto max-w-7xl">
+    <div class="flex items-center gap-3 mb-8 border-b border-[#303030] pb-6">
+        <Icon Name="HeroiconName.Newspaper" Class="w-8 h-8 text-white" />
+        <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Tin Tức Mới Nhất</h1>
+    </div>
+
+    @if (VM.IsLoading)
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="animate-pulse">
+                    <div class="aspect-video w-full rounded-lg bg-[#202020] mb-4"></div>
+                    <div class="h-4 bg-[#202020] rounded w-1/4 mb-3"></div>
+                    <div class="h-6 bg-[#202020] rounded w-full mb-3"></div>
+                    <div class="h-4 bg-[#202020] rounded w-3/4 mb-4"></div>
+                </div>
+            }
+        </div>
+    }
+    else if (VM.PagedArticles.Count == 0)
+    {
+        <div class="flex flex-col items-center justify-center py-24 text-center min-h-[60vh]">
+            <Icon Name="HeroiconName.DocumentMagnifyingGlass" Class="w-16 h-16 text-[#303030] mb-4" />
+            <h3 class="text-xl font-bold text-white mb-2">Không có tin tức nào</h3>
+            <p class="text-gray-400">Trở lại sau để cập nhật những thông tin mới nhất.</p>
+        </div>
+    }
+    else
+    {
+        var featured = VM.CurrentPage == 1 ? VM.PagedArticles.FirstOrDefault() : null;
+        var others = VM.CurrentPage == 1 ? VM.PagedArticles.Skip(1).ToList() : VM.PagedArticles;
+        
+        if (featured != null)
+        {
+            <div class="flex flex-col lg:flex-row bg-[#1e1e1e] rounded-2xl overflow-hidden mb-12 hover:bg-[#252525] border border-[#303030]/50 hover:border-[#0078F2]/30 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:-translate-y-1 group cursor-pointer" @onclick='@(() => NavigationManager.NavigateTo($"/news/{featured.Id}"))'>
+                <div class="lg:w-2/3 aspect-video lg:aspect-[16/9] overflow-hidden relative">
+                    <img src="@(string.IsNullOrEmpty(featured.CoverImageUrl) ? "/images/placeholder-game.jpg" : featured.CoverImageUrl)" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#1e1e1e] via-transparent to-transparent opacity-80 lg:hidden"></div>
+                </div>
+                <div class="lg:w-1/3 p-8 flex flex-col justify-center relative z-10">
+                    <div class="flex items-center gap-2 mb-4 text-xs font-bold text-[#0078F2] uppercase tracking-wider">
+                        <span class="px-2 py-1 bg-[#0078F2]/10 rounded">Tin Nổi Bật</span>
+                        <span class="text-gray-500">•</span>
+                        <span class="text-gray-400">@featured.PublishedAt.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <h2 class="text-2xl lg:text-3xl font-black text-white mb-4 line-clamp-3 leading-tight group-hover:text-[#0078F2] transition-colors duration-300">@featured.Title</h2>
+                    <p class="text-gray-400 text-sm line-clamp-4 leading-relaxed mb-6 group-hover:text-gray-300 transition-colors">@featured.Summary</p>
+                    <div class="flex items-center gap-2 text-sm text-gray-500 font-medium mt-auto group-hover:text-gray-400 transition-colors">
+                        <Icon Name="HeroiconName.Pencil" Class="w-4 h-4" />
+                        <span>@featured.AuthorName</span>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach (var article in others)
+            {
+                <a href="/news/@article.Id" class="group block bg-[#1a1a1a] rounded-2xl overflow-hidden border border-[#303030]/50 hover:border-[#0078F2]/30 transition-all duration-500 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:-translate-y-2">
+                    <div class="aspect-[16/9] overflow-hidden bg-[#202020] relative">
+                        <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-game.jpg" : article.CoverImageUrl)" class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out" />
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <span class="text-[#0078F2]">Tin Tức</span>
+                            <span>•</span>
+                            <span>@article.PublishedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-200 group-hover:text-[#0078F2] mb-3 line-clamp-2 leading-snug transition-colors duration-300">@article.Title</h2>
+                        <p class="text-gray-400 text-sm line-clamp-2 group-hover:text-gray-300 transition-colors">@article.Summary</p>
+                    </div>
+                </a>
+            }
+        </div>
+        
+        @* Pagination *@
+        @if (VM.TotalPages > 1)
+        {
+            <div class="flex justify-center items-center gap-3 mt-16">
+                <button class="btn btn-circle bg-[#202020] border-[#303030] hover:bg-[#303030] hover:border-gray-500 text-white transition-all shadow-lg" 
+                        disabled="@(VM.CurrentPage == 1)"
+                        @onclick="@(() => VM.LoadPageAsync(VM.CurrentPage - 1))">
+                    <Icon Name="HeroiconName.ChevronLeft" Class="w-5 h-5" />
+                </button>
+                
+                <div class="flex items-center gap-2 bg-[#1a1a1a] p-1.5 rounded-full border border-[#303030] shadow-inner">
+                    @for (int i = 1; i <= VM.TotalPages; i++)
+                    {
+                        var pageNum = i;
+                        <button class="w-10 h-10 rounded-full font-bold transition-all duration-300 @(pageNum == VM.CurrentPage ? "bg-[#0078F2] text-white shadow-[0_0_15px_rgba(0,120,242,0.6)] scale-110" : "bg-transparent text-gray-400 hover:text-white hover:bg-[#303030]")"
+                                @onclick="@(() => VM.LoadPageAsync(pageNum))">
+                            @pageNum
+                        </button>
+                    }
+                </div>
+                
+                <button class="btn btn-circle bg-[#202020] border-[#303030] hover:bg-[#303030] hover:border-gray-500 text-white transition-all shadow-lg"
+                        disabled="@(VM.CurrentPage == VM.TotalPages)"
+                        @onclick="@(() => VM.LoadPageAsync(VM.CurrentPage + 1))">
+                    <Icon Name="HeroiconName.ChevronRight" Class="w-5 h-5" />
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadArticlesAsync();
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

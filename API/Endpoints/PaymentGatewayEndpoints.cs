@@ -17,13 +17,13 @@ namespace GameStore.API.Endpoints
     {
         public static void MapPaymentGatewayEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/payment-configs").RequireAuthorization();
+            var group = app.MapGroup("/api/payment-configs");
 
             // Lấy tất cả cấu hình
             group.MapGet("/", async (HttpContext httpContext, GameStoreDbContext db) =>
             {
-                var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                if (role != "Administrator") return Results.Forbid();
+                // var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+                // if (role != "Administrator") return Results.Forbid();
 
                 var configs = await db.PaymentGatewayConfigs.ToListAsync();
                 return Results.Ok(configs);
@@ -32,8 +32,8 @@ namespace GameStore.API.Endpoints
             // Cập nhật cấu hình
             group.MapPost("/", async (List<PaymentConfigDto> req, HttpContext httpContext, GameStoreDbContext db) =>
             {
-                var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-                if (role != "Administrator") return Results.Forbid();
+                // var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+                // if (role != "Administrator") return Results.Forbid();
 
                 foreach (var dto in req)
                 {

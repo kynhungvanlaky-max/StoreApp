@@ -8,11 +8,11 @@ namespace GameStore.API.Endpoints
     {
         public static void MapProductKeyEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/keys");
+            var group = app.MapGroup("/api/keys").RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
-            group.MapGet("/", async (GameStoreDbContext db) =>
+            group.MapGet("/", async ([AsParameters] PaginationParams pagination, GameStoreDbContext db) =>
             {
-                return await db.ProductKeys
+                var query = db.ProductKeys
                     .Include(k => k.Product)
                     .Select(k => new ProductKeyDto
                     {
@@ -22,8 +22,24 @@ namespace GameStore.API.Endpoints
                         ProductId = k.ProductId,
                         ProductName = k.Product.Name,
                         OrderId = k.OrderId
-                    })
+                    });
+
+                var totalItems = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pagination.PageSize);
+
+                var keys = await query
+                    .Skip((pagination.Page - 1) * pagination.PageSize)
+                    .Take(pagination.PageSize)
                     .ToListAsync();
+
+                return Results.Ok(new
+                {
+                    Data = keys,
+                    TotalItems = totalItems,
+                    TotalPages = totalPages,
+                    CurrentPage = pagination.Page,
+                    PageSize = pagination.PageSize
+                });
             });
 
             group.MapPost("/", async (CreateProductKeyDto dto, GameStoreDbContext db) =>

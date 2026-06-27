@@ -1,8 +1,9 @@
-@model IEnumerable<Backend.Models.CommentViewModel>
+@model Backend.Models.CommentListViewModel
 
 @{
     ViewData["Title"] = "Quản lý Bình luận";
     Layout = "_Layout";
+    ViewBag.PaginationAction = "?page=";
 }
 
 <div class="glassmorphism rounded-3xl p-8 mb-8">
@@ -29,14 +30,14 @@
     }
 
     <div class="space-y-6">
-        @if (!Model.Any())
+        @if (!Model.Comments.Any())
         {
             <div class="bg-black/40 border border-white/10 rounded-2xl p-8 text-center">
                 <p class="text-gray-400">Chưa có bình luận nào.</p>
             </div>
         }
 
-        @foreach (var c in Model)
+        @foreach (var c in Model.Comments)
         {
             <div class="bg-black/40 border border-white/10 rounded-2xl p-6 transition-all hover:bg-white/5 group">
                 <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -136,4 +137,11 @@
             </div>
         }
     </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="glassmorphism rounded-3xl p-6">
+            @await Html.PartialAsync("_Pagination")
+        </div>
+    }
 </div>
