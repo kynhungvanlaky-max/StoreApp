@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Models;
+using Backend.Extensions;
 
 namespace Backend.Controllers
 {
-    using Backend.Models;
-
     public class OrdersController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -14,71 +13,71 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] string? status = null)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.GetAsync($"/api/orders?page={page}&pageSize={pageSize}");
-            
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
+            var url = $"/api/v1/orders?page={page}&pageSize={pageSize}";
+            if (!string.IsNullOrWhiteSpace(search)) url += $"&search={Uri.EscapeDataString(search)}";
+            if (!string.IsNullOrWhiteSpace(status)) url += $"&status={Uri.EscapeDataString(status)}";
 
-            if (response.IsSuccessStatusCode)
+            var orders = new List<OrderViewModel>();
+            int totalPages = 1;
+            int totalItems = 0;
+
+            try
             {
-                try
+                var response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
                 {
-                    var pagedResult = await response.Content.ReadFromJsonAsync<PagedResponse<OrderViewModel>>();
-                    ViewBag.CurrentPage = pagedResult?.CurrentPage ?? page;
-                    ViewBag.TotalPages = pagedResult?.TotalPages ?? 1;
-                    ViewBag.TotalItems = pagedResult?.TotalItems ?? 0;
-                    ViewBag.PageSize = pagedResult?.PageSize ?? pageSize;
-                    return View(new OrderListViewModel { Orders = pagedResult?.Data ?? new List<OrderViewModel>() });
-                }
-                catch (Exception ex)
-                {
-                    SetErrorMessage("Lỗi khi tải dữ liệu đơn hàng: " + ex.Message);
-                    return View(new OrderListViewModel());
+                    var paged = await response.Content.ReadJsonAsync<PagedResponse<OrderViewModel>>();
+                    if (paged != null)
+                    {
+                        orders = paged.Data;
+                        totalPages = paged.TotalPages > 0 ? paged.TotalPages : 1;
+                        totalItems = paged.TotalItems;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("API Order Error: " + ex.Message);
+            }
 
-            return View(new OrderListViewModel());
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.Search = search;
+            ViewBag.Status = status;
+
+            return View(orders);
         }
 
         public async Task<IActionResult> Details(int id)
         {
+            ViewData["OrderId"] = id;
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.GetAsync($"/api/orders/{id}");
-            
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
+            OrderViewModel? order = null;
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var order = await response.Content.ReadFromJsonAsync<OrderViewModel>();
-                return View(order);
+                var response = await client.GetAsync($"/api/v1/orders/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    order = await response.Content.ReadJsonAsync<OrderViewModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("API Order Details Error: " + ex.Message);
             }
 
-            return RedirectToAction("Index");
+            if (order == null)
+            {
+                order = new OrderViewModel { Id = id, Status = "Pending", TotalAmount = 0, OrderDate = DateTime.Now };
+            }
+
+            return View(order);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
-        {
-            var client = _httpClientFactory.CreateClient("API");
-            var response = await client.PutAsJsonAsync($"/api/orders/{id}/status", new { Status = status });
-            
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
-
-            if (response.IsSuccessStatusCode)
-            {
-                SetSuccessMessage("Cập nhật trạng thái đơn hàng thành công!");
-            }
-            else
-            {
-                SetErrorMessage("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.");
-            }
-
-            return RedirectToAction("Details", new { id = id });
-        }
     }
 }

@@ -1,198 +1,164 @@
+@model List<Backend.Models.CouponViewModel>
+
 @{
-    ViewData["Title"] = "Mã Giảm Giá (Coupons)";
+    ViewData["Title"] = "Quản Lý Mã Giảm Giá (Coupons)";
 }
 
-<div class="glassmorphism rounded-3xl p-8 mb-8">
+<div class="admin-card p-8 mb-8">
+    <!-- Header Controls -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <h2 class="text-2xl font-bold text-white">Quản Lý Mã Giảm Giá</h2>
-        <button onclick="openCouponModal()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-bold flex items-center gap-2 transition-all">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tạo Mã Mới
-        </button>
+        <div class="relative w-full md:w-96">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm mã coupon..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium placeholder-slate-400" />
+            <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-4 top-3.5 text-sm"></i>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="document.getElementById('couponModal').classList.remove('hidden')" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-sm shadow-indigo-200 flex items-center gap-2 transition-all active:scale-95 text-sm">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>Tạo Mã Giảm Giá</span>
+            </button>
+        </div>
     </div>
 
-    <div class="overflow-x-auto min-h-[400px]">
-        <table class="w-full text-left">
+    <!-- Data Table -->
+    <div class="overflow-x-auto min-h-[380px]">
+        <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
-                    <th class="pb-4 font-medium w-16">ID</th>
-                    <th class="pb-4 font-medium">Mã Giảm Giá (Code)</th>
-                    <th class="pb-4 font-medium">Mức Giảm</th>
-                    <th class="pb-4 font-medium">Lượt dùng</th>
-                    <th class="pb-4 font-medium">Hết hạn</th>
-                    <th class="pb-4 font-medium">Trạng thái</th>
-                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                <tr class="text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
+                    <th class="py-3 px-4 font-bold w-16 text-center rounded-l-xl">ID</th>
+                    <th class="py-3 px-4 font-bold">Mã Code</th>
+                    <th class="py-3 px-4 font-bold">Giảm Giá (%)</th>
+                    <th class="py-3 px-4 font-bold">Lượt Dùng</th>
+                    <th class="py-3 px-4 font-bold">Hạn Sử Dụng</th>
+                    <th class="py-3 px-4 font-bold">Trạng Thái</th>
+                    <th class="py-3 px-4 font-bold text-right rounded-r-xl">Hành Động</th>
                 </tr>
             </thead>
-            <tbody class="text-sm" id="couponsTableBody">
-                <tr>
-                    <td colspan="7" class="py-12 text-center text-gray-500">Đang tải dữ liệu...</td>
-                </tr>
+            <tbody class="text-sm divide-y divide-slate-100">
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-400 font-medium">
+                            <i class="fa-solid fa-ticket text-3xl text-slate-300 mb-2 block"></i>
+                            <span>Chưa có mã giảm giá nào.</span>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var c in Model)
+                    {
+                        <tr class="hover:bg-slate-50/80 transition-all duration-150 group">
+                            <td class="py-3.5 px-4 text-slate-400 font-mono font-bold text-center">#@c.Id</td>
+                            <td class="py-3.5 px-4 font-mono font-black text-indigo-600 text-sm select-all">@c.Code</td>
+                            <td class="py-3.5 px-4 font-black text-emerald-600">@c.DiscountPercent% OFF</td>
+                            <td class="py-3.5 px-4 text-slate-700 font-bold">@c.CurrentUsage / @c.MaxUsage</td>
+                            <td class="py-3.5 px-4 text-slate-500 text-xs font-medium">@c.ExpiryDate.ToString("dd/MM/yyyy")</td>
+                            <td class="py-3.5 px-4">
+                                @if (c.IsActive)
+                                {
+                                    <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">Hoạt Động</span>
+                                }
+                                else
+                                {
+                                    <span class="px-2.5 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-bold border border-rose-200">Đã Khóa</span>
+                                }
+                            </td>
+                            <td class="py-3.5 px-4 text-right">
+                                <button onclick="deleteCoupon(@c.Id)" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white inline-flex items-center justify-center transition-all shadow-2xs" title="Xóa">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Modal Thêm/Sửa Coupon -->
+<!-- Modal Create Coupon -->
 <div id="couponModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCouponModal()"></div>
-    <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl">
-        <div class="p-6 border-b border-white/10 flex justify-between items-center">
-            <h3 id="modalTitle" class="text-xl font-bold text-white">Tạo Mã Giảm Giá</h3>
-            <button onclick="closeCouponModal()" class="text-gray-400 hover:text-white transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="document.getElementById('couponModal').classList.add('hidden')"></div>
+    
+    <div class="relative bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200 transform transition-all">
+        <div class="p-6 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
+            <h3 class="text-xl font-black text-slate-800">Tạo Mã Giảm Giá Mới</h3>
+            <button onclick="document.getElementById('couponModal').classList.add('hidden')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         
-        <form id="couponForm" asp-action="Save" method="post" class="p-6 space-y-4">
-            <input type="hidden" name="Id" id="cId" value="" />
+        <form id="couponForm" onsubmit="saveCoupon(event)" class="p-6 space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-400 mb-1">Mã (Code)</label>
-                <input type="text" name="Code" id="cCode" required placeholder="VD: SUMMER2026" style="text-transform:uppercase" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Mã Code (Coupon Code)</label>
+                <input type="text" id="cCode" required placeholder="VD: NEXUSSUMMER20..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 font-mono font-bold uppercase" />
             </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Mức Giảm Giá (%)</label>
-                    <input type="number" name="DiscountPercent" id="cPercent" required min="1" max="100" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Giảm (%)</label>
+                    <input type="number" id="cDiscount" required min="1" max="100" placeholder="VD: 15" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 font-bold" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Lượt dùng tối đa</label>
-                    <input type="number" name="MaxUsage" id="cMax" required min="0" value="100" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none" />
-                    <span class="text-xs text-gray-500">0 = Không giới hạn</span>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Lượt Dùng Tối Đa</label>
+                    <input type="number" id="cMaxUsage" required min="1" placeholder="VD: 100" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 font-bold" />
                 </div>
             </div>
+
             <div>
-                <label class="block text-sm font-medium text-gray-400 mb-1">Ngày Hết Hạn</label>
-                <input type="datetime-local" name="ExpiryDate" id="cEnd" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-blue-500 focus:outline-none [color-scheme:dark]" />
+                <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Ngày Hết Hạn</label>
+                <input type="date" id="cExpiryDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 font-medium" />
             </div>
-            <div class="flex items-center gap-2 mt-4">
-                <input type="checkbox" name="IsActive" id="cActive" checked class="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-500 focus:ring-offset-[#1a1a1f]" />
-                <label for="cActive" class="text-sm font-medium text-gray-400">Kích hoạt mã</label>
+
+            <div class="p-6 border-t border-slate-100 bg-slate-50/60 flex justify-end gap-3 -mx-6 -mb-6 mt-6">
+                <button type="button" onclick="document.getElementById('couponModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 transition-all text-xs border border-slate-200">Hủy Bỏ</button>
+                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all text-xs shadow-sm shadow-indigo-200 active:scale-95">Tạo Mã Ngay</button>
             </div>
         </form>
-        
-        <div class="p-6 border-t border-white/10 flex justify-end gap-3 bg-white/5 rounded-b-3xl">
-            <button type="button" onclick="closeCouponModal()" class="px-5 py-2.5 text-white hover:bg-white/10 rounded-xl transition-colors">Hủy Bỏ</button>
-            <button type="button" onclick="saveCoupon()" class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-colors">Lưu Mã</button>
-        </div>
     </div>
 </div>
 
 @section Scripts {
 <script>
-    const token = '@ViewData["Token"]';
-    const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-    };
+    const authHeaders = {};
 
-    async function loadCoupons() {
-        try {
-            const res = await fetch('http://localhost:5021/api/coupons', { headers });
-            const data = await res.json();
-            const tbody = document.getElementById('couponsTableBody');
-            
-            if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-gray-500">Chưa có mã giảm giá nào</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = data.map(c => {
-                const isActive = c.isActive ? 
-                    '<span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold">Kích hoạt</span>' : 
-                    '<span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-bold">Khóa</span>';
-                    
-                const isExpired = new Date(c.expiryDate) < new Date() ? 
-                    '<span class="ml-2 px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-bold">Hết hạn</span>' : '';
-
-                return `
-                    <tr class="border-b border-gray-800 hover:bg-white/[0.02] transition-colors group">
-                        <td class="py-4 text-gray-400">#${c.id}</td>
-                        <td class="py-4 font-bold text-white"><span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-lg tracking-wider">${c.code}</span></td>
-                        <td class="py-4 text-emerald-400 font-bold">-${c.discountPercent}%</td>
-                        <td class="py-4 text-gray-300">${c.currentUsage} / ${c.maxUsage === 0 ? '∞' : c.maxUsage}</td>
-                        <td class="py-4 text-gray-300">${new Date(c.expiryDate).toLocaleString('vi-VN')}</td>
-                        <td class="py-4">${isActive} ${isExpired}</td>
-                        <td class="py-4 text-right">
-                            <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="editCoupon(${c.id}, '${c.code}', ${c.discountPercent}, ${c.maxUsage}, '${c.expiryDate}', ${c.isActive})" class="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-colors" title="Sửa">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                                <button onclick="deleteCoupon(${c.id})" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors" title="Xóa">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    function toLocalISO(dateString) {
-        const d = new Date(dateString);
-        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,16);
-    }
-
-    function openCouponModal() {
-        document.getElementById('couponForm').reset();
-        document.getElementById('cId').value = '';
-        document.getElementById('modalTitle').innerText = 'Tạo Mã Giảm Giá';
-        document.getElementById('couponModal').classList.remove('hidden');
-    }
-
-    function closeCouponModal() {
-        document.getElementById('couponModal').classList.add('hidden');
-    }
-
-    function editCoupon(id, code, percent, maxUsage, end, isActive) {
-        document.getElementById('cId').value = id;
-        document.getElementById('cCode').value = code;
-        document.getElementById('cPercent').value = percent;
-        document.getElementById('cMax').value = maxUsage;
-        document.getElementById('cEnd').value = toLocalISO(end);
-        document.getElementById('cActive').checked = isActive;
-        document.getElementById('modalTitle').innerText = 'Sửa Mã Giảm Giá';
-        document.getElementById('couponModal').classList.remove('hidden');
-    }
-
-    async function saveCoupon() {
-        const form = document.getElementById('couponForm');
-        const formData = new FormData(form);
+    async function saveCoupon(e) {
+        e.preventDefault();
         const payload = {
-            Id: formData.get('Id') ? parseInt(formData.get('Id')) : 0,
-            Code: formData.get('Code'),
-            DiscountPercent: parseFloat(formData.get('DiscountPercent')),
-            MaxUsage: parseInt(formData.get('MaxUsage')),
-            ExpiryDate: new Date(formData.get('ExpiryDate')).toISOString(),
-            IsActive: formData.get('IsActive') === 'on'
+            code: document.getElementById('cCode').value.toUpperCase(),
+            discountPercent: parseFloat(document.getElementById('cDiscount').value) || 0,
+            maxUsage: parseInt(document.getElementById('cMaxUsage').value) || 1,
+            expiryDate: document.getElementById('cExpiryDate').value,
+            isActive: true
         };
 
-        const res = await fetch('/Coupons/Save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        if (res.ok) {
-            closeCouponModal();
-            loadCoupons();
-        } else {
-            const err = await res.text();
-            alert('Lỗi: ' + err);
-        }
+        try {
+            const res = await apiFetch('/api-proxy/api/v1/coupons', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                document.getElementById('couponModal').classList.add('hidden');
+                window.location.reload();
+            } else {
+                const err = await res.json().catch(() => ({}));
+                alert("Lỗi khi tạo mã giảm giá: " + (err.message || "Vui lòng kiểm tra dữ liệu!"));
+            }
+        } catch (err) { console.error(err); }
     }
 
     async function deleteCoupon(id) {
-        if(!confirm('Chắc chắn muốn xóa mã giảm giá này?')) return;
-        const form = new FormData();
-        form.append('id', id);
-        await fetch(`/Coupons/Delete/${id}`, { method: 'POST', body: form });
-        loadCoupons();
+        if (!confirm("Bạn có chắc chắn muốn xóa mã giảm giá này?")) return;
+        try {
+            const res = await apiFetch(`/api-proxy/api/v1/coupons/${id}`, {
+                method: 'DELETE',
+                headers: authHeaders
+            });
+            if (res.ok) window.location.reload();
+        } catch (e) { console.error(e); }
     }
-
-    document.addEventListener('DOMContentLoaded', loadCoupons);
 </script>
 }
+

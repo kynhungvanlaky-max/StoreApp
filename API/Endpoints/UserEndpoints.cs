@@ -107,7 +107,8 @@ namespace GameStore.API.Endpoints
                     WalletBalance = user.WalletBalance,
                     RoleName = user.Role.RoleName,
                     CreatedAt = user.CreatedAt,
-                    AvatarUrl = user.AvatarUrl
+                    AvatarUrl = user.AvatarUrl,
+                    IsLocked = user.IsLocked
                 });
             }).RequireAuthorization();
 

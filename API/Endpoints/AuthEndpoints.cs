@@ -58,7 +58,8 @@ namespace GameStore.API.Endpoints
             // LOGIN
             group.MapPost("/login", async (LoginRequest req, GameStoreDbContext db, IConfiguration config) =>
             {
-                var user = await db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == req.Email);
+                var account = (string.IsNullOrWhiteSpace(req.Username) ? req.Email : req.Username)?.Trim() ?? string.Empty;
+                var user = await db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == account || u.Username == account);
                 if (user == null || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
                     return Results.Unauthorized();
 
@@ -329,9 +330,11 @@ namespace GameStore.API.Endpoints
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "Customer"),
+                new Claim("role", user.Role?.RoleName ?? "Customer"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -355,7 +358,7 @@ namespace GameStore.API.Endpoints
     }
 
     public class RegisterRequest { public string Username { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; public string SecretCode { get; set; } = string.Empty; }
-    public class LoginRequest { public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
+    public class LoginRequest { public string? Email { get; set; } public string? Username { get; set; } public string Password { get; set; } = string.Empty; }
     public class RefreshRequest { public string RefreshToken { get; set; } = string.Empty; }
     public class ForgotPasswordRequest { public string Email { get; set; } = string.Empty; }
     public class ExternalLoginRequest { public string Provider { get; set; } = string.Empty; public string AccessToken { get; set; } = string.Empty; }

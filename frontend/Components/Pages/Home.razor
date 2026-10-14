@@ -57,13 +57,19 @@
                     <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
                         <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                        <span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded @GetTypeBadgeClass(p.Type, p.Categories) shadow-md">
+                            @GetTypeBadge(p.Type, p.Categories)
+                        </span>
+                        @if (p.BasePrice > 0)
+                        {
+                            <span class="absolute top-2 left-2 px-1.5 py-0.5 text-[11px] font-bold text-[#121212] bg-[#0078F2] rounded shadow">-20%</span>
+                        }
                     </div>
                     <div class="space-y-1">
-                        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate">@p.Name</h3>
+                        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate" title="@p.Name">@p.Name</h3>
                         <div class="flex items-center gap-2">
                             @if (p.BasePrice > 0)
                             {
-                                <span class="px-1.5 py-0.5 text-[11px] font-bold text-[#121212] bg-[#0078F2] rounded">-20%</span>
                                 <span class="text-xs text-gray-500 line-through">@p.BasePrice.ToString("N0") đ</span>
                             }
                             <span class="text-sm font-medium text-white">@GetDisplayPrice(p)</span>
@@ -163,28 +169,34 @@
         </div>
     </div>
 
-    @* Free to Play *@
-    @if (freeProducts.Any())
+    @* Featured Applications *@
+    @if (featuredApps.Any())
     {
         <div class="mb-16">
             <div class="flex justify-between items-end mb-6">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    <Icon Name="HeroiconName.Gift" Class="w-6 h-6 text-green-500" />
-                    Chơi Miễn Phí
+                    <Icon Name="HeroiconName.CpuChip" Class="w-6 h-6 text-[#0078F2]" />
+                    Ứng Dụng Nổi Bật
                 </h2>
-                <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Khám phá</a>
+                <a href="/products?type=Software" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Khám phá</a>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                @foreach (var p in freeProducts)
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+                @foreach (var p in featuredApps)
                 {
-                    <a href="/products/@p.Id" class="group block bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#303030] hover:border-[#0078F2] transition-colors">
-                        <div class="aspect-[3/4] relative">
+                    <a href="/products/@p.Id" class="group block">
+                        <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
                             <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                            <span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded @GetTypeBadgeClass(p.Type, p.Categories) shadow-md">
+                                @GetTypeBadge(p.Type, p.Categories)
+                            </span>
                         </div>
-                        <div class="p-3 text-center">
-                            <h3 class="text-xs font-bold text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
-                            <span class="text-[11px] font-black text-green-500 uppercase tracking-wider bg-green-500/10 px-2 py-0.5 rounded">Miễn Phí</span>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate" title="@p.Name">@p.Name</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-white">@GetDisplayPrice(p)</span>
+                            </div>
                         </div>
                     </a>
                 }
@@ -192,7 +204,7 @@
         </div>
     }
 
-    @* Recently Viewed Games *@
+    @* Recently Viewed Games & Apps *@
     @if (recentlyViewedProducts.Any())
     {
         <div class="mb-12 border-t border-[#303030] pt-8">
@@ -204,16 +216,22 @@
                 <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
                 @foreach (var p in recentlyViewedProducts)
                 {
-                    <a href="/products/@p.ProductId" class="group block bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#303030] hover:border-[#0078F2] transition-all hover:scale-[1.02]">
-                        <div class="aspect-[3/4] relative overflow-hidden">
+                    <a href="/products/@p.ProductId" class="group block">
+                        <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
                             <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                            <span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded @GetTypeBadgeClass(p.Type) shadow-md">
+                                @GetTypeBadge(p.Type)
+                            </span>
                         </div>
-                        <div class="p-3">
-                            <h3 class="text-sm font-bold text-gray-200 group-hover:text-white truncate">@p.Name</h3>
-                            <div class="text-xs text-gray-500 mt-1">@p.BasePrice.ToString("N0") đ</div>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate" title="@p.Name">@p.Name</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-white">@p.BasePrice.ToString("N0") đ</span>
+                            </div>
                         </div>
                     </a>
                 }
@@ -287,7 +305,7 @@
     private List<Frontend.Models.Product.ProductDto> specialOffers = new();
     private List<Frontend.Models.Product.ProductDto> newReleases = new();
     private List<Frontend.Models.Product.ProductDto> trendingProducts = new();
-    private List<Frontend.Models.Product.ProductDto> freeProducts = new();
+    private List<Frontend.Models.Product.ProductDto> featuredApps = new();
     private List<Frontend.Models.News.NewsArticleDto> latestNews = new();
     private List<Frontend.Services.RecentlyViewedItem> recentlyViewedProducts = new();
     private List<Frontend.Models.Product.ProductDto> recommendedProducts = new();
@@ -302,7 +320,22 @@
             specialOffers = products.Skip(1).Take(5).ToList();
             newReleases = products.OrderByDescending(p => p.ReleaseDate).Take(6).ToList();
             trendingProducts = products.Skip(6).Take(6).ToList();
-            freeProducts = products.Where(p => p.BasePrice == 0 || (p.Pricing != null && (p.Pricing.ToLower() == "free" || p.Pricing.ToLower() == "miễn phí"))).Take(6).ToList();
+        }
+
+        // Load featured applications
+        var appsResult = await ProductService.GetProductsAsync(1, 6, type: "Software");
+        if (appsResult?.Items?.Any() == true)
+        {
+            featuredApps = appsResult.Items.Take(6).ToList();
+        }
+        else if (result != null && result.Items.Any())
+        {
+            featuredApps = result.Items
+                .Where(p => p.Type?.Equals("Software", StringComparison.OrdinalIgnoreCase) == true 
+                         || p.Type?.Equals("App", StringComparison.OrdinalIgnoreCase) == true 
+                         || (p.Categories != null && p.Categories.Any(c => c.Contains("Phần mềm", StringComparison.OrdinalIgnoreCase) || c.Contains("Ứng dụng", StringComparison.OrdinalIgnoreCase))))
+                .Take(6)
+                .ToList();
         }
 
         var newsResult = await NewsService.GetNewsAsync();
@@ -350,5 +383,37 @@
         }
         
         return p.Pricing?.Trim().Equals("Miễn phí", StringComparison.OrdinalIgnoreCase) == true || p.Pricing == "Free" ? "Miễn phí" : "Liên hệ";
+    }
+
+    private bool IsApp(string? type, List<string>? categories = null)
+    {
+        if (string.Equals(type, "Software", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(type, "App", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (categories != null && categories.Any(c => 
+            c.Contains("Phần mềm", StringComparison.OrdinalIgnoreCase) || 
+            c.Contains("Ứng dụng", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Software", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("App", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private string GetTypeBadge(string? type, List<string>? categories = null)
+    {
+        return IsApp(type, categories) ? "App" : "Game";
+    }
+
+    private string GetTypeBadgeClass(string? type, List<string>? categories = null)
+    {
+        return IsApp(type, categories)
+            ? "bg-[#0078F2] text-white border border-blue-400/40"
+            : "bg-purple-600 text-white border border-purple-400/40";
     }
 }

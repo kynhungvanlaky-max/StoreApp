@@ -1,80 +1,138 @@
-@model Backend.Models.KeyListViewModel
+@model List<Backend.Models.ProductKeyViewModel>
 
-@{
-    ViewData["Title"] = "Quản Lý Product Keys";
+@functions {
+    private static string MaskKey(string key)
+    {
+        var parts = (key ?? string.Empty).Split('-');
+        return string.Join("-", parts.Select((part, index) =>
+            index == parts.Length - 1 ? part : new string('•', Math.Max(part.Length, 4))));
+    }
 }
 
-<div class="glassmorphism rounded-3xl p-8 mb-8">
+@{
+    ViewData["Title"] = "Kho Key Game (Product Keys)";
+    var products = ViewBag.Products as List<Backend.Models.ProductDto> ?? new List<Backend.Models.ProductDto>();
+    var groupedKeys = (Model ?? new List<Backend.Models.ProductKeyViewModel>())
+        .GroupBy(k => new { k.ProductId, ProductName = string.IsNullOrEmpty(k.ProductName) ? "Khác" : k.ProductName })
+        .ToList();
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalItems = ViewBag.TotalItems ?? (Model?.Count ?? 0);
+    string search = ViewBag.Search as string ?? string.Empty;
+    int pageSize = ViewBag.PageSize ?? 10;
+}
+
+<div class="admin-card p-8 mb-8">
+    <!-- Header Controls -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div class="relative w-full md:w-96">
-            <input type="text" placeholder="Tìm kiếm mã Key..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
-            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </div>
+        <form method="get" action="/Keys" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <input type="hidden" name="pageSize" value="@pageSize" />
+            <div class="relative w-full md:w-96">
+                <input type="search" name="search" value="@search" placeholder="Tìm tên game hoặc mã key..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium placeholder-slate-400" />
+                <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-4 top-3.5 text-sm"></i>
+            </div>
+            <button type="submit" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold">Tìm</button>
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a href="/Keys?pageSize=@pageSize" class="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-bold text-center">Xóa lọc</a>
+            }
+        </form>
         <div class="flex items-center gap-3">
-            <button onclick="document.getElementById('importKeyModal').showModal()" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center gap-2 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Import Key Mới
+            <button onclick="document.getElementById('addKeyModal').showModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-sm shadow-indigo-200 flex items-center gap-2 transition-all active:scale-95 text-sm">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>Thêm Mã Key Mới</span>
             </button>
         </div>
     </div>
 
-    <div class="space-y-4">
-        @if (Model.Keys != null && Model.Keys.Any())
+    <!-- Accordion Key Groups Container -->
+    <div class="space-y-4 min-h-[380px]">
+        @if (!groupedKeys.Any())
         {
-            var groupedKeys = Model.Keys.GroupBy(k => k.ProductName);
-            int groupIndex = 0;
+            <div class="text-center py-16 text-slate-400 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+                <i class="fa-solid fa-key text-4xl text-slate-300 mb-3"></i>
+                <p class="font-semibold text-slate-600">Chưa có mã Key nào được khởi tạo.</p>
+                <p class="text-xs text-slate-400 mt-1">Bấm "Thêm Mã Key Mới" để nhập key cho game.</p>
+            </div>
+        }
+        else
+        {
+            int index = 0;
             foreach (var group in groupedKeys)
             {
-                groupIndex++;
-                var totalKeys = group.Count();
-                var soldKeys = group.Count(k => k.IsSold || k.Status == "Đã bán");
-                var availableKeys = totalKeys - soldKeys;
+                index++;
+                var total = group.Count();
+                var available = group.Count(k => !k.IsSold && !k.OrderId.HasValue);
                 
-                <div class="bg-black/20 border border-white/10 rounded-2xl overflow-hidden">
-                    <button type="button" onclick="document.getElementById('group-@groupIndex').classList.toggle('hidden'); document.getElementById('icon-@groupIndex').classList.toggle('rotate-180');" class="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors focus:outline-none">
-                        <div class="flex items-center gap-4">
-                            <h4 class="text-xl font-bold text-white text-left">@group.Key</h4>
+                <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                    <button type="button"
+                            aria-expanded="false"
+                            aria-controls="group-@index"
+                            onclick="toggleKeyGroup(this, 'group-@index', 'icon-@index')"
+                            class="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 bg-slate-50 hover:bg-slate-100/80 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 cursor-pointer text-left">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-extrabold text-slate-800 truncate">@group.Key.ProductName</h4>
+                                <p class="text-[11px] text-slate-400 font-semibold mt-0.5">Nhấn để xem danh sách key</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-bold border border-blue-500/20">Tổng: @totalKeys</span>
-                            <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Sẵn sàng: @availableKeys</span>
-                            <svg id="icon-@groupIndex" class="w-6 h-6 text-gray-400 transition-transform duration-300 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div class="flex items-center flex-wrap gap-2 self-start sm:self-auto pl-12 sm:pl-0">
+                            <span class="px-2.5 py-1 bg-slate-200/80 text-slate-600 rounded-lg text-xs font-bold">Tổng: @total</span>
+                            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">Sẵn sàng: @available</span>
+                            <i id="icon-@index" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 ml-2"></i>
                         </div>
                     </button>
-                    <div id="group-@groupIndex" class="hidden border-t border-white/10 p-6">
+                    <div id="group-@index" class="hidden border-t border-slate-200 bg-white" role="region" aria-label="Danh sách key của @group.Key.ProductName">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left">
+                            <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="text-gray-500 text-sm border-b border-white/10">
-                                        <th class="pb-4 font-medium w-24">ID</th>
-                                        <th class="pb-4 font-medium">Mã Key</th>
-                                        <th class="pb-4 font-medium">Trạng Thái</th>
-                                        <th class="pb-4 font-medium text-right">Hành Động</th>
+                                    <tr class="text-slate-500 text-xs uppercase tracking-wider bg-slate-50/70 border-b border-slate-200">
+                                        <th class="py-3 px-6 font-bold w-20">ID</th>
+                                        <th class="py-3 px-4 font-bold">Mã Key</th>
+                                        <th class="py-3 px-4 font-bold">Trạng Thái</th>
+                                        <th class="py-3 px-4 font-bold text-right">Hành Động</th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-sm">
-                                    @foreach (var key in group)
+                                <tbody class="text-sm divide-y divide-slate-100">
+                                    @foreach (var k in group)
                                     {
-                                        <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group">
-                                            <td class="py-4 font-bold text-gray-400">#@key.Id</td>
-                                            <td class="py-4 font-mono text-blue-400">@key.KeyCode</td>
-                                            <td class="py-4">
-                                                @if (key.Status == "Chưa bán" || key.IsSold == false)
+                                        <tr class="hover:bg-slate-50/80 transition-all">
+                                            <td class="py-3.5 px-6 font-mono font-bold text-slate-400">#@k.Id</td>
+                                            <td class="py-3.5 px-4">
+                                                <div class="flex items-center gap-2 min-w-[240px]">
+                                                    <code id="key-value-@k.Id" data-key="@k.KeyCode" data-visible="false" class="font-mono font-bold text-indigo-600 tracking-wider">@MaskKey(k.KeyCode)</code>
+                                                    <button type="button" onclick="toggleKeyVisibility(@k.Id)" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 inline-flex items-center justify-center" title="Ẩn/hiện key" aria-label="Ẩn hoặc hiện key">
+                                                        <i id="key-eye-@k.Id" class="fa-solid fa-eye text-xs"></i>
+                                                    </button>
+                                                    <button type="button" onclick="copyKey(@k.Id, this)" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 inline-flex items-center justify-center" title="Sao chép key" aria-label="Sao chép key">
+                                                        <i class="fa-regular fa-copy text-xs"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="py-3.5 px-4">
+                                                @if (!k.IsSold && !k.OrderId.HasValue)
                                                 {
-                                                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Chưa Bán</span>
+                                                    <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">Chưa Bán</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-bold border border-red-500/20">Đã Bán</span>
+                                                    <span class="px-2.5 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-bold border border-rose-200">Đã Bán</span>
                                                 }
                                             </td>
-                                            <td class="py-4 text-right">
-                                                <form method="post" asp-action="Delete" asp-controller="Keys" class="inline">
-                                                    <input type="hidden" name="id" value="@key.Id" />
-                                                    <button type="submit" class="w-8 h-8 rounded bg-red-500/10 text-red-400 hover:bg-red-500/100 hover:text-white inline-flex items-center justify-center transition-colors" onclick="return confirm('Bạn có chắc chắn muốn xóa mã game này?');">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            <td class="py-3.5 px-4 text-right">
+                                                @if (!k.IsSold && !k.OrderId.HasValue)
+                                                {
+                                                    <button onclick="deleteKey(@k.Id)" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white inline-flex items-center justify-center transition-all shadow-2xs" title="Xóa key chưa bán">
+                                                        <i class="fa-solid fa-trash text-xs"></i>
                                                     </button>
-                                                </form>
+                                                }
+                                                else
+                                                {
+                                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400" title="Key đã bán không thể xóa"><i class="fa-solid fa-lock"></i> Đã khóa</span>
+                                                }
                                             </td>
                                         </tr>
                                     }
@@ -85,46 +143,166 @@
                 </div>
             }
         }
-        else
-        {
-            <div class="text-center py-12 text-gray-400">
-                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                <p>Chưa có mã key nào được tạo.</p>
-            </div>
-        }
     </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-6 gap-4">
+            <div class="text-sm font-semibold text-slate-500">
+                Tổng cộng @totalItems game (Trang @currentPage/@totalPages)
+            </div>
+            <div class="flex items-center gap-1.5">
+                @if (currentPage > 1)
+                {
+                    <a href="?page=@(currentPage - 1)&pageSize=@pageSize&search=@Uri.EscapeDataString(search)" class="w-9 h-9 flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 transition-all text-slate-600 rounded-xl text-xs shadow-2xs">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                }
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a href="?page=@i&pageSize=@pageSize&search=@Uri.EscapeDataString(search)" class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs @(i == currentPage ? "bg-indigo-600 text-white shadow-sm shadow-indigo-200" : "border border-slate-200 bg-white hover:bg-slate-50 text-slate-600") transition-all">@i</a>
+                }
+                @if (currentPage < totalPages)
+                {
+                    <a href="?page=@(currentPage + 1)&pageSize=@pageSize&search=@Uri.EscapeDataString(search)" class="w-9 h-9 flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 transition-all text-slate-600 rounded-xl text-xs shadow-2xs">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    }
 </div>
 
-<!-- Import Modal (Mô phỏng Dialog) -->
-<dialog id="importKeyModal" class="bg-transparent backdrop:bg-black/80 backdrop:backdrop-blur-sm w-full max-w-lg p-0 rounded-3xl m-auto shadow-2xl border border-white/10">
-    <div class="bg-black/40 p-8 rounded-3xl relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-        <form method="post" asp-controller="Keys" asp-action="Generate">
-            <h3 class="font-black text-2xl text-white mb-6">Import / Sinh Key Tự Động</h3>
-            
-            <div class="space-y-4 mb-8">
-                <div>
-                    <label class="block text-sm font-bold text-gray-400 mb-2">Sản Phẩm</label>
-                    <select name="productId" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-                        @if (Model.Products != null)
-                        {
-                            foreach (var p in Model.Products)
-                            {
-                                <option value="@p.Id">@p.Name</option>
-                            }
-                        }
-                    </select>
+
+<!-- Modal Add Key -->
+<dialog id="addKeyModal" class="bg-transparent backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm w-full max-w-lg p-0 rounded-3xl m-auto shadow-2xl border-0">
+    <div class="bg-white rounded-3xl overflow-hidden border border-slate-200">
+        <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-400 mb-2">Số lượng Key cần tạo</label>
-                    <input type="number" name="quantity" required min="1" max="1000" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500" placeholder="Ví dụ: 50" />
+                <h3 class="font-black text-xl text-slate-800">Thêm Mã Key Mới</h3>
+            </div>
+            <button onclick="document.getElementById('addKeyModal').close()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="addKeyForm" onsubmit="createKey(event)" class="p-8 space-y-5">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Chọn Sản Phẩm (Game)</label>
+                <select id="pSelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-indigo-500 font-medium">
+                    @foreach (var p in products)
+                    {
+                        <option value="@p.Id">@p.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Mã Key Game</label>
+                <div class="flex gap-2">
+                    <input type="text" id="pKeyCode" required placeholder="XXXXX-XXXXX-XXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-mono font-bold uppercase focus:outline-none focus:border-indigo-500 placeholder-slate-400" />
+                    <button type="button" onclick="autoGenerateCode()" class="px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold whitespace-nowrap transition-all">
+                        Tạo ngẫu nhiên
+                    </button>
                 </div>
             </div>
-            
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="document.getElementById('importKeyModal').close()" class="px-6 py-3 rounded-xl font-bold text-white bg-white/5 hover:bg-white/10 transition-colors">Hủy</button>
-                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold transition-all">Tạo Ngay</button>
+
+            <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                <button type="button" onclick="document.getElementById('addKeyModal').close()" class="px-5 py-2.5 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 transition-all text-xs border border-slate-200">Hủy Bỏ</button>
+                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all text-xs shadow-sm shadow-indigo-200 active:scale-95">Lưu Mã Key</button>
             </div>
         </form>
     </div>
 </dialog>
+
+@section Scripts {
+<script>
+    const authHeaders = {};
+
+    function toggleKeyGroup(button, groupId, iconId) {
+        const group = document.getElementById(groupId);
+        const opening = group.classList.contains('hidden');
+        group.classList.toggle('hidden', !opening);
+        document.getElementById(iconId).classList.toggle('rotate-180', opening);
+        button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    }
+
+    function maskKey(key) {
+        const parts = String(key || '').split('-');
+        return parts.map((part, index) => index === parts.length - 1 ? part : '•'.repeat(Math.max(part.length, 4))).join('-');
+    }
+
+    function toggleKeyVisibility(id) {
+        const code = document.getElementById(`key-value-${id}`);
+        const icon = document.getElementById(`key-eye-${id}`);
+        const show = code.dataset.visible !== 'true';
+        code.textContent = show ? code.dataset.key : maskKey(code.dataset.key);
+        code.dataset.visible = show ? 'true' : 'false';
+        icon.classList.toggle('fa-eye', !show);
+        icon.classList.toggle('fa-eye-slash', show);
+    }
+
+    async function copyKey(id, button) {
+        const key = document.getElementById(`key-value-${id}`).dataset.key;
+        try {
+            await navigator.clipboard.writeText(key);
+            const icon = button.querySelector('i');
+            icon.className = 'fa-solid fa-check text-xs';
+            button.classList.add('text-emerald-600', 'bg-emerald-50');
+            setTimeout(() => {
+                icon.className = 'fa-regular fa-copy text-xs';
+                button.classList.remove('text-emerald-600', 'bg-emerald-50');
+            }, 1200);
+        } catch {
+            alert('Không thể sao chép tự động. Hãy mở key và sao chép thủ công.');
+        }
+    }
+
+    function autoGenerateCode() {
+        const rand = () => Math.random().toString(36).substring(2, 7).toUpperCase();
+        document.getElementById('pKeyCode').value = `${rand()}-${rand()}-${rand()}`;
+    }
+
+    async function createKey(e) {
+        e.preventDefault();
+        const pId = parseInt(document.getElementById('pSelect').value);
+        const code = document.getElementById('pKeyCode').value.trim();
+
+        try {
+            const res = await apiFetch('/api-proxy/api/v1/product-keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
+                body: JSON.stringify({ productId: pId, keyCode: code, isSold: false })
+            });
+
+            if (res.ok) {
+                document.getElementById('addKeyModal').close();
+                window.location.reload();
+            } else {
+                alert("Lỗi khi thêm mã Key!");
+            }
+        } catch (err) { console.error(err); }
+    }
+
+    async function deleteKey(id) {
+        if (!confirm("Bạn có chắc chắn muốn xóa mã Key này?")) return;
+        try {
+            const res = await apiFetch(`/api-proxy/api/v1/product-keys/${id}`, {
+                method: 'DELETE',
+                headers: authHeaders
+            });
+            if (res.ok) {
+                window.location.reload();
+            } else if (res.status === 409) {
+                alert("Key đã bán hoặc đã gán cho đơn hàng nên không thể xóa.");
+            } else {
+                alert("Không thể xóa key.");
+            }
+        } catch (e) { console.error(e); }
+    }
+</script>
+}
+

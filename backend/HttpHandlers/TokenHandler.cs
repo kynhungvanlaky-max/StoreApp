@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 
 namespace Backend.HttpHandlers
@@ -14,9 +13,10 @@ namespace Backend.HttpHandlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = _httpContextAccessor.HttpContext?.Request.Cookies["access_token"];
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["access_token"] 
+                ?? _httpContextAccessor.HttpContext?.Items["AdminToken"]?.ToString();
 
-            if (!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token) && request.Headers.Authorization is null)
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }

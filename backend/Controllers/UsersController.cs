@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Backend.Models;
+using Backend.Extensions;
+using Backend.Attributes;
 
 namespace Backend.Controllers
 {
+    [RequireAdminRole]
     public class UsersController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -11,53 +15,41 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index()
-        {
-            ViewData["Token"] = Request.Cookies["access_token"];
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ToggleLock(int id)
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.PutAsync($"/api/users/{id}/toggle-lock", null);
-            
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
+            var users = new List<UserViewModel>();
+            int totalPages = 1;
+            int totalItems = 0;
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                SetSuccessMessage("Cập nhật trạng thái thành công.");
+                var url = $"/api/v1/users?page={page}&pageSize={pageSize}";
+                if (!string.IsNullOrWhiteSpace(search)) url += $"&search={Uri.EscapeDataString(search)}";
+
+                var response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var paged = await response.Content.ReadJsonAsync<PagedResponse<UserViewModel>>();
+                    if (paged != null)
+                    {
+                        users = paged.Data;
+                        totalPages = paged.TotalPages > 0 ? paged.TotalPages : 1;
+                        totalItems = paged.TotalItems;
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                SetErrorMessage("Có lỗi xảy ra khi cập nhật trạng thái.");
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangeRole(int id, string roleName)
-        {
-            var client = _httpClientFactory.CreateClient("API");
-            var dto = new { RoleName = roleName };
-            var response = await client.PutAsJsonAsync($"/api/users/{id}/role", dto);
-            
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
-
-            if (response.IsSuccessStatusCode)
-            {
-                SetSuccessMessage("Cập nhật quyền thành công.");
-            }
-            else
-            {
-                SetErrorMessage("Có lỗi xảy ra khi cập nhật quyền.");
+                Console.WriteLine("API Users Error: " + ex.Message);
             }
 
-            return RedirectToAction("Index");
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.Search = search;
+
+            return View(users);
         }
     }
 }

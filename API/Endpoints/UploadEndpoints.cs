@@ -10,6 +10,31 @@ namespace GameStore.API.Endpoints
 {
     public static class UploadEndpoints
     {
+        public static string GetUploadDirectory()
+        {
+            var baseDir = Directory.GetCurrentDirectory();
+            var possiblePaths = new[]
+            {
+                Path.Combine(baseDir, "MediaStorage"),
+                Path.Combine(baseDir, "..", "MediaStorage"),
+                @"D:\DA\MediaStorage",
+                Path.Combine(AppContext.BaseDirectory, "MediaStorage")
+            };
+
+            foreach (var path in possiblePaths)
+            {
+                try
+                {
+                    if (Directory.Exists(path)) return Path.GetFullPath(path);
+                }
+                catch {}
+            }
+
+            var target = Path.Combine(baseDir, "MediaStorage");
+            try { Directory.CreateDirectory(target); } catch {}
+            return target;
+        }
+
         public static void MapUploadEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/upload");
@@ -25,12 +50,7 @@ namespace GameStore.API.Endpoints
                 if (files.Count == 0)
                     return Results.BadRequest("No files were uploaded.");
 
-                var uploadDir = @"D:\DA\MediaStorage";
-                if (!Directory.Exists(uploadDir))
-                {
-                    Directory.CreateDirectory(uploadDir);
-                }
-
+                var uploadDir = GetUploadDirectory();
                 var uploadedUrls = new System.Collections.Generic.List<string>();
 
                 foreach (var file in files)
@@ -46,27 +66,28 @@ namespace GameStore.API.Endpoints
                             await file.CopyToAsync(stream);
                         }
 
-                        // Trả về URL của API Server Static Files
-                        uploadedUrls.Add($"http://localhost:5021/media/{newFileName}");
+                        // URL tương thích cả truy cập trực tiếp port 5021 lẫn qua reverse proxy
+                        var host = request.Host.HasValue ? $"{request.Scheme}://{request.Host}" : "http://localhost:5021";
+                        uploadedUrls.Add($"{host}/media/{newFileName}");
                     }
                 }
 
                 return Results.Ok(new { urls = uploadedUrls });
             })
-            // Configure upload sizes if needed
             .DisableAntiforgery();
 
             // GET list of uploaded files
-            group.MapGet("/", () =>
+            group.MapGet("/", (HttpRequest request) =>
             {
-                var uploadDir = @"D:\DA\MediaStorage";
+                var uploadDir = GetUploadDirectory();
                 if (!Directory.Exists(uploadDir)) return Results.Ok(new string[0]);
 
+                var host = request.Host.HasValue ? $"{request.Scheme}://{request.Host}" : "http://localhost:5021";
                 var files = Directory.GetFiles(uploadDir)
                     .Select(f => new 
                     {
                         FileName = Path.GetFileName(f),
-                        Url = $"http://localhost:5021/media/{Path.GetFileName(f)}",
+                        Url = $"{host}/media/{Path.GetFileName(f)}",
                         Size = new FileInfo(f).Length,
                         CreatedAt = new FileInfo(f).CreationTime
                     })
@@ -79,7 +100,7 @@ namespace GameStore.API.Endpoints
             // DELETE file
             group.MapDelete("/{fileName}", (string fileName) =>
             {
-                var uploadDir = @"D:\DA\MediaStorage";
+                var uploadDir = GetUploadDirectory();
                 var filePath = Path.Combine(uploadDir, fileName);
                 
                 // Prevent directory traversal

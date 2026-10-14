@@ -26,7 +26,7 @@ namespace Frontend.Services
             }
         }
 
-        public async Task AddRecentlyViewedAsync(int productId, string name, string imageUrl, decimal basePrice)
+        public async Task AddRecentlyViewedAsync(int productId, string name, string imageUrl, decimal basePrice, string? type = null)
         {
             var items = await GetRecentlyViewedAsync();
             
@@ -40,6 +40,7 @@ namespace Frontend.Services
                 Name = name,
                 ImageUrl = imageUrl,
                 BasePrice = basePrice,
+                Type = type ?? "Game",
                 ViewedAt = DateTime.UtcNow
             });
             
@@ -64,6 +65,7 @@ namespace Frontend.Services
         public string Name { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
         public decimal BasePrice { get; set; }
+        public string Type { get; set; } = "Game";
         public DateTime ViewedAt { get; set; }
     }
 }

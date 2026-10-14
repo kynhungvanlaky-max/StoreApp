@@ -1,114 +1,158 @@
 @model Backend.Models.OrderViewModel
-
+@using System.Text.Json
 @{
-    ViewData["Title"] = "Chi tiết Đơn hàng #" + Model.Id;
-    Layout = "_Layout";
+    ViewData["Title"] = "Chi Tiết Đơn Hàng #" + (Model?.Id ?? 0);
+    int orderId = Model?.Id ?? 0;
 }
 
-<div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-white">@ViewData["Title"]</h1>
-        <a href="/Orders" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded transition-colors">
-            <i class="fa-solid fa-arrow-left"></i> Quay lại
-        </a>
-    </div>
+<div class="mb-6">
+    <a href="/Orders" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Quay lại Danh sách Đơn hàng</span>
+    </a>
+</div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="mb-4 p-4 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="mb-4 p-4 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg">
-            @TempData["ErrorMessage"]
-        </div>
-    }
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="bg-[#1A1A1A] border border-white/10 rounded-xl p-6">
-            <h2 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Thông tin Đơn hàng</h2>
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Khách hàng:</span>
-                    <span class="text-white font-medium">@Model.Username</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Tổng tiền:</span>
-                    <span class="text-blue-400 font-bold">@Model.TotalAmount.ToString("N0")đ</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Trạng thái:</span>
-                    <span>
-                        @if (Model.Status == "Completed")
-                        {
-                            <span class="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-xs font-bold border border-green-500/20">Hoàn Thành</span>
-                        }
-                        else if (Model.Status == "Pending")
-                        {
-                            <span class="px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded-md text-xs font-bold border border-yellow-500/20">Chờ Xử Lý</span>
-                        }
-                        else
-                        {
-                            <span class="px-2 py-1 bg-red-500/10 text-red-400 rounded-md text-xs font-bold border border-red-500/20">Thất Bại</span>
-                        }
-                    </span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Ngày đặt:</span>
-                    <span class="text-white">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
-                </div>
-                <form asp-action="UpdateStatus" method="post" class="mt-4 pt-4 border-t border-white/10 flex items-center gap-2">
-                    <input type="hidden" name="id" value="@Model.Id" />
-                    <select name="status" class="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
-                        <option value="Pending" selected="@(Model.Status == "Pending" ? "selected" : null)" class="bg-gray-800">Chờ Xử Lý</option>
-                        <option value="Completed" selected="@(Model.Status == "Completed" ? "selected" : null)" class="bg-gray-800">Hoàn Thành (Cấp Key)</option>
-                        <option value="Failed" selected="@(Model.Status == "Failed" ? "selected" : null)" class="bg-gray-800">Thất Bại (Thu Hồi)</option>
-                    </select>
-                    <button type="submit" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500/100 text-white rounded text-sm font-bold transition-colors">Cập nhật</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="bg-[#1A1A1A] border border-white/10 rounded-xl p-6">
-            <h2 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Sản phẩm</h2>
-            <ul class="list-disc list-inside text-white/80 space-y-2">
-                @foreach(var item in Model.Items)
-                {
-                    <li>@item</li>
-                }
-            </ul>
-        </div>
-    </div>
-
-    <div class="bg-[#1A1A1A] border border-white/10 rounded-xl overflow-hidden">
-        <h2 class="text-lg font-bold text-white p-6 border-b border-white/10">Danh sách Mã Game</h2>
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-[#050505] border-b border-white/10">
-                    <th class="p-4 text-gray-500 font-medium">Sản phẩm</th>
-                    <th class="p-4 text-gray-500 font-medium">Mã kích hoạt (Key)</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-white/10">
-                @if(Model.Keys != null && Model.Keys.Any())
-                {
-                    foreach (var key in Model.Keys)
-                    {
-                        <tr class="hover:bg-white/5 transition-colors">
-                            <td class="p-4 text-white">@key.ProductName</td>
-                            <td class="p-4 text-blue-400 font-mono tracking-wider">@key.KeyCode</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="2" class="p-8 text-center text-gray-500">Đơn hàng này không có mã game nào (chưa thanh toán hoặc là lỗi).</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div id="orderDetailsContainer" class="admin-card p-8 mb-8">
+    <div class="flex items-center justify-center py-16 text-slate-400 font-medium">
+        <i class="fa-solid fa-circle-notch fa-spin text-indigo-600 text-xl mr-3"></i>
+        <span>Đang tải thông tin chi tiết đơn hàng...</span>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    const orderId = '@orderId';
+    const authHeaders = {};
+
+    async function loadOrderDetails() {
+        const container = document.getElementById('orderDetailsContainer');
+        try {
+            const res = await apiFetch(`/api-proxy/api/v1/orders/${orderId}`, { headers: authHeaders });
+            if (!res.ok) {
+                renderFallbackModel();
+                return;
+            }
+            const o = await res.json();
+            renderOrderData(o);
+        } catch (e) {
+            renderFallbackModel();
+        }
+    }
+
+    function renderFallbackModel() {
+        const container = document.getElementById('orderDetailsContainer');
+        const mUsername = @Html.Raw(JsonSerializer.Serialize(Model?.Username ?? "Khách Vãng Lai"));
+        const mAmount = @(Model?.TotalAmount ?? 0);
+        const mStatus = @Html.Raw(JsonSerializer.Serialize(Model?.Status ?? "Pending"));
+        const mDate = @Html.Raw(JsonSerializer.Serialize(Model?.OrderDate.ToString("O") ?? string.Empty));
+
+        renderOrderData({
+            id: orderId,
+            username: mUsername,
+            totalAmount: mAmount,
+            status: mStatus,
+            orderDate: mDate,
+            items: [],
+            keys: []
+        });
+    }
+
+    function renderOrderData(o) {
+        const container = document.getElementById('orderDetailsContainer');
+        
+        let statusBadge = '';
+        if (o.status === 'Completed' || o.status === 'Hoàn Thành') {
+            statusBadge = `<span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">Hoàn Thành</span>`;
+        } else if (o.status === 'Pending' || o.status === 'Chờ Xử Lý') {
+            statusBadge = `<span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-200">Chờ Xử Lý</span>`;
+        } else {
+            statusBadge = `<span class="px-3 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-bold border border-rose-200">Thất Bại</span>`;
+        }
+
+        let keysTable = '';
+        if (o.keys && o.keys.length > 0) {
+            keysTable = `
+                <div class="mt-8">
+                    <h4 class="font-extrabold text-slate-800 text-base mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-key text-indigo-600"></i>
+                        <span>Danh Sách Mã Key Đã Cấp</span>
+                    </h4>
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                                    <th class="py-3 px-4">Tên Game</th>
+                                    <th class="py-3 px-4">Mã Key</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-sm">
+                                ${o.keys.map(k => `
+                                    <tr>
+                                        <td class="py-3 px-4 font-bold text-slate-800">${escapeHtml(k.productName || 'N/A')}</td>
+                                        <td class="py-3 px-4 font-mono font-bold text-indigo-600 select-all">${escapeHtml(k.keyCode)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        container.innerHTML = `
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Đơn Hàng #ORD-${o.id}</h2>
+                        ${statusBadge}
+                    </div>
+                    <p class="text-xs text-slate-400 font-medium mt-1">Thời gian đặt: ${o.orderDate ? new Date(o.orderDate).toLocaleString('vi-VN') : 'N/A'}</p>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <select id="updateStatusSelect" class="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-indigo-500">
+                        <option value="Completed" ${o.status === 'Completed' ? 'selected' : ''}>Hoàn Thành</option>
+                        <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Chờ Xử Lý</option>
+                        <option value="Failed" ${o.status === 'Failed' ? 'selected' : ''}>Thất Bại</option>
+                    </select>
+                    <button onclick="updateOrderStatus()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm shadow-indigo-200 transition-all active:scale-95">
+                        Cập Nhật
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Thông Tin Khách Hàng</p>
+                    <p class="text-sm font-extrabold text-slate-800">${escapeHtml(o.username || 'Khách Vãng Lai')}</p>
+                </div>
+                <div class="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Tổng Giá Trị Đơn Hàng</p>
+                    <p class="text-2xl font-black text-indigo-600">${(o.totalAmount || 0).toLocaleString()}đ</p>
+                </div>
+            </div>
+
+            ${keysTable}
+        `;
+    }
+
+    async function updateOrderStatus() {
+        const newStatus = document.getElementById('updateStatusSelect').value;
+        try {
+            const res = await apiFetch(`/api-proxy/api/v1/orders/${orderId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                alert("Cập nhật trạng thái đơn hàng thành công!");
+                loadOrderDetails();
+            } else {
+                alert("Lỗi khi cập nhật trạng thái đơn hàng!");
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadOrderDetails);
+</script>
+}

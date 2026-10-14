@@ -1,0 +1,14 @@
+**/.git
+**/.gitignore
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/test_build_output
+**/node_modules
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+MediaStorage/*
+!MediaStorage/.gitkeep

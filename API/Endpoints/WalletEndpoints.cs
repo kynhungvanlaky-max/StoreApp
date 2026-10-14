@@ -78,7 +78,7 @@ namespace GameStore.API.Endpoints
             });
 
             // Admin lấy toàn bộ giao dịch
-            group.MapGet("/admin/all", async (HttpContext httpContext, GameStoreDbContext db, [FromQuery] int page = 1, [FromQuery] int pageSize = 50) =>
+            var getAllTransactionsHandler = async (HttpContext httpContext, GameStoreDbContext db, [FromQuery] int page = 1, [FromQuery] int pageSize = 50) =>
             {
                 var query = db.Transactions.Include(t => t.User).AsQueryable();
 
@@ -110,7 +110,11 @@ namespace GameStore.API.Endpoints
                     CurrentPage = page,
                     PageSize = pageSize
                 });
-            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            };
+
+            group.MapGet("/admin/all", getAllTransactionsHandler).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            app.MapGet("/api/v1/transactions", getAllTransactionsHandler).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            app.MapGet("/api/transactions", getAllTransactionsHandler).RequireAuthorization(policy => policy.RequireRole("Administrator"));
         }
     }
 }

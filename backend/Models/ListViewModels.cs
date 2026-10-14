@@ -9,78 +9,109 @@ namespace Backend.Models
         public int PageSize { get; set; }
     }
 
-    public class ProductListViewModel
+    public class DashboardViewModel
     {
-        public List<ProductViewModel> Products { get; set; } = new List<ProductViewModel>();
+        public decimal TotalRevenue { get; set; }
+        public int TotalOrders { get; set; }
+        public int CustomerCount { get; set; }
+        public int TotalProducts { get; set; }
+        public int AvailableKeys { get; set; }
+        public int PendingSupportTickets { get; set; }
+        public bool ApiAvailable { get; set; }
+        public List<RecentOrderViewModel> RecentOrders { get; set; } = new();
+        public List<LowStockAlertViewModel> LowStockAlerts { get; set; } = new();
+        public List<MonthlyRevenueViewModel> MonthlyRevenue { get; set; } = new();
+        public List<OrderStatusViewModel> OrdersByStatus { get; set; } = new();
+        public List<TopProductViewModel> TopProducts { get; set; } = new();
     }
 
-    public class OrderListViewModel
+    public class RecentOrderViewModel
     {
-        public List<OrderViewModel> Orders { get; set; } = new List<OrderViewModel>();
+        public int Id { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public DateTime OrderDate { get; set; }
+        public string CustomerEmail { get; set; } = string.Empty;
     }
 
-    public class UserListViewModel
+    public class LowStockAlertViewModel
     {
-        public List<UserViewModel> Users { get; set; } = new List<UserViewModel>();
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public int KeyCount { get; set; }
     }
 
-    public class KeyListViewModel
+    public class MonthlyRevenueViewModel
     {
-        public List<ProductKeyViewModel> Keys { get; set; } = new List<ProductKeyViewModel>();
-        public List<ProductDto> Products { get; set; } = new List<ProductDto>();
+        public string Month { get; set; } = string.Empty;
+        public decimal Revenue { get; set; }
+        public int OrdersCount { get; set; }
     }
 
-    public class ProductDto
+    public class OrderStatusViewModel
+    {
+        public string Status { get; set; } = string.Empty;
+        public int Count { get; set; }
+    }
+
+    public class TopProductViewModel
+    {
+        public string ProductName { get; set; } = string.Empty;
+        public int TotalSold { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    public class ProductViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = "Game";
+        public decimal BasePrice { get; set; }
+        public string Status { get; set; } = "Active";
+        public string DeveloperName { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
     }
 
-    public class CommentListViewModel
-    {
-        public List<CommentViewModel> Comments { get; set; } = new List<CommentViewModel>();
-    }
-
-    public class NewsListViewModel
-    {
-        public List<NewsViewModel> NewsArticles { get; set; } = new List<NewsViewModel>();
-    }
-
-    public class SupportTicketViewModel
+    public class OrderViewModel
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
-        public string Topic { get; set; } = string.Empty;
+        public decimal TotalAmount { get; set; }
+        public string Status { get; set; } = "Completed";
+        public DateTime OrderDate { get; set; } = DateTime.Now;
+        public List<string> Items { get; set; } = new();
+        public List<OrderKeyDto> Keys { get; set; } = new();
+    }
+
+    public class OrderKeyDto
+    {
+        public int Id { get; set; }
+        public string KeyCode { get; set; } = string.Empty;
+        public string ProductName { get; set; } = string.Empty;
+    }
+
+    public class ProductKeyViewModel
+    {
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string KeyCode { get; set; } = string.Empty;
+        public bool IsSold { get; set; }
+        public int? OrderId { get; set; }
+        public string Status { get; set; } = "Chưa bán";
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+    }
+
+    public class UserViewModel
+    {
+        public int Id { get; set; }
+        public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string? OrderId { get; set; }
-        public string Content { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public string? AdminReply { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public DateTime? RepliedAt { get; set; }
-    }
-
-    public class SupportListViewModel
-    {
-        public List<SupportTicketViewModel> Tickets { get; set; } = new List<SupportTicketViewModel>();
-    }
-
-    public class TransactionViewModel
-    {
-        public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string TransactionType { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public string PaymentGateway { get; set; } = string.Empty;
-        public string? GatewayTransactionId { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-    }
-
-    public class TransactionListViewModel
-    {
-        public List<TransactionViewModel> Transactions { get; set; } = new List<TransactionViewModel>();
+        public string RoleName { get; set; } = "Customer";
+        public bool IsLocked { get; set; }
+        public string? AvatarUrl { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
     public class CouponViewModel
@@ -90,9 +121,8 @@ namespace Backend.Models
         public decimal DiscountPercent { get; set; }
         public int MaxUsage { get; set; }
         public int CurrentUsage { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime ExpiryDate { get; set; } = DateTime.Now.AddDays(30);
+        public bool IsActive { get; set; } = true;
     }
 
     public class PromotionViewModel
@@ -101,10 +131,79 @@ namespace Backend.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal DiscountPercent { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public bool IsActive { get; set; }
-        public List<int> ProductIds { get; set; } = new List<int>();
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now.AddDays(14);
+        public bool IsActive { get; set; } = true;
+    }
+
+    public class ProductDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
+    // --- NEW MODELS FOR 6 REMAINING PAGES ---
+
+    public class ReviewViewModel
+    {
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public bool IsPositive { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public List<ReviewCommentDto> Replies { get; set; } = new();
+    }
+
+    public class ReviewCommentDto
+    {
+        public int Id { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+    }
+
+    public class NewsViewModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public string? CoverImageUrl { get; set; }
+        public string AuthorName { get; set; } = string.Empty;
+        public DateTime PublishedAt { get; set; } = DateTime.Now;
+    }
+
+    public class SupportTicketViewModel
+    {
+        public int Id { get; set; }
+        public string Topic { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? OrderId { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public string Status { get; set; } = "Pending";
+        public string? AdminReply { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+    }
+
+    public class PaymentConfigViewModel
+    {
+        public int Id { get; set; }
+        public string GatewayName { get; set; } = string.Empty;
+        public string ConfigKey { get; set; } = string.Empty;
+        public string ConfigValue { get; set; } = string.Empty;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    }
+
+    public class TransactionViewModel
+    {
+        public int Id { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string TransactionType { get; set; } = "Deposit";
+        public string PaymentGateway { get; set; } = "VnPay";
+        public string? GatewayTransactionId { get; set; }
+        public string Status { get; set; } = "Success";
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
     public class AuditLogViewModel
@@ -114,13 +213,8 @@ namespace Backend.Models
         public string AdminUsername { get; set; } = string.Empty;
         public string Action { get; set; } = string.Empty;
         public string EntityType { get; set; } = string.Empty;
-        public string EntityId { get; set; } = string.Empty;
-        public string Details { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-    }
-
-    public class AuditLogListViewModel
-    {
-        public List<AuditLogViewModel> Logs { get; set; } = new List<AuditLogViewModel>();
+        public string? EntityId { get; set; }
+        public string? Details { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

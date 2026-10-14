@@ -14,6 +14,7 @@ namespace Frontend.ViewModels
         public string SearchQuery { get; set; } = "";
         public List<string> SelectedCategories { get; set; } = new();
         public List<string> SelectedPriceRanges { get; set; } = new();
+        public string? SelectedType { get; set; }
         public string SortBy { get; set; } = "newest";
 
         public event Action? StateChanged;
@@ -28,7 +29,7 @@ namespace Frontend.ViewModels
             IsLoading = true;
             StateChanged?.Invoke();
 
-            var result = await _productService.GetProductsAsync(page, 20, SearchQuery, SelectedCategories, SelectedPriceRanges, SortBy);
+            var result = await _productService.GetProductsAsync(page, 20, SearchQuery, SelectedCategories, SelectedPriceRanges, SortBy, SelectedType);
             if (result != null)
             {
                 Products = result.Items;

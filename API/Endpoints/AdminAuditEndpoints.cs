@@ -10,10 +10,17 @@ namespace GameStore.API.Endpoints
     {
         public static void MapAdminAuditEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/admin/audit").RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            RegisterAuditRoutes(app.MapGroup("/api/admin/audit"));
+            RegisterAuditRoutes(app.MapGroup("/api/v1/audit-logs"));
+            RegisterAuditRoutes(app.MapGroup("/api/audit-logs"));
+        }
+
+        private static void RegisterAuditRoutes(RouteGroupBuilder group)
+        {
+            group.RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             // GET audit logs with pagination
-            group.MapGet("/", async (GameStoreDbContext db, int page = 1, int pageSize = 20) =>
+            group.MapGet("", async (GameStoreDbContext db, int page = 1, int pageSize = 20) =>
             {
                 var query = db.AuditLogs.OrderByDescending(a => a.CreatedAt);
                 var totalItems = await query.CountAsync();

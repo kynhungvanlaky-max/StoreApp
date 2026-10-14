@@ -12,10 +12,11 @@ namespace Frontend.Services
             _httpClient = httpClientFactory.CreateClient("API");
         }
 
-        public async Task<PaginatedList<ProductDto>?> GetProductsAsync(int page = 1, int pageSize = 20, string? search = null, List<string>? categories = null, List<string>? priceRanges = null, string? sortBy = null)
+        public async Task<PaginatedList<ProductDto>?> GetProductsAsync(int page = 1, int pageSize = 20, string? search = null, List<string>? categories = null, List<string>? priceRanges = null, string? sortBy = null, string? type = null)
         {
             var query = $"?page={page}&pageSize={pageSize}";
             if (!string.IsNullOrEmpty(search)) query += $"&search={Uri.EscapeDataString(search)}";
+            if (!string.IsNullOrEmpty(type)) query += $"&type={Uri.EscapeDataString(type)}";
             
             if (categories != null && categories.Any())
             {

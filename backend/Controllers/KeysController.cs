@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Backend.Models;
+using Backend.Extensions;
 
 namespace Backend.Controllers
 {
-    using Backend.Models;
-    using System.Text.Json;
-    using System.Text;
-
     public class KeysController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -15,95 +13,63 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null)
         {
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.GetAsync($"/api/keys?page={page}&pageSize={pageSize}");
+            var keys = new List<ProductKeyViewModel>();
+            var products = new List<ProductDto>();
+            int totalPages = 1;
+            int totalItems = 0;
 
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
-
-            var viewModel = new KeyListViewModel();
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                try
+                var url = $"/api/v1/product-keys?page={page}&pageSize={pageSize}";
+                if (!string.IsNullOrWhiteSpace(search))
                 {
-                    var pagedResult = await response.Content.ReadFromJsonAsync<PagedResponse<ProductKeyViewModel>>();
-                    ViewBag.CurrentPage = pagedResult?.CurrentPage ?? page;
-                    ViewBag.TotalPages = pagedResult?.TotalPages ?? 1;
-                    ViewBag.TotalItems = pagedResult?.TotalItems ?? 0;
-                    ViewBag.PageSize = pagedResult?.PageSize ?? pageSize;
-                    if (pagedResult?.Data != null)
-                    {
-                        foreach (var k in pagedResult.Data)
-                        {
-                            k.Status = k.IsSold ? "Đã bán" : "Chưa bán";
-                        }
-                        viewModel.Keys = pagedResult.Data;
-                    }
+                    url += $"&search={Uri.EscapeDataString(search.Trim())}";
                 }
-                catch (Exception ex)
-                {
-                    SetErrorMessage("Lỗi khi tải dữ liệu mã game: " + ex.Message);
-                }
-            }
-
-            var prodResponse = await client.GetAsync("/api/products?pageSize=1000");
-            if (prodResponse.IsSuccessStatusCode)
-            {
-                var pagedProds = await prodResponse.Content.ReadFromJsonAsync<PagedResponse<ProductDto>>();
-                viewModel.Products = pagedProds?.Data ?? new List<ProductDto>();
-            }
-
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Generate(int productId, int quantity)
-        {
-            var client = _httpClientFactory.CreateClient("API");
-            int successCount = 0;
-            for (int i = 0; i < quantity; i++)
-            {
-                string randomKey = Guid.NewGuid().ToString("N").Substring(0, 16).ToUpper();
-                string formattedKey = $"{randomKey.Substring(0,4)}-{randomKey.Substring(4,4)}-{randomKey.Substring(8,4)}-{randomKey.Substring(12,4)}";
-
-                var jsonContent = new StringContent(JsonSerializer.Serialize(new { ProductId = productId, KeyCode = formattedKey, IsSold = false }), Encoding.UTF8, "application/json");
-                var response = await client.PostAsync("/api/keys", jsonContent);
-                
-                var redirectResult = HandleApiResponse(response);
-                if (redirectResult != null) return redirectResult;
-
+                var response = await client.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    successCount++;
+                    var paged = await response.Content.ReadJsonAsync<PagedResponse<ProductKeyViewModel>>();
+                    if (paged?.Data != null)
+                    {
+                        keys = paged.Data;
+                        totalPages = paged.TotalPages > 0 ? paged.TotalPages : 1;
+                        totalItems = paged.TotalItems;
+                        page = paged.CurrentPage > 0 ? paged.CurrentPage : 1;
+                        pageSize = paged.PageSize > 0 ? paged.PageSize : 10;
+                    }
                 }
             }
-
-            SetSuccessMessage($"Đã tạo thành công {successCount}/{quantity} key mới.");
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var client = _httpClientFactory.CreateClient("API");
-            var response = await client.DeleteAsync($"/api/keys/{id}");
-
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
-
-            if (response.IsSuccessStatusCode)
+            catch (Exception ex)
             {
-                SetSuccessMessage("Đã xóa mã game thành công!");
-            }
-            else
-            {
-                SetErrorMessage("Có lỗi xảy ra khi xóa mã game.");
+                Console.WriteLine("API Keys Error: " + ex.Message);
             }
 
-            return RedirectToAction("Index");
+            try
+            {
+                var prodResponse = await client.GetAsync("/api/v1/products?pageSize=1000");
+                if (prodResponse.IsSuccessStatusCode)
+                {
+                    var pagedProds = await prodResponse.Content.ReadJsonAsync<PagedResponse<ProductDto>>();
+                    if (pagedProds?.Data != null) products = pagedProds.Data;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("API Prods Error: " + ex.Message);
+            }
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.Search = search;
+            ViewBag.PageSize = pageSize;
+            ViewBag.Products = products;
+
+            return View(keys);
         }
     }
 }
+

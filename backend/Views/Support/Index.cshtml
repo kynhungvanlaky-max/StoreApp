@@ -1,268 +1,158 @@
-@model Backend.Models.SupportListViewModel
+@model List<Backend.Models.SupportTicketViewModel>
 
 @{
-    ViewData["Title"] = "Quản Lý Hỗ Trợ";
-    ViewBag.PaginationAction = "?page=";
+    ViewData["Title"] = "Quản Lý Yêu Cầu Hỗ Trợ";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalItems = ViewBag.TotalItems ?? (Model?.Count ?? 0);
 }
 
-<div class="glassmorphism rounded-3xl p-8 mb-8">
+<div class="admin-card p-8 mb-8">
+    <!-- Header Controls -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div class="relative w-full md:w-96">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm theo email, chủ đề..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" />
-            <svg class="w-5 h-5 text-gray-500 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </div>
-        <div class="flex gap-2">
-            <select id="statusFilter" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
-                <option value="All" class="bg-gray-800">Tất cả trạng thái</option>
-                <option value="Pending" class="bg-gray-800">Pending</option>
-                <option value="Resolved" class="bg-gray-800">Resolved</option>
-                <option value="Closed" class="bg-gray-800">Closed</option>
-            </select>
+        <div>
+            <h3 class="text-xl font-black text-slate-800">Yêu Cầu Hỗ Trợ Khách Hàng (Support Tickets)</h3>
+            <p class="text-xs text-slate-400 font-medium mt-1">Tiếp nhận ticket khiếu nại, hỗ trợ kỹ thuật và phản hồi trực tiếp cho khách hàng.</p>
         </div>
     </div>
 
-    <div class="overflow-x-auto min-h-[400px]">
-        <table class="w-full text-left">
+    <!-- Data Table -->
+    <div class="overflow-x-auto min-h-[380px]">
+        <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="text-gray-500 text-sm border-b border-white/10">
-                    <th class="pb-4 font-medium w-16 text-center">ID</th>
-                    <th class="pb-4 font-medium">Khách Hàng</th>
-                    <th class="pb-4 font-medium">Chủ Đề</th>
-                    <th class="pb-4 font-medium">Mã Đơn Hàng</th>
-                    <th class="pb-4 font-medium">Ngày Gửi</th>
-                    <th class="pb-4 font-medium text-center">Trạng Thái</th>
-                    <th class="pb-4 font-medium text-right">Hành Động</th>
+                <tr class="text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
+                    <th class="py-3 px-4 font-bold w-16 text-center rounded-l-xl">ID</th>
+                    <th class="py-3 px-4 font-bold">Chủ Đề</th>
+                    <th class="py-3 px-4 font-bold">Email</th>
+                    <th class="py-3 px-4 font-bold">Mã Đơn</th>
+                    <th class="py-3 px-4 font-bold">Trạng Thái</th>
+                    <th class="py-3 px-4 font-bold">Thời Gian</th>
+                    <th class="py-3 px-4 font-bold text-right rounded-r-xl">Hành Động</th>
                 </tr>
             </thead>
-            <tbody class="text-sm" id="supportTableBody">
-                <!-- JS data -->
+            <tbody class="text-sm divide-y divide-slate-100">
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-400 font-medium">
+                            <i class="fa-solid fa-headset text-3xl text-slate-300 mb-2 block"></i>
+                            <span>Chưa có yêu cầu hỗ trợ nào.</span>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var t in Model)
+                    {
+                        <tr class="hover:bg-slate-50/80 transition-all duration-150 group">
+                            <td class="py-3.5 px-4 text-slate-400 font-mono font-bold text-center">#@t.Id</td>
+                            <td class="py-3.5 px-4 font-extrabold text-slate-800 group-hover:text-indigo-600 transition-colors">@t.Topic</td>
+                            <td class="py-3.5 px-4 text-slate-600 font-medium">@t.Email</td>
+                            <td class="py-3.5 px-4 font-mono font-bold text-slate-400">@(string.IsNullOrEmpty(t.OrderId) ? "N/A" : $"#ORD-{t.OrderId}")</td>
+                            <td class="py-3.5 px-4">
+                                @if (t.Status == "Resolved" || t.Status == "Đã Xử Lý")
+                                {
+                                    <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">Đã Xử Lý</span>
+                                }
+                                else
+                                {
+                                    <span class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-200">Chờ Phản Hồi</span>
+                                }
+                            </td>
+                            <td class="py-3.5 px-4 text-slate-400 text-xs font-medium">@t.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="py-3.5 px-4 text-right">
+                                <button type="button"
+                                        data-ticket-id="@t.Id"
+                                        data-topic="@t.Topic"
+                                        data-content="@t.Content"
+                                        data-reply="@(t.AdminReply ?? string.Empty)"
+                                        onclick="openReplyModal(this)"
+                                        class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm shadow-indigo-200 transition-all active:scale-95">
+                                    <i class="fa-solid fa-reply mr-1"></i> Phản hồi
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
     </div>
-
-    <div class="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
-        <div class="text-sm text-gray-400" id="supportPageInfo">
-            Hiển thị 0 kết quả
-        </div>
-        <div class="flex items-center gap-2" id="supportPaginationContainer">
-            <!-- Pagination buttons loaded via JS -->
-        </div>
-    </div>
 </div>
 
-<!-- View Details Modal -->
-<div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-white/5 backdrop-blur-sm" onclick="closeSupportModal()"></div>
-    <div class="relative bg-[#1a1a1f] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
-        <div class="p-6 border-b border-white/10 flex justify-between items-center">
-            <h3 class="text-xl font-bold text-white">Chi Tiết Yêu Cầu Hỗ Trợ</h3>
-            <button onclick="closeSupportModal()" class="text-gray-400 hover:text-blue-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+<!-- Modal Reply Ticket -->
+<div id="replyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeReplyModal()"></div>
+    
+    <div class="relative bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-200 transform transition-all">
+        <div class="p-6 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
+            <h3 class="text-xl font-black text-slate-800">Phản Hồi Yêu Cầu Hỗ Trợ</h3>
+            <button onclick="closeReplyModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         
-        <div class="p-6 space-y-6">
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <div class="text-gray-500 mb-1">Khách Hàng</div>
-                    <div id="sUsername" class="font-bold text-white"></div>
-                </div>
-                <div>
-                    <div class="text-gray-500 mb-1">Email</div>
-                    <div id="sEmail" class="text-gray-300"></div>
-                </div>
-                <div>
-                    <div class="text-gray-500 mb-1">Mã Đơn Hàng</div>
-                    <div id="sOrderId" class="text-blue-400 font-mono"></div>
-                </div>
-                <div>
-                    <div class="text-gray-500 mb-1">Trạng Thái</div>
-                    <div id="sStatus"></div>
-                </div>
-            </div>
-            
+        <form id="replyForm" onsubmit="sendReply(event)" class="p-6 space-y-4">
+            <input type="hidden" id="tId" />
+
             <div>
-                <div class="text-gray-500 mb-2 text-sm">Nội Dung Yêu Cầu</div>
-                <div id="sContent" class="bg-black/30 p-4 rounded-xl text-gray-300 whitespace-pre-wrap mb-4"></div>
-            </div>
-            
-            <div id="sReplyContainer" class="hidden">
-                <div class="text-gray-500 mb-2 text-sm">Phản Hồi Hiện Tại</div>
-                <div id="sReplyText" class="bg-blue-950/30 border border-blue-500/20 p-4 rounded-xl text-blue-400 whitespace-pre-wrap mb-4 font-bold"></div>
+                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Chủ Đề Yêu Cầu</label>
+                <p id="tTopic" class="text-base font-extrabold text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200/80"></p>
             </div>
 
-            <form method="post" action="/Support/Reply" class="space-y-3 pt-4 border-t border-white/10">
-                <input type="hidden" name="id" id="sIdReply" />
-                <label class="block text-sm text-gray-400">Gửi Phản Hồi Mới:</label>
-                <textarea name="replyContent" id="sReplyContent" required rows="3" placeholder="Nhập câu trả lời gửi đến khách hàng..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-blue-500"></textarea>
-                <div class="flex justify-end">
-                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">Gửi Phản Hồi</button>
-                </div>
-            </form>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Nội Dung Khách Hàng Gửi</label>
+                <p id="tContent" class="text-sm font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200/80 italic"></p>
+            </div>
 
-            <form method="post" action="/Support/UpdateStatus" class="flex items-center gap-4 pt-4 border-t border-white/10">
-                <input type="hidden" name="id" id="sId" />
-                <label class="text-sm text-gray-400">Cập Nhật Trạng Thái:</label>
-                <select name="status" id="sStatusUpdate" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
-                    <option value="Pending" class="bg-gray-800">Pending</option>
-                    <option value="Resolved" class="bg-gray-800">Resolved</option>
-                    <option value="Closed" class="bg-gray-800">Closed</option>
-                </select>
-                <button type="submit" class="px-6 py-2 bg-blue-600/20 hover:bg-blue-600 hover:text-white text-blue-400 rounded-xl font-bold border border-blue-500/30 transition-colors">Lưu</button>
-            </form>
-        </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Nội Dung Phản Hồi Từ Admin</label>
+                <textarea id="tReply" rows="3" required placeholder="Nhập câu trả lời chi tiết cho khách hàng..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 font-medium"></textarea>
+            </div>
+
+            <div class="p-6 border-t border-slate-100 bg-slate-50/60 flex justify-end gap-3 -mx-6 -mb-6 mt-6">
+                <button type="button" onclick="closeReplyModal()" class="px-5 py-2.5 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 transition-all text-xs border border-slate-200">Hủy Bỏ</button>
+                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all text-xs shadow-sm shadow-indigo-200 active:scale-95">Gửi Phản Hồi</button>
+            </div>
+        </form>
     </div>
 </div>
 
 @section Scripts {
 <script>
-    const authToken = '@ViewData["Token"]';
-    const authHeaders = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+    const authHeaders = {};
 
-    let currentPage = 1;
-    let currentSearch = '';
-    let currentStatus = 'All';
-    let totalPages = 1;
-    let totalItems = 0;
-    let currentTickets = [];
-
-    const DOM = {
-        tbody: document.getElementById('supportTableBody'),
-        searchInput: document.getElementById('searchInput'),
-        statusFilter: document.getElementById('statusFilter'),
-        modal: document.getElementById('supportModal'),
-        pageInfo: document.getElementById('supportPageInfo'),
-        paginationContainer: document.getElementById('supportPaginationContainer')
-    };
-
-    function showToast(message, isError = false) {
-        alert(message);
+    function openReplyModal(button) {
+        document.getElementById('tId').value = button.dataset.ticketId;
+        document.getElementById('tTopic').innerText = button.dataset.topic || '';
+        document.getElementById('tContent').innerText = button.dataset.content || '';
+        document.getElementById('tReply').value = button.dataset.reply || '';
+        document.getElementById('replyModal').classList.remove('hidden');
     }
 
-    async function loadTickets(page = 1, search = '', status = 'All') {
+    function closeReplyModal() {
+        document.getElementById('replyModal').classList.add('hidden');
+    }
+
+    async function sendReply(e) {
+        e.preventDefault();
+        const id = document.getElementById('tId').value;
+        const replyContent = document.getElementById('tReply').value;
+
         try {
-            currentPage = page;
-            currentSearch = search;
-            currentStatus = status;
-
-            const url = new URL('http://localhost:5021/api/support/admin/all');
-            url.searchParams.set('page', page);
-            url.searchParams.set('pageSize', 10);
-            if (search) url.searchParams.set('search', search);
-            
-            const res = await fetch(url.toString(), {
-                headers: authHeaders
+            const res = await apiFetch(`/api-proxy/api/v1/support-tickets/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
+                body: JSON.stringify({ adminReply: replyContent })
             });
-            if (!res.ok) throw new Error("Lỗi kết nối API");
-            const result = await res.json();
-            
-            currentTickets = result.data;
-            totalPages = result.totalPages;
-            totalItems = result.totalItems;
-            
-            renderTable(result.data);
-            renderPagination(result.totalPages, result.currentPage, result.totalItems);
-        } catch (error) {
-            console.error(error);
-            DOM.tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-red-500">Lỗi khi tải dữ liệu!</td></tr>`;
-        }
+
+            if (res.ok) {
+                closeReplyModal();
+                window.location.reload();
+            } else {
+                alert("Lỗi khi gửi phản hồi!");
+            }
+        } catch (err) { console.error(err); }
     }
-
-    function renderTable(tickets) {
-        if (!tickets || tickets.length === 0) {
-            DOM.tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-gray-500">Không tìm thấy yêu cầu nào.</td></tr>`;
-            return;
-        }
-
-        DOM.tbody.innerHTML = tickets.map(t => {
-            let statusBadge = '';
-            if (t.status === 'Pending') statusBadge = `<span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">Pending</span>`;
-            else if (t.status === 'Resolved') statusBadge = `<span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Resolved</span>`;
-            else statusBadge = `<span class="px-3 py-1 bg-gray-500/10 text-gray-400 rounded-full text-xs font-bold border border-gray-500/20">Closed</span>`;
-
-            const tJson = encodeURIComponent(JSON.stringify(t));
-
-            return `
-                <tr class="border-b border-white/10 hover:bg-white/5 transition-colors group cursor-pointer" onclick="viewTicket('${tJson}')">
-                    <td class="py-4 text-gray-400 text-center">#${t.id}</td>
-                    <td class="py-4">
-                        <div class="font-bold text-white">${t.username}</div>
-                        <div class="text-xs text-gray-500">${t.email}</div>
-                    </td>
-                    <td class="py-4 font-medium text-gray-300 truncate max-w-xs">${t.topic}</td>
-                    <td class="py-4 text-gray-400 font-mono text-sm">${t.orderId || '-'}</td>
-                    <td class="py-4 text-gray-400 text-sm">${new Date(t.createdAt).toLocaleDateString('vi-VN')}</td>
-                    <td class="py-4 text-center">${statusBadge}</td>
-                    <td class="py-4 text-right">
-                        <button class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/100 hover:text-white inline-flex items-center justify-center transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    function renderPagination(totalPages, current, totalItems) {
-        DOM.pageInfo.innerText = `Tổng cộng ${totalItems} kết quả (Trang ${current}/${totalPages || 1})`;
-        if (totalPages <= 1) { DOM.paginationContainer.innerHTML = ''; return; }
-        let html = `<button onclick="loadTickets(${current - 1}, currentSearch, currentStatus)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === 1 ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
-        for (let i = 1; i <= totalPages; i++) {
-            html += `<button onclick="loadTickets(${i}, currentSearch, currentStatus)" class="w-10 h-10 rounded-xl flex items-center justify-center ${i === current ? 'bg-blue-600 font-bold shadow-lg shadow-blue-500/20 text-white' : 'border border-white/10 hover:bg-white/10 text-gray-400 hover:text-blue-400'} transition-colors">${i}</button>`;
-        }
-        html += `<button onclick="loadTickets(${current + 1}, currentSearch, currentStatus)" class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors text-white disabled:opacity-50" ${current === totalPages ? 'disabled' : ''}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
-        DOM.paginationContainer.innerHTML = html;
-    }
-
-    function viewTicket(tJson) {
-        const t = JSON.parse(decodeURIComponent(tJson));
-        document.getElementById('sUsername').innerText = t.username;
-        document.getElementById('sEmail').innerText = t.email;
-        document.getElementById('sOrderId').innerText = t.orderId || 'Không có';
-        document.getElementById('sContent').innerText = t.content;
-        document.getElementById('sId').value = t.id;
-        document.getElementById('sIdReply').value = t.id;
-        document.getElementById('sStatusUpdate').value = t.status;
-        
-        const replyContainer = document.getElementById('sReplyContainer');
-        const replyText = document.getElementById('sReplyText');
-        const replyContentTextarea = document.getElementById('sReplyContent');
-        
-        if (t.adminReply) {
-            replyText.innerText = t.adminReply;
-            replyContainer.classList.remove('hidden');
-            replyContentTextarea.value = t.adminReply;
-        } else {
-            replyText.innerText = '';
-            replyContainer.classList.add('hidden');
-            replyContentTextarea.value = '';
-        }
-        
-        let statusBadge = '';
-        if (t.status === 'Pending') statusBadge = `<span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20">Pending</span>`;
-        else if (t.status === 'Resolved') statusBadge = `<span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-bold border border-green-500/20">Resolved</span>`;
-        else statusBadge = `<span class="px-3 py-1 bg-gray-500/10 text-gray-400 rounded-full text-xs font-bold border border-gray-500/20">Closed</span>`;
-        document.getElementById('sStatus').innerHTML = statusBadge;
-
-        DOM.modal.classList.remove('hidden');
-    }
-
-    function closeSupportModal() {
-        DOM.modal.classList.add('hidden');
-    }
-
-    let searchDebounce;
-    DOM.searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => {
-            loadTickets(1, e.target.value, DOM.statusFilter.value);
-        }, 300);
-    });
-
-    DOM.statusFilter.addEventListener('change', (e) => {
-        loadTickets(1, DOM.searchInput.value, e.target.value);
-    });
-    
-    document.addEventListener('DOMContentLoaded', () => loadTickets(1, '', 'All'));
 </script>
 }
+

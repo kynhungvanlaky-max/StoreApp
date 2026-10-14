@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
-using System.Text.Json;
+using Backend.Extensions;
+using Backend.Attributes;
 
 namespace Backend.Controllers
 {
+    [RequireAdminRole]
     public class CouponsController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -13,137 +15,26 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index()
-        {
-            ViewData["Token"] = Request.Cookies["access_token"];
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(CouponViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                SetErrorMessage("Dữ liệu không hợp lệ.");
-                return RedirectToAction("Index");
-            }
-
-            var client = _httpClientFactory.CreateClient("API");
-            var payload = new
-            {
-                code = model.Code,
-                discountPercent = model.DiscountPercent,
-                maxUsage = model.MaxUsage,
-                expiryDate = model.ExpiryDate,
-                isActive = model.IsActive
-            };
-            var response = await client.PostAsJsonAsync("/api/coupons", payload);
-            if (response.IsSuccessStatusCode)
-            {
-                SetSuccessMessage("Tạo mã giảm giá thành công!");
-            }
-            else
-            {
-                var err = await response.Content.ReadAsStringAsync();
-                SetErrorMessage("Lỗi: " + err);
-            }
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Edit(int id, CouponViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                SetErrorMessage("Dữ liệu không hợp lệ.");
-                return RedirectToAction("Index");
-            }
-
-            var client = _httpClientFactory.CreateClient("API");
-            var payload = new
-            {
-                code = model.Code,
-                discountPercent = model.DiscountPercent,
-                maxUsage = model.MaxUsage,
-                expiryDate = model.ExpiryDate,
-                isActive = model.IsActive
-            };
-            var response = await client.PutAsJsonAsync($"/api/coupons/{id}", payload);
-            if (response.IsSuccessStatusCode)
-            {
-                SetSuccessMessage("Cập nhật mã giảm giá thành công!");
-            }
-            else
-            {
-                var err = await response.Content.ReadAsStringAsync();
-                SetErrorMessage("Lỗi: " + err);
-            }
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Index()
         {
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.DeleteAsync($"/api/coupons/{id}");
-            SetSuccessMessage(response.IsSuccessStatusCode ? "Đã xóa mã giảm giá thành công!" : "Có lỗi xảy ra khi xóa mã giảm giá.");
-            return RedirectToAction("Index");
-        }
+            var coupons = new List<CouponViewModel>();
 
-        [HttpPost]
-        public async Task<IActionResult> Save(CouponViewModel model)
-        {
-            if (!ModelState.IsValid)
+            try
             {
-                SetErrorMessage("Dữ liệu không hợp lệ.");
-                return RedirectToAction("Index");
-            }
-
-            var client = _httpClientFactory.CreateClient("API");
-            if (model.Id > 0)
-            {
-                var payload = new
-                {
-                    code = model.Code,
-                    discountPercent = model.DiscountPercent,
-                    maxUsage = model.MaxUsage,
-                    expiryDate = model.ExpiryDate,
-                    isActive = model.IsActive
-                };
-                var response = await client.PutAsJsonAsync($"/api/coupons/{model.Id}", payload);
+                var response = await client.GetAsync("/api/v1/coupons");
                 if (response.IsSuccessStatusCode)
                 {
-                    SetSuccessMessage("Cập nhật mã giảm giá thành công!");
-                }
-                else
-                {
-                    var err = await response.Content.ReadAsStringAsync();
-                    SetErrorMessage("Lỗi: " + err);
+                    var data = await response.Content.ReadJsonAsync<List<CouponViewModel>>();
+                    if (data != null) coupons = data;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                var payload = new
-                {
-                    code = model.Code,
-                    discountPercent = model.DiscountPercent,
-                    maxUsage = model.MaxUsage,
-                    expiryDate = model.ExpiryDate,
-                    isActive = model.IsActive
-                };
-                var response = await client.PostAsJsonAsync("/api/coupons", payload);
-                if (response.IsSuccessStatusCode)
-                {
-                    SetSuccessMessage("Tạo mã giảm giá thành công!");
-                }
-                else
-                {
-                    var err = await response.Content.ReadAsStringAsync();
-                    SetErrorMessage("Lỗi: " + err);
-                }
+                Console.WriteLine("API Coupons Error: " + ex.Message);
             }
 
-            return RedirectToAction("Index");
+            return View(coupons);
         }
     }
 }

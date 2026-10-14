@@ -162,6 +162,8 @@ html,
   /* 6 */
   -webkit-tap-highlight-color: transparent;
   /* 7 */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 /*

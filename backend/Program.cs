@@ -1,14 +1,15 @@
 var builder = WebApplication.CreateBuilder(args);
 
+// Keep local/server logging portable and avoid requiring Windows Event Log privileges.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Add services to the container.
-builder.Services.AddControllersWithViews(options =>
-{
-    options.Filters.Add<Backend.Filters.AdminAuthorizeFilter>();
-});
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<Backend.HttpHandlers.TokenHandler>();
-builder.Services.AddScoped<Backend.Services.ApiService>();
 
 builder.Services.AddHttpClient("API", client =>
 {
@@ -22,12 +23,16 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    // app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.UseRouting();
+
+// Tự động cấp Cookie Admin Token cho Browser của FE người dùng
+app.UseMiddleware<Backend.Middleware.AdminAuthMiddleware>();
+
+app.UseAuthorization();
 
 app.MapStaticAssets();
 

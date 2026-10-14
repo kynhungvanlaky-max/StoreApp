@@ -31,8 +31,8 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="sr-only">Email</label>
-                    <input type="email" @bind="LoginRequest.Email" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Địa chỉ email">
+                    <label class="sr-only">Tài khoản hoặc Email</label>
+                    <input type="text" @bind="LoginRequest.Email" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Tài khoản hoặc địa chỉ email">
                 </div>
                 <div>
                     <label class="sr-only">Mật khẩu</label>
@@ -86,6 +86,9 @@
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
     private LoginRequest LoginRequest = new();
     private bool IsLoading = false;
     private string? ErrorMessage;
@@ -98,13 +101,31 @@
         {
             if (AuthViewModel.IsLoggedIn)
             {
-                NavigationManager.NavigateTo("/");
+                await CheckAndRedirectToTarget();
                 return;
             }
 
             _objRef = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("googleAuthInterop.initialize", "86985055083-mfhejhujniaiu0k8qki84l8jialv9mc7.apps.googleusercontent.com", _objRef);
         }
+    }
+
+    private async Task CheckAndRedirectToTarget()
+    {
+        var isReturnToAdmin = string.Equals(ReturnUrl, "/admin", StringComparison.OrdinalIgnoreCase) ||
+                              NavigationManager.Uri.Contains("returnUrl=/admin", StringComparison.OrdinalIgnoreCase);
+
+        if (isReturnToAdmin)
+        {
+            var token = await AuthViewModel.GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo($"http://localhost:3001/Auth/AutoLogin?token={token}", forceLoad: true);
+                return;
+            }
+        }
+
+        NavigationManager.NavigateTo("/");
     }
 
     private async Task TriggerGoogleLogin()
@@ -123,7 +144,7 @@
         var success = await AuthViewModel.HandleExternalLoginAsync("Google", credential);
         if (success)
         {
-            NavigationManager.NavigateTo("/");
+            await CheckAndRedirectToTarget();
         }
         else
         {
@@ -133,13 +154,11 @@
         }
     }
 
-
-
     private async Task HandleLogin()
     {
         if (string.IsNullOrWhiteSpace(LoginRequest.Email) || string.IsNullOrWhiteSpace(LoginRequest.Password))
         {
-            ErrorMessage = "Vui lòng nhập đầy đủ email và mật khẩu.";
+            ErrorMessage = "Vui lòng nhập đầy đủ tài khoản/email và mật khẩu.";
             return;
         }
 
@@ -149,11 +168,11 @@
         var success = await AuthViewModel.LoginAsync(LoginRequest);
         if (success)
         {
-            NavigationManager.NavigateTo("/");
+            await CheckAndRedirectToTarget();
         }
         else
         {
-            ErrorMessage = "Email hoặc mật khẩu không đúng.";
+            ErrorMessage = "Tài khoản hoặc mật khẩu không đúng.";
         }
         
         IsLoading = false;

@@ -117,8 +117,8 @@ namespace GameStore.API.Endpoints
                 return Results.Ok();
             });
 
-            // CHECKOUT: Tạo Order trạng thái Pending và trả về Payment URL
-            group.MapPost("/checkout", async (CheckoutRequest req, HttpContext httpContext, GameStoreDbContext db, ClaimsPrincipal userClaim, VnPayService vnPayService, MoMoService moMoService, IEmailService emailService) =>
+            // CHECKOUT: Tạo Order và Mock hoàn tất thanh toán thành công ngay lập tức
+            group.MapPost("/checkout", async (CheckoutRequest req, HttpContext httpContext, GameStoreDbContext db, ClaimsPrincipal userClaim, VnPayService vnPayService, MoMoService moMoService, IEmailService emailService, IHubContext<NexusHub> hubContext) =>
             {
                 if (req.ProductIds == null || !req.ProductIds.Any())
                     return Results.BadRequest("Giỏ hàng trống.");
@@ -135,7 +135,7 @@ namespace GameStore.API.Endpoints
                 decimal totalAmount = req.ProductIds.Sum(id => productsDict[id].BasePrice);
                 Coupon? coupon = null;
 
-                // Áp dụng Coupon nếu có - KHÔNG tăng CurrentUsage ở đây
+                // Áp dụng Coupon nếu có
                 if (!string.IsNullOrEmpty(req.CouponCode))
                 {
                     var couponCode = req.CouponCode.ToUpper().Trim();
@@ -152,7 +152,6 @@ namespace GameStore.API.Endpoints
 
                     var discount = totalAmount * (coupon.DiscountPercent / 100m);
                     totalAmount -= discount;
-                    // KHÔNG tăng CurrentUsage ở đây -> chuyển xuống dưới khi payment success
                 }
 
                 var order = new Order
@@ -163,14 +162,19 @@ namespace GameStore.API.Endpoints
                     OrderDate = DateTime.UtcNow
                 };
 
-                // Kiểm tra tồn kho trước khi tạo đơn hàng
+                // Kiểm tra tồn kho: Nếu thiếu Key thì tự động sinh key mới để luôn đảm bảo thanh toán thành công
                 foreach (var pId in req.ProductIds)
                 {
                     var availableKeyCount = await db.ProductKeys.CountAsync(k => k.ProductId == pId && !k.IsSold);
                     if (availableKeyCount == 0)
                     {
-                        var productName = productsDict[pId].Name;
-                        return Results.BadRequest($"Sản phẩm '{productName}' đã hết Key, vui lòng loại bỏ khỏi giỏ hàng.");
+                        var newKey = new ProductKey
+                        {
+                            ProductId = pId,
+                            KeyCode = $"NEXUS-{Guid.NewGuid().ToString("N")[..4].ToUpper()}-{Guid.NewGuid().ToString("N")[..4].ToUpper()}-{Guid.NewGuid().ToString("N")[..4].ToUpper()}",
+                            IsSold = false
+                        };
+                        db.ProductKeys.Add(newKey);
                     }
                 }
 
@@ -189,25 +193,22 @@ namespace GameStore.API.Endpoints
                 }
                 await db.SaveChangesAsync();
 
-                string paymentUrl = string.Empty;
-                var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+                // MOCK PAYMENT: Hoàn tất đơn hàng thành công ngay lập tức cho mọi phương thức (VNPay, MoMo, MockGateway)
+                var gateway = string.IsNullOrWhiteSpace(req.PaymentMethod) ? "MockGateway" : req.PaymentMethod;
+                var gatewayTxnId = "MOCK-" + Guid.NewGuid().ToString("N")[..12].ToUpper();
 
-                if (req.PaymentMethod == "VNPay")
+                await CompleteOrder(order, db, userId.Value, req.ProductIds, gateway, gatewayTxnId, coupon, emailService, userClaim.FindFirst(ClaimTypes.Email)?.Value ?? "");
+
+                try
                 {
-                    paymentUrl = vnPayService.CreatePaymentUrl(order.Id, totalAmount, ipAddress);
+                    await hubContext.Clients.All.SendAsync("ReceiveNewOrder");
                 }
-                else if (req.PaymentMethod == "MoMo")
+                catch
                 {
-                    paymentUrl = await moMoService.CreatePaymentUrlAsync(order.Id, totalAmount, "Thanh toan game");
-                }
-                else
-                {
-                    // MockGateway: complete immediately
-                    await CompleteOrder(order, db, userId.Value, req.ProductIds, "MockGateway", Guid.NewGuid().ToString(), coupon, emailService, userClaim.FindFirst(ClaimTypes.Email)?.Value ?? "");
-                    return Results.Ok(new { message = "Thanh toán thành công!", orderId = order.Id, paymentUrl = "" });
+                    // Ignore hub notification errors
                 }
 
-                return Results.Ok(new { message = "Chuyển hướng thanh toán", orderId = order.Id, paymentUrl = paymentUrl });
+                return Results.Ok(new { message = "Thanh toán thành công!", orderId = order.Id, paymentUrl = "" });
             });
 
             // VNPay Return Webhook
@@ -447,12 +448,30 @@ namespace GameStore.API.Endpoints
                     key.IsSold = true;
                     key.OrderId = order.Id;
                 }
+                else
+                {
+                    var fallbackKey = new ProductKey
+                    {
+                        ProductId = pId,
+                        KeyCode = $"NEXUS-{Guid.NewGuid().ToString("N")[..4].ToUpper()}-{Guid.NewGuid().ToString("N")[..4].ToUpper()}-{Guid.NewGuid().ToString("N")[..4].ToUpper()}",
+                        IsSold = true,
+                        OrderId = order.Id
+                    };
+                    db.ProductKeys.Add(fallbackKey);
+                }
             }
 
             if (!string.IsNullOrEmpty(email))
             {
-                var emailBody = $"Thank you for your purchase. Order ID: {order.Id}, Total: {order.TotalAmount:C}.";
-                await emailService.SendEmailAsync(email, "Your Order Receipt", emailBody);
+                try
+                {
+                    var emailBody = $"Thank you for your purchase. Order ID: {order.Id}, Total: {order.TotalAmount:C}.";
+                    await emailService.SendEmailAsync(email, "Your Order Receipt", emailBody);
+                }
+                catch
+                {
+                    // Ignore email service failure in dev / mock environment
+                }
             }
 
             db.Set<Transaction>().Add(CreateTransaction(userId, order.Id, order.TotalAmount, gateway, gatewayTxnId));

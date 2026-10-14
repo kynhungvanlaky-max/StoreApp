@@ -7,7 +7,13 @@ namespace GameStore.API.Endpoints
     {
         public static void MapAdminEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/admin").RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            RegisterAdminRoutes(app.MapGroup("/api/admin"));
+            RegisterAdminRoutes(app.MapGroup("/api/v1/admin"));
+        }
+
+        private static void RegisterAdminRoutes(RouteGroupBuilder group)
+        {
+            group.RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             group.MapGet("/dashboard", async (GameStoreDbContext db) =>
             {

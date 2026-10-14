@@ -40,6 +40,13 @@
             </div>
         }
         
+        @* Type badge (Game or App) *@
+        <div class="absolute top-2 right-2 z-10 @(IsWishlistMode ? "group-hover:opacity-0 transition-opacity" : "")">
+            <span class="px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded shadow-md @(IsApp ? "bg-[#0078F2] text-white border border-blue-400/40" : "bg-purple-600 text-white border border-purple-400/40")">
+                @(IsApp ? "App" : "Game")
+            </span>
+        </div>
+
         @* Wishlist actions *@
         @if (IsWishlistMode)
         {
@@ -177,4 +184,13 @@
         
         return "Liên hệ";
     }
+
+    private bool IsApp => 
+        string.Equals(Product.Type, "Software", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(Product.Type, "App", StringComparison.OrdinalIgnoreCase) ||
+        (Product.Categories != null && Product.Categories.Any(c => 
+            c.Contains("Phần mềm", StringComparison.OrdinalIgnoreCase) || 
+            c.Contains("Ứng dụng", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Software", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("App", StringComparison.OrdinalIgnoreCase)));
 }

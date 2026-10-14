@@ -74,7 +74,7 @@ namespace GameStore.API.Endpoints
             });
 
             // Admin lấy toàn bộ yêu cầu (phân trang)
-            group.MapGet("/admin/all", async (GameStoreDbContext db, int page = 1, int pageSize = 10) =>
+            var getAllSupportTicketsHandler = async (GameStoreDbContext db, int page = 1, int pageSize = 10) =>
             {
                 var query = db.SupportTickets
                     .Include(t => t.User)
@@ -110,7 +110,11 @@ namespace GameStore.API.Endpoints
                     CurrentPage = page,
                     PageSize = pageSize
                 });
-            }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            };
+
+            group.MapGet("/admin/all", getAllSupportTicketsHandler).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            app.MapGet("/api/v1/support-tickets", getAllSupportTicketsHandler).RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            app.MapGet("/api/support-tickets", getAllSupportTicketsHandler).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             // Admin cập nhật trạng thái
             group.MapPut("/admin/{id}/status", async (int id, UpdateTicketStatusDto dto, HttpContext httpContext, GameStoreDbContext db) =>

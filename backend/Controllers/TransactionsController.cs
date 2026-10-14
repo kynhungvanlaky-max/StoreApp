@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
-using System.Text.Json;
+using Backend.Extensions;
+using Backend.Attributes;
 
 namespace Backend.Controllers
 {
+    [RequireAdminRole]
     public class TransactionsController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -13,37 +15,26 @@ namespace Backend.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> Index()
         {
-            ViewData["Token"] = Request.Cookies["access_token"];
-            
             var client = _httpClientFactory.CreateClient("API");
-            var response = await client.GetAsync($"/api/wallet/admin/all?page={page}&pageSize={pageSize}");
-            
-            var redirectResult = HandleApiResponse(response);
-            if (redirectResult != null) return redirectResult;
+            var transactions = new List<TransactionViewModel>();
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                try
+                var response = await client.GetAsync("/api/v1/transactions?page=1&pageSize=100");
+                if (response.IsSuccessStatusCode)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var pagedResult = JsonSerializer.Deserialize<PagedResponse<TransactionViewModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    ViewBag.CurrentPage = pagedResult?.CurrentPage ?? page;
-                    ViewBag.TotalPages = pagedResult?.TotalPages ?? 1;
-                    ViewBag.TotalItems = pagedResult?.TotalItems ?? 0;
-                    ViewBag.PageSize = pagedResult?.PageSize ?? pageSize;
-                    return View(new TransactionListViewModel { Transactions = pagedResult?.Data ?? new List<TransactionViewModel>() });
-                }
-                catch (Exception ex)
-                {
-                    SetErrorMessage("Lỗi khi tải dữ liệu giao dịch: " + ex.Message);
-                    return View(new TransactionListViewModel());
+                    var data = await response.Content.ReadJsonAsync<PagedResponse<TransactionViewModel>>();
+                    if (data?.Data != null) transactions = data.Data;
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("API Transactions Error: " + ex.Message);
+            }
 
-            SetErrorMessage("Không thể lấy danh sách giao dịch.");
-            return View(new TransactionListViewModel());
+            return View(transactions);
         }
     }
 }
