@@ -6,29 +6,36 @@ using GameStore.API.Data;
 
 namespace GameStore.Tests.IntegrationTests
 {
-    public class GameStoreApiFactory : WebApplicationFactory<object>
+    public class GameStoreApiFactory : WebApplicationFactory<GameStore.API.ApiMarker>
     {
+        private static readonly Microsoft.EntityFrameworkCore.Storage.InMemoryDatabaseRoot InMemoryRoot = new();
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("Testing");
             builder.ConfigureServices(services =>
             {
-                // Remove the real DbContext registration
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<GameStoreDbContext>));
-                if (descriptor != null)
-                    services.Remove(descriptor);
+                // Remove existing DbContext registrations
+                var descriptors = services.Where(d =>
+                    d.ServiceType == typeof(DbContextOptions<GameStoreDbContext>) ||
+                    d.ServiceType == typeof(DbContextOptions) ||
+                    d.ServiceType == typeof(GameStoreDbContext)).ToList();
 
-                // Add InMemory database for testing
+                foreach (var descriptor in descriptors)
+                {
+                    services.Remove(descriptor);
+                }
+
+                var inMemoryProvider = new ServiceCollection()
+                    .AddEntityFrameworkInMemoryDatabase()
+                    .BuildServiceProvider();
+
+                // Add InMemory database for testing with isolated provider
                 services.AddDbContext<GameStoreDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase("GameStoreTestDb");
+                    options.UseInMemoryDatabase("GameStoreTestDb", InMemoryRoot);
+                    options.UseInternalServiceProvider(inMemoryProvider);
                 });
-
-                // Ensure database is created
-                var sp = services.BuildServiceProvider();
-                using var scope = sp.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<GameStoreDbContext>();
-                db.Database.EnsureCreated();
             });
         }
     }

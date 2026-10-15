@@ -1,4 +1,4 @@
-﻿  Determining projects to restore...
+  Determining projects to restore...
   All projects are up-to-date for restore.
   Frontend -> D:\DA\frontend\bin\Debug\net10.0\Frontend.dll
   GameStore.API -> D:\DA\API\bin\Debug\net10.0\GameStore.API.dll
@@ -6,4 +6,4 @@
 Test run for D:\DA\GameStore.Tests\bin\Debug\net10.0\GameStore.Tests.dll (.NETCoreApp,Version=v10.0)
 A total of 1 test files matched the specified pattern.
 
-Passed!  - Failed:     0, Passed:    41, Skipped:     0, Total:    41, Duration: 1 s - GameStore.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 1 s - GameStore.Tests.dll (net10.0)

@@ -19,6 +19,7 @@ services:
       start_period: 15s
 
   api:
+    image: ${DOCKER_USERNAME:-nexus}/gamestore-api:latest
     build:
       context: .
       dockerfile: Dockerfile.api
@@ -39,6 +40,7 @@ services:
       - Jwt__Audience=http://localhost:5205
 
   frontend:
+    image: ${DOCKER_USERNAME:-nexus}/gamestore-frontend:latest
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -55,6 +57,7 @@ services:
       - SignalR__HubUrl=http://localhost:5021/hubs/nexus
 
   backend:
+    image: ${DOCKER_USERNAME:-nexus}/gamestore-backend:latest
     build:
       context: .
       dockerfile: Dockerfile.backend

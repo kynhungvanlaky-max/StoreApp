@@ -8,7 +8,7 @@ echo "=========================="
 PROJECT_DIR="/opt/gamestore"
 BACKUP_DIR="/opt/gamestore-backups/$(date +%Y%m%d_%H%M%S)"
 COMPOSE_FILE="docker-compose.yml"
-GIT_REPO="https://github.com/your-org/gamestore.git"
+GIT_REPO="https://github.com/kynhungvanlaky-max/StoreApp.git"
 
 # Step 1: Backup current deployment
 echo "📦 Creating backup..."

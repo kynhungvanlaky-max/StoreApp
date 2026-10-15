@@ -162,124 +162,139 @@ app.MapAdminAuditEndpoints();
 app.MapRecommendationEndpoints();
 app.MapHub<NexusHub>("/hubs/nexus");
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseInit");
-    var db = services.GetRequiredService<GameStoreDbContext>();
-
-    // Retry loop chờ SQL Server khởi động hoàn tất (đặc biệt khi chạy Docker lần đầu)
-    int maxRetries = 10;
-    for (int retry = 1; retry <= maxRetries; retry++)
+    using (var scope = app.Services.CreateScope())
     {
+        var services = scope.ServiceProvider;
+        var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseInit");
+        var db = services.GetRequiredService<GameStoreDbContext>();
+
+        if (db.Database.IsRelational())
+        {
+            // Retry loop chờ SQL Server khởi động hoàn tất (đặc biệt khi chạy Docker lần đầu)
+            int maxRetries = 10;
+            for (int retry = 1; retry <= maxRetries; retry++)
+            {
+                try
+                {
+                    logger.LogInformation("Đang kiểm tra kết nối và cập nhật Database migrations (Lần {Retry}/{Max})...", retry, maxRetries);
+                    await db.Database.MigrateAsync();
+                    logger.LogInformation("Database migration thành công!");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning("Chưa kết nối được Database: {Message}. Thử lại sau 3s...", ex.Message);
+                    if (retry == maxRetries)
+                    {
+                        logger.LogError(ex, "Không thể kết nối đến Database sau nhiều lần thử.");
+                        // Không crash app ngay để cho phép API endpoint "/" vẫn trả về trạng thái
+                    }
+                    else
+                    {
+                        await Task.Delay(3000);
+                    }
+                }
+            }
+
+            try {
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE Reviews ADD CreatedAt datetime2 NOT NULL DEFAULT GETDATE();");
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE Reviews ADD UpdatedAt datetime2 NULL;");
+            } catch {}
+            try {
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE SupportTickets ADD AdminReply nvarchar(max) NULL;");
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE SupportTickets ADD RepliedAt datetime2 NULL;");
+            } catch {}
+            try {
+                await db.Database.ExecuteSqlRawAsync(@"
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Coupons')
+                    CREATE TABLE Coupons (
+                        Id int NOT NULL IDENTITY,
+                        Code nvarchar(max) NOT NULL,
+                        DiscountPercent decimal(18,2) NOT NULL,
+                        MaxUsage int NOT NULL,
+                        CurrentUsage int NOT NULL,
+                        ExpiryDate datetime2 NOT NULL,
+                        IsActive bit NOT NULL,
+                        CreatedAt datetime2 NOT NULL,
+                        CONSTRAINT PK_Coupons PRIMARY KEY (Id)
+                    );
+                ");
+            } catch {}
+        }
+        else
+        {
+            await db.Database.EnsureCreatedAsync();
+        }
+
+        // Seed Data: Roles
         try
         {
-            logger.LogInformation("Đang kiểm tra kết nối và cập nhật Database migrations (Lần {Retry}/{Max})...", retry, maxRetries);
-            await db.Database.MigrateAsync();
-            logger.LogInformation("Database migration thành công!");
-            break;
+            if (!await db.Roles.AnyAsync())
+            {
+                var adminRole = new Role { RoleName = "Administrator" };
+                var customerRole = new Role { RoleName = "Customer" };
+                var developerRole = new Role { RoleName = "Developer" };
+                db.Roles.AddRange(adminRole, customerRole, developerRole);
+                await db.SaveChangesAsync();
+                logger.LogInformation("Đã khởi tạo các vai trò mặc định (Roles).");
+            }
+
+            // Seed Data: Admin User
+            var adminRoleEntity = await db.Roles.FirstOrDefaultAsync(r => r.RoleName == "Administrator");
+            if (adminRoleEntity != null && !await db.Users.AnyAsync(u => u.RoleId == adminRoleEntity.Id))
+            {
+                var adminUser = new User
+                {
+                    Username = "admin",
+                    Email = "admin@nexusstore.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    RoleId = adminRoleEntity.Id,
+                    WalletBalance = 10000000,
+                    CreatedAt = DateTime.UtcNow
+                };
+                db.Users.Add(adminUser);
+
+                var testAdmin = new User
+                {
+                    Username = "testadmin",
+                    Email = "testadmin@nexusstore.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    RoleId = adminRoleEntity.Id,
+                    WalletBalance = 5000000,
+                    CreatedAt = DateTime.UtcNow
+                };
+                db.Users.Add(testAdmin);
+                await db.SaveChangesAsync();
+                logger.LogInformation("Đã tạo tài khoản Admin mặc định (admin/admin123 và testadmin/123456).");
+            }
+
+            // Seed Data: Categories nếu chưa có
+            if (!await db.Categories.AnyAsync())
+            {
+                db.Categories.AddRange(
+                    new Category { Name = "Hành động", Description = "Các trò chơi hành động kịch tính và gay cấn." },
+                    new Category { Name = "Nhập vai (RPG)", Description = "Thế giới mở, cốt truyện sâu sắc và phát triển nhân vật." },
+                    new Category { Name = "Chiến thuật", Description = "Tư duy chiến thuật thời gian thực hoặc theo lượt." },
+                    new Category { Name = "Phiêu lưu", Description = "Khám phá thế giới kì thú và giải đố hấp dẫn." },
+                    new Category { Name = "Mô phỏng", Description = "Mô phỏng đời sống, xây dựng và lái xe chân thực." },
+                    new Category { Name = "Ứng dụng & Tiện ích", Description = "Phần mềm công cụ, chỉnh sửa và năng suất." }
+                );
+                await db.SaveChangesAsync();
+                logger.LogInformation("Đã khởi tạo các danh mục mẫu (Categories).");
+            }
         }
         catch (Exception ex)
         {
-            logger.LogWarning("Chưa kết nối được Database: {Message}. Thử lại sau 3s...", ex.Message);
-            if (retry == maxRetries)
-            {
-                logger.LogError(ex, "Không thể kết nối đến Database sau nhiều lần thử.");
-                // Không crash app ngay để cho phép API endpoint "/" vẫn trả về trạng thái
-            }
-            else
-            {
-                await Task.Delay(3000);
-            }
+            logger.LogWarning("Không thể seed dữ liệu mặc định: {Message}", ex.Message);
         }
-    }
-
-    try {
-        await db.Database.ExecuteSqlRawAsync("ALTER TABLE Reviews ADD CreatedAt datetime2 NOT NULL DEFAULT GETDATE();");
-        await db.Database.ExecuteSqlRawAsync("ALTER TABLE Reviews ADD UpdatedAt datetime2 NULL;");
-    } catch {}
-    try {
-        await db.Database.ExecuteSqlRawAsync("ALTER TABLE SupportTickets ADD AdminReply nvarchar(max) NULL;");
-        await db.Database.ExecuteSqlRawAsync("ALTER TABLE SupportTickets ADD RepliedAt datetime2 NULL;");
-    } catch {}
-    try {
-        await db.Database.ExecuteSqlRawAsync(@"
-            IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Coupons')
-            CREATE TABLE Coupons (
-                Id int NOT NULL IDENTITY,
-                Code nvarchar(max) NOT NULL,
-                DiscountPercent decimal(18,2) NOT NULL,
-                MaxUsage int NOT NULL,
-                CurrentUsage int NOT NULL,
-                ExpiryDate datetime2 NOT NULL,
-                IsActive bit NOT NULL,
-                CreatedAt datetime2 NOT NULL,
-                CONSTRAINT PK_Coupons PRIMARY KEY (Id)
-            );
-        ");
-    } catch {}
-
-    // Seed Data: Roles
-    try
-    {
-        if (!await db.Roles.AnyAsync())
-        {
-            var adminRole = new Role { RoleName = "Administrator" };
-            var customerRole = new Role { RoleName = "Customer" };
-            var developerRole = new Role { RoleName = "Developer" };
-            db.Roles.AddRange(adminRole, customerRole, developerRole);
-            await db.SaveChangesAsync();
-            logger.LogInformation("Đã khởi tạo các vai trò mặc định (Roles).");
-        }
-
-        // Seed Data: Admin User
-        var adminRoleEntity = await db.Roles.FirstOrDefaultAsync(r => r.RoleName == "Administrator");
-        if (adminRoleEntity != null && !await db.Users.AnyAsync(u => u.RoleId == adminRoleEntity.Id))
-        {
-            var adminUser = new User
-            {
-                Username = "admin",
-                Email = "admin@nexusstore.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                RoleId = adminRoleEntity.Id,
-                WalletBalance = 10000000,
-                CreatedAt = DateTime.UtcNow
-            };
-            db.Users.Add(adminUser);
-
-            var testAdmin = new User
-            {
-                Username = "testadmin",
-                Email = "testadmin@nexusstore.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
-                RoleId = adminRoleEntity.Id,
-                WalletBalance = 5000000,
-                CreatedAt = DateTime.UtcNow
-            };
-            db.Users.Add(testAdmin);
-            await db.SaveChangesAsync();
-            logger.LogInformation("Đã tạo tài khoản Admin mặc định (admin/admin123 và testadmin/123456).");
-        }
-
-        // Seed Data: Categories nếu chưa có
-        if (!await db.Categories.AnyAsync())
-        {
-            db.Categories.AddRange(
-                new Category { Name = "Hành động", Description = "Các trò chơi hành động kịch tính và gay cấn." },
-                new Category { Name = "Nhập vai (RPG)", Description = "Thế giới mở, cốt truyện sâu sắc và phát triển nhân vật." },
-                new Category { Name = "Chiến thuật", Description = "Tư duy chiến thuật thời gian thực hoặc theo lượt." },
-                new Category { Name = "Phiêu lưu", Description = "Khám phá thế giới kì thú và giải đố hấp dẫn." },
-                new Category { Name = "Mô phỏng", Description = "Mô phỏng đời sống, xây dựng và lái xe chân thực." },
-                new Category { Name = "Ứng dụng & Tiện ích", Description = "Phần mềm công cụ, chỉnh sửa và năng suất." }
-            );
-            await db.SaveChangesAsync();
-            logger.LogInformation("Đã khởi tạo các danh mục mẫu (Categories).");
-        }
-    }
-    catch (Exception ex)
-    {
-        logger.LogWarning("Không thể seed dữ liệu mặc định: {Message}", ex.Message);
     }
 }
 
 app.Run();
+
+namespace GameStore.API
+{
+    public class ApiMarker { }
+}
