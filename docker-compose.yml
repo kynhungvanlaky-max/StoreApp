@@ -19,7 +19,7 @@ services:
       start_period: 15s
 
   api:
-    image: ${IMAGE_PREFIX:-ghcr.io/kynhungvanlaky-max}/gamestore-api:latest
+    image: ${DOCKER_USERNAME:-nexus}/gamestore-api:latest
     build:
       context: .
       dockerfile: Dockerfile.api
@@ -40,7 +40,7 @@ services:
       - Jwt__Audience=http://localhost:5205
 
   frontend:
-    image: ${IMAGE_PREFIX:-ghcr.io/kynhungvanlaky-max}/gamestore-frontend:latest
+    image: ${DOCKER_USERNAME:-nexus}/gamestore-frontend:latest
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -57,7 +57,7 @@ services:
       - SignalR__HubUrl=http://localhost:5021/hubs/nexus
 
   backend:
-    image: ${IMAGE_PREFIX:-ghcr.io/kynhungvanlaky-max}/gamestore-backend:latest
+    image: ${DOCKER_USERNAME:-nexus}/gamestore-backend:latest
     build:
       context: .
       dockerfile: Dockerfile.backend
