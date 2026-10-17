@@ -84,14 +84,16 @@ else
             @* Product Type Badge *@
             @if (GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
             {
-                <span class="inline-flex items-center px-3 py-1 rounded-md bg-purple-600/90 text-white text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/40">
-                    Ứng dụng & Phần mềm
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-purple-300 text-xs font-bold uppercase tracking-wider border border-purple-500/30 shadow-md">
+                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                    <span>Ứng dụng & Phần mềm</span>
                 </span>
             }
             else
             {
-                <span class="inline-flex items-center px-3 py-1 rounded-md bg-[#0078f2]/90 text-white text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/40">
-                    Trò chơi (Game)
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-sky-300 text-xs font-bold uppercase tracking-wider border border-sky-500/30 shadow-md">
+                    <span class="w-2 h-2 rounded-full bg-[#0078f2]"></span>
+                    <span>Trò chơi (Game)</span>
                 </span>
             }
 
