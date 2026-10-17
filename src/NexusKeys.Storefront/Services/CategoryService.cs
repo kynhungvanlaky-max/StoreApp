@@ -43,8 +43,7 @@ namespace Frontend.Services
                 new() { Name = "Sinh tồn", ProductCount = 0 },
                 new() { Name = "Kinh dị", ProductCount = 0 },
                 new() { Name = "Đua xe", ProductCount = 0 },
-                new() { Name = "Phần mềm", ProductCount = 0 },
-                new() { Name = "Thẻ quà tặng", ProductCount = 0 }
+                new() { Name = "Phần mềm", ProductCount = 0 }
             };
         }
     }

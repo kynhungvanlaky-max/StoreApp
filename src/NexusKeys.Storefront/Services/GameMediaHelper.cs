@@ -51,17 +51,43 @@ namespace Frontend.Services
             { "Medieval Dynasty", 1129580 },
             { "Planet Zoo", 703080 },
             { "Agent A", 801480 },
-            { "Graveyard Keeper", 599140 }
+            { "Graveyard Keeper", 599140 },
+            { "Blender", 365670 },
+            { "Wallpaper Engine", 431960 },
+            { "Substance 3D Painter", 1775390 },
+            { "Substance Painter", 1775390 },
+            { "Aseprite", 431730 },
+            { "VEGAS Pro", 1325400 },
+            { "RPG Maker MZ", 1096900 },
+            { "RPG Maker", 1096900 },
+            { "3DMark", 223850 }
         };
 
-        private static int? FindAppId(string? name)
+        private static readonly HashSet<int> SoftwareSteamAppIds = new()
+        {
+            365670,  // Blender
+            431960,  // Wallpaper Engine
+            1775390, // Substance 3D Painter
+            431730,  // Aseprite
+            1325400, // VEGAS Pro
+            1096900, // RPG Maker MZ
+            223850   // 3DMark
+        };
+
+        private static int? FindAppId(string? name, bool isApp = false)
         {
             if (string.IsNullOrWhiteSpace(name)) return null;
 
             foreach (var kvp in TitleToSteamAppId)
             {
+                bool isSoftwareId = SoftwareSteamAppIds.Contains(kvp.Value);
+                // When resolving an App, NEVER match a game Steam AppId (Control, Elden Ring, RDR2, etc.)
+                if (isApp && !isSoftwareId) continue;
+                // When resolving a Game, do not match a software Steam AppId
+                if (!isApp && isSoftwareId) continue;
+
                 if (name.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase) ||
-                    kvp.Key.Contains(name, StringComparison.OrdinalIgnoreCase))
+                    (name.Length >= 5 && kvp.Key.Contains(name, StringComparison.OrdinalIgnoreCase)))
                 {
                     return kvp.Value;
                 }
@@ -70,9 +96,10 @@ namespace Frontend.Services
             return null;
         }
 
-        public static string GetCover(string? name, string? fallbackUrl)
+        public static string GetCover(string? name, string? fallbackUrl, string? type = null, IEnumerable<string>? categories = null)
         {
-            var appId = FindAppId(name);
+            bool isApp = IsApp(name, type, categories);
+            var appId = FindAppId(name, isApp);
             if (appId.HasValue)
             {
                 return $"https://cdn.akamai.steamstatic.com/steam/apps/{appId.Value}/library_600x900.jpg";
@@ -80,81 +107,197 @@ namespace Frontend.Services
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                if (name.Contains("Steam Wallet", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_616x353.jpg";
-                if (name.Contains("Epic Games Gift", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_616x353.jpg";
-                if (name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase) || name.Contains("Software", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/870780/library_600x900.jpg";
-                if (name.Contains("3D Modeler", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_600x900.jpg";
-                if (name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/1174180/library_600x900.jpg";
-                if (name.Contains("Music Studio", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg";
-                if (name.Contains("DevStudio", StringComparison.OrdinalIgnoreCase) || name.Contains("Code IDE", StringComparison.OrdinalIgnoreCase))
-                    return "https://cdn.akamai.steamstatic.com/steam/apps/1086940/library_600x900.jpg";
+                if (name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800";
+                if (name.Contains("Blender", StringComparison.OrdinalIgnoreCase) || name.Contains("3D Modeler", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/365670/library_600x900.jpg";
+                if (name.Contains("Premiere", StringComparison.OrdinalIgnoreCase) || name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase) || name.Contains("VEGAS", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800";
+                if (name.Contains("FL Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("Music Studio", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800";
+                if (name.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("DevStudio", StringComparison.OrdinalIgnoreCase) || name.Contains("Code IDE", StringComparison.OrdinalIgnoreCase) || name.Contains("VS Code", StringComparison.OrdinalIgnoreCase) || name.Contains("VSCode", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800";
+                if (name.Contains("Windows 11", StringComparison.OrdinalIgnoreCase) || name.Contains("Windows", StringComparison.OrdinalIgnoreCase) || name.Contains("Office", StringComparison.OrdinalIgnoreCase) || name.Contains("Microsoft 365", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800";
+                if (name.Contains("JetBrains", StringComparison.OrdinalIgnoreCase) || name.Contains("IntelliJ", StringComparison.OrdinalIgnoreCase) || name.Contains("PyCharm", StringComparison.OrdinalIgnoreCase) || name.Contains("WebStorm", StringComparison.OrdinalIgnoreCase) || name.Contains("Rider", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800";
+                if (name.Contains("AutoCAD", StringComparison.OrdinalIgnoreCase) || name.Contains("CAD", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800";
+                if (name.Contains("Substance", StringComparison.OrdinalIgnoreCase) || name.Contains("Painter", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/1775390/library_600x900.jpg";
+                if (name.Contains("Wallpaper Engine", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/431960/library_600x900.jpg";
+                if (name.Contains("Aseprite", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/431730/library_600x900.jpg";
             }
 
-            if (!string.IsNullOrWhiteSpace(fallbackUrl) && !fallbackUrl.Contains("unsplash.com"))
+            if (!string.IsNullOrWhiteSpace(fallbackUrl))
             {
                 return fallbackUrl;
+            }
+
+            if (isApp)
+            {
+                return "https://cdn.akamai.steamstatic.com/steam/apps/431960/library_600x900.jpg";
             }
 
             return "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg";
         }
 
-        public static string GetHeroBanner(string? name, string? fallbackUrl)
+        public static string GetHeroBanner(string? name, string? fallbackUrl, string? type = null, IEnumerable<string>? categories = null)
         {
-            var appId = FindAppId(name);
+            bool isApp = IsApp(name, type, categories);
+            var appId = FindAppId(name, isApp);
             if (appId.HasValue)
             {
                 return $"https://cdn.akamai.steamstatic.com/steam/apps/{appId.Value}/library_hero.jpg";
             }
 
-            if (!string.IsNullOrWhiteSpace(fallbackUrl) && !fallbackUrl.Contains("unsplash.com"))
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                if (name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1600";
+                if (name.Contains("Blender", StringComparison.OrdinalIgnoreCase) || name.Contains("3D Modeler", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/365670/library_hero.jpg";
+                if (name.Contains("Premiere", StringComparison.OrdinalIgnoreCase) || name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase) || name.Contains("VEGAS", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1600";
+                if (name.Contains("FL Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("Music Studio", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1600";
+                if (name.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("DevStudio", StringComparison.OrdinalIgnoreCase) || name.Contains("Code IDE", StringComparison.OrdinalIgnoreCase) || name.Contains("VS Code", StringComparison.OrdinalIgnoreCase) || name.Contains("VSCode", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1600";
+                if (name.Contains("Windows 11", StringComparison.OrdinalIgnoreCase) || name.Contains("Windows", StringComparison.OrdinalIgnoreCase) || name.Contains("Office", StringComparison.OrdinalIgnoreCase) || name.Contains("Microsoft 365", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=1600";
+                if (name.Contains("JetBrains", StringComparison.OrdinalIgnoreCase) || name.Contains("IntelliJ", StringComparison.OrdinalIgnoreCase) || name.Contains("PyCharm", StringComparison.OrdinalIgnoreCase) || name.Contains("WebStorm", StringComparison.OrdinalIgnoreCase) || name.Contains("Rider", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1600";
+                if (name.Contains("AutoCAD", StringComparison.OrdinalIgnoreCase) || name.Contains("CAD", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1600";
+                if (name.Contains("Substance", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/1775390/library_hero.jpg";
+                if (name.Contains("Wallpaper Engine", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/431960/library_hero.jpg";
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackUrl))
             {
                 return fallbackUrl;
+            }
+
+            if (isApp)
+            {
+                return "https://cdn.akamai.steamstatic.com/steam/apps/431960/library_hero.jpg";
             }
 
             return "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_hero.jpg";
         }
 
-        public static string GetCapsule(string? name, string? fallbackUrl)
+        public static string GetCapsule(string? name, string? fallbackUrl, string? type = null, IEnumerable<string>? categories = null)
         {
-            var appId = FindAppId(name);
+            bool isApp = IsApp(name, type, categories);
+            var appId = FindAppId(name, isApp);
             if (appId.HasValue)
             {
                 return $"https://cdn.akamai.steamstatic.com/steam/apps/{appId.Value}/capsule_616x353.jpg";
             }
 
-            if (!string.IsNullOrWhiteSpace(fallbackUrl) && !fallbackUrl.Contains("unsplash.com"))
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                if (name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800";
+                if (name.Contains("Blender", StringComparison.OrdinalIgnoreCase) || name.Contains("3D Modeler", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/365670/capsule_616x353.jpg";
+                if (name.Contains("Premiere", StringComparison.OrdinalIgnoreCase) || name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase) || name.Contains("VEGAS", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800";
+                if (name.Contains("FL Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("Music Studio", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800";
+                if (name.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("DevStudio", StringComparison.OrdinalIgnoreCase) || name.Contains("Code IDE", StringComparison.OrdinalIgnoreCase) || name.Contains("VS Code", StringComparison.OrdinalIgnoreCase) || name.Contains("VSCode", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800";
+                if (name.Contains("Windows 11", StringComparison.OrdinalIgnoreCase) || name.Contains("Windows", StringComparison.OrdinalIgnoreCase) || name.Contains("Office", StringComparison.OrdinalIgnoreCase) || name.Contains("Microsoft 365", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800";
+                if (name.Contains("JetBrains", StringComparison.OrdinalIgnoreCase) || name.Contains("IntelliJ", StringComparison.OrdinalIgnoreCase) || name.Contains("PyCharm", StringComparison.OrdinalIgnoreCase) || name.Contains("WebStorm", StringComparison.OrdinalIgnoreCase) || name.Contains("Rider", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800";
+                if (name.Contains("AutoCAD", StringComparison.OrdinalIgnoreCase) || name.Contains("CAD", StringComparison.OrdinalIgnoreCase))
+                    return "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800";
+                if (name.Contains("Substance", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/1775390/capsule_616x353.jpg";
+                if (name.Contains("Wallpaper Engine", StringComparison.OrdinalIgnoreCase))
+                    return "https://cdn.akamai.steamstatic.com/steam/apps/431960/capsule_616x353.jpg";
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackUrl))
             {
                 return fallbackUrl;
+            }
+
+            if (isApp)
+            {
+                return "https://cdn.akamai.steamstatic.com/steam/apps/431960/capsule_616x353.jpg";
             }
 
             return "https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_616x353.jpg";
         }
 
-        public static List<MediaGalleryItem> GetMediaGallery(string? name, string? mainUrl)
+        public static List<MediaGalleryItem> GetMediaGallery(string? name, string? mainUrl, string? type = null, IEnumerable<string>? categories = null)
         {
             var list = new List<MediaGalleryItem>();
-            var appId = FindAppId(name);
+            bool isApp = IsApp(name, type, categories);
+            var appId = FindAppId(name, isApp);
 
             if (appId.HasValue)
             {
                 int id = appId.Value;
-                list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/library_hero.jpg", "Image", "Hero Cinematic"));
-                list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/page_bg_raw.jpg", "Image", "Gameplay Panorama"));
-                list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/capsule_616x353.jpg", "Image", "Capsule Art"));
-                list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/header.jpg", "Image", "Action Banner"));
+                if (isApp)
+                {
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/library_hero.jpg", "Image", "Giao diện làm việc (Workspace)"));
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/page_bg_raw.jpg", "Image", "Không gian sáng tạo"));
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/capsule_616x353.jpg", "Image", "Bộ công cụ chuyên nghiệp"));
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/header.jpg", "Image", "Biểu trưng ứng dụng"));
+                }
+                else
+                {
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/library_hero.jpg", "Image", "Hero Cinematic"));
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/page_bg_raw.jpg", "Image", "Gameplay Panorama"));
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/capsule_616x353.jpg", "Image", "Capsule Art"));
+                    list.Add(new MediaGalleryItem($"https://cdn.akamai.steamstatic.com/steam/apps/{id}/header.jpg", "Image", "Action Banner"));
+                }
             }
             else
             {
-                string cover = GetCover(name, mainUrl);
-                string hero = GetHeroBanner(name, mainUrl);
-                list.Add(new MediaGalleryItem(hero, "Image", "Hero Spotlight"));
-                list.Add(new MediaGalleryItem(cover, "Image", "Poster Art"));
+                string cover = GetCover(name, mainUrl, type, categories);
+                string hero = GetHeroBanner(name, mainUrl, type, categories);
+                if (isApp)
+                {
+                    list.Add(new MediaGalleryItem(hero, "Image", "Giao diện làm việc"));
+                    list.Add(new MediaGalleryItem(cover, "Image", "Hình ảnh bản quyền"));
+                    if (!string.IsNullOrWhiteSpace(name) && name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200", "Image", "Chỉnh sửa đồ họa & AI"));
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200", "Image", "Xử lý màu sắc chuyên sâu"));
+                    }
+                    else if (!string.IsNullOrWhiteSpace(name) && name.Contains("Premiere", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1536240478700-b869070f9279?w=1200", "Image", "Dựng phim Timeline đa kênh"));
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200", "Image", "Hiệu ứng chuyển cảnh & Màu sắc"));
+                    }
+                    else if (!string.IsNullOrWhiteSpace(name) && name.Contains("FL Studio", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200", "Image", "Bàn mixer & Nhạc cụ ảo"));
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1200", "Image", "Hòa âm phối khí chuyên nghiệp"));
+                    }
+                    else if (!string.IsNullOrWhiteSpace(name) && (name.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase) || name.Contains("JetBrains", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200", "Image", "Trình soạn thảo mã thông minh"));
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200", "Image", "Debug & Quản lý dự án"));
+                    }
+                    else if (!string.IsNullOrWhiteSpace(name) && name.Contains("AutoCAD", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(new MediaGalleryItem("https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200", "Image", "Bản vẽ kỹ thuật 2D/3D"));
+                    }
+                }
+                else
+                {
+                    list.Add(new MediaGalleryItem(hero, "Image", "Hero Spotlight"));
+                    list.Add(new MediaGalleryItem(cover, "Image", "Poster Art"));
+                }
             }
 
             return list;
@@ -239,13 +382,28 @@ namespace Frontend.Services
             {
                 var nNorm = RemoveDiacritics(name);
                 if (name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Blender", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Premiere", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("FL Studio", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("AutoCAD", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Substance", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Wallpaper Engine", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("JetBrains", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("IntelliJ", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Aseprite", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("3D Modeler", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Music Studio", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("DevStudio", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("VS Code", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("VSCode", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("PyCharm", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("WebStorm", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Rider", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Software", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Office", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Microsoft 365", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Windows 1", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Antivirus", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Phần mềm", StringComparison.OrdinalIgnoreCase) ||
@@ -316,7 +474,6 @@ namespace Frontend.Services
 
         public static string GetProductType(string? name, string? type, IEnumerable<string>? categories = null)
         {
-            if (IsGiftCard(name, type, categories)) return "GiftCard";
             if (IsApp(name, type, categories)) return "Software";
             return "Game";
         }
@@ -338,15 +495,16 @@ namespace Frontend.Services
                             cNorm.Contains("do hoa", StringComparison.OrdinalIgnoreCase) ||
                             cNorm.Contains("thiet ke", StringComparison.OrdinalIgnoreCase))
                         {
-                            return "Phần mềm đồ họa";
+                            return "Đồ họa & Thiết kế 3D";
                         }
 
                         if (c.Contains("Video", StringComparison.OrdinalIgnoreCase) ||
                             c.Contains("Âm thanh", StringComparison.OrdinalIgnoreCase) ||
                             c.Contains("Nhạc", StringComparison.OrdinalIgnoreCase) ||
+                            cNorm.Contains("bien tap", StringComparison.OrdinalIgnoreCase) ||
                             cNorm.Contains("am thanh", StringComparison.OrdinalIgnoreCase))
                         {
-                            return "Biên tập đa phương tiện";
+                            return "Biên tập Video & Âm thanh";
                         }
 
                         if (c.Contains("Lập trình", StringComparison.OrdinalIgnoreCase) ||
@@ -354,7 +512,7 @@ namespace Frontend.Services
                             cNorm.Contains("lap trinh", StringComparison.OrdinalIgnoreCase) ||
                             cNorm.Contains("tien ich", StringComparison.OrdinalIgnoreCase))
                         {
-                            return "Ứng dụng tiện ích";
+                            return "Lập trình & Tiện ích";
                         }
 
                         if (c.Contains("Công cụ", StringComparison.OrdinalIgnoreCase) ||
@@ -372,34 +530,40 @@ namespace Frontend.Services
                 {
                     var nNorm = RemoveDiacritics(name);
                     if (name.Contains("Photoshop", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("Blender", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("AutoCAD", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("Substance", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("Aseprite", StringComparison.OrdinalIgnoreCase) ||
                         name.Contains("3D Modeler", StringComparison.OrdinalIgnoreCase) ||
                         nNorm.Contains("do hoa", StringComparison.OrdinalIgnoreCase))
                     {
-                        return "Phần mềm đồ họa";
+                        return "Đồ họa & Thiết kế 3D";
                     }
-                    if (name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase) ||
+                    if (name.Contains("Premiere", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("Video Editor", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("VEGAS", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("FL Studio", StringComparison.OrdinalIgnoreCase) ||
                         name.Contains("Music Studio", StringComparison.OrdinalIgnoreCase) ||
                         nNorm.Contains("bien tap", StringComparison.OrdinalIgnoreCase) ||
                         nNorm.Contains("am thanh", StringComparison.OrdinalIgnoreCase))
                     {
-                        return "Biên tập đa phương tiện";
+                        return "Biên tập Video & Âm thanh";
                     }
                     if (name.Contains("DevStudio", StringComparison.OrdinalIgnoreCase) ||
                         name.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("JetBrains", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("IntelliJ", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("Wallpaper Engine", StringComparison.OrdinalIgnoreCase) ||
+                        name.Contains("Windows", StringComparison.OrdinalIgnoreCase) ||
                         name.Contains("Code", StringComparison.OrdinalIgnoreCase) ||
                         name.Contains("IDE", StringComparison.OrdinalIgnoreCase) ||
                         nNorm.Contains("lap trinh", StringComparison.OrdinalIgnoreCase))
                     {
-                        return "Ứng dụng tiện ích";
+                        return "Lập trình & Tiện ích";
                     }
                 }
 
-                return "Ứng dụng tiện ích";
-            }
-
-            if (IsGiftCard(name, type, categories))
-            {
-                return "Thẻ quà tặng";
+                return "Lập trình & Tiện ích";
             }
 
             if (!string.IsNullOrWhiteSpace(name))
@@ -407,8 +571,13 @@ namespace Frontend.Services
                 if (name.Contains("Edition", StringComparison.OrdinalIgnoreCase) || 
                     name.Contains("Deluxe", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Ultimate", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Definitive", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Remake", StringComparison.OrdinalIgnoreCase))
-                    return "Phiên bản đặc biệt";
+                    return "Bản đặc biệt";
+
+                if (name.Contains("Hades II", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Early Access", StringComparison.OrdinalIgnoreCase))
+                    return "Truy cập sớm";
 
                 if (name.Contains("DLC", StringComparison.OrdinalIgnoreCase) || 
                     name.Contains("Expansion", StringComparison.OrdinalIgnoreCase) ||
@@ -422,11 +591,11 @@ namespace Frontend.Services
         public static string GetDetailedBadgeColor(string? name, string? type, IEnumerable<string>? categories = null)
         {
             if (IsApp(name, type, categories)) return "text-purple-400";
-            if (IsGiftCard(name, type, categories)) return "text-amber-400";
             if (!string.IsNullOrWhiteSpace(name) && 
                 (name.Contains("Edition", StringComparison.OrdinalIgnoreCase) || 
                  name.Contains("Deluxe", StringComparison.OrdinalIgnoreCase) ||
                  name.Contains("Ultimate", StringComparison.OrdinalIgnoreCase) ||
+                 name.Contains("Definitive", StringComparison.OrdinalIgnoreCase) ||
                  name.Contains("Remake", StringComparison.OrdinalIgnoreCase)))
             {
                 return "text-amber-300";

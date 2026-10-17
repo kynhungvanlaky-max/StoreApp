@@ -1,114 +1,61 @@
-# BÁO CÁO THẨM ĐỊNH & HOÀN THIỆN TYPOGRAPHY (REVIEWER R1 HANDOFF REPORT)
-**Vai trò:** reviewer@swe_light / qa@swe_light (Review Round 1)  
-**Thời gian:** 16/10/2026  
-**Trạng thái kiểm tra:** PASSED 100% (Build & All 72 Test Cases Passed)
+# Reviewer R1 Handoff Report
 
----
+> [!WARNING] **Skepticism Disclaimer**
+> Đã xác minh tính toàn vẹn 100% của test suite (72/72 passed, 0 diff trên `tests/`) và biên dịch sạch toàn bộ solution, tuy nhiên môi trường kiểm thử là headless CLI (không có display browser vật lý để chụp lại screenshot render runtime).
 
-## 1. Những điểm khiếm khuyết trong lần triển khai trước (What the prior attempt got wrong)
+## 1. What the prior attempt got wrong
+- **Lỗi nhận diện AppId do so khớp chuỗi con quá rộng (`GameMediaHelper.FindAppId`)**:
+  - *Input*: Sản phẩm có tên ngắn hoặc chứa các từ đơn lẻ ("A", "Pro", "War").
+  - *Expected*: `FindAppId` chỉ khớp chính xác hoặc khớp tên game dài có nghĩa, không bắt nhầm các từ ngắn vào các tựa game như "Agent A" (appId 801480) hay "VEGAS Pro" (appId 1325400).
+  - *Actual*: Do logic `kvp.Key.Contains(name, StringComparison.OrdinalIgnoreCase)` không kiểm tra độ dài tối thiểu của `name`, chuỗi ngắn 1 ký tự như "A" cũng bị khớp vào "Agent A", biến sản phẩm bất kỳ thành game Steam.
+  - *Root cause*: `FindAppId` thiếu điều kiện ràng buộc độ dài `name.Length >= 5` trước khi kiểm tra `kvp.Key.Contains(name)`.
+- **Hàm ánh xạ ảnh thiếu ngữ cảnh phân loại (`Product.Type` và `Product.Categories`)**:
+  - *Input*: Một sản phẩm phần mềm mới trong DB có tên độc lạ hoặc tùy biến không nằm trong từ khóa cố định, `Type = "App"`, `ImageUrl = null`.
+  - *Expected*: Hiển thị ảnh cover/banner/capsule đặc trưng của phần mềm (Wallpaper Engine 431960).
+  - *Actual*: `GetCover(name, fallbackUrl)` chỉ nhận `name` và `fallbackUrl`, không nhận `type` hay `categories`, dẫn đến fallback về ảnh game Black Myth: Wukong (2358720), vi phạm trực tiếp R6 ("Tuyệt đối không dùng ảnh poster game cho ứng dụng phần mềm").
+  - *Root cause*: Chữ ký của `GetCover`, `GetHeroBanner`, `GetCapsule`, `GetMediaGallery` thiếu tham số ngữ cảnh `string? type = null, IEnumerable<string>? categories = null`.
+- **Thiếu đồng bộ trải nghiệm người dùng theo ngữ cảnh sản phẩm trong `ProductDetail.razor`**:
+  - *Input*: Truy cập trang chi tiết một ứng dụng phần mềm (Adobe Photoshop, Blender, Premiere Pro, v.v.).
+  - *Expected*: Các văn bản mô tả, placeholder đánh giá, tỷ lệ hài lòng và thông tin phiên bản phù hợp với ứng dụng (ví dụ: "Dựa trên người dùng đã mua", "Các gói bản quyền & Tiện ích bổ sung", "Bao gồm ứng dụng gốc...").
+  - *Actual*: Vẫn cố định nội dung cho game: "Dựa trên người chơi đã mua", "Hầu hết người chơi đều hài lòng với chất lượng tựa game", "Các phiên bản & Tiện ích bổ sung", "Bao gồm trò chơi gốc...".
+  - *Root cause*: Các nhãn văn bản trong tab Editions và Reviews chưa được rẽ nhánh theo `GameMediaHelper.IsApp(product.Name, product.Type, product.Categories)`.
+- **Đường dẫn liên kết thẻ phần mềm trên Trang chủ (`Home.razor`) chưa chuyển đúng bộ lọc**:
+  - *Input*: Người dùng bấm vào thẻ phần mềm mini (Blender, Wallpaper Engine) hoặc 4 thẻ trong Section 5 Software Showcase trên Trang chủ.
+  - *Expected*: Chuyển hướng tới `/products?type=App` để lọc ngay kho phần mềm.
+  - *Actual*: Trỏ về `/products` chung không có filter type, khiến người dùng phải thao tác chọn lại tab.
+  - *Root cause*: `href="/products"` thay vì `href="/products?type=App"`.
 
-### Vấn đề 1: Bỏ sót class CSS thuần có cỡ chữ siêu nhỏ `< 11px` (`.egs-card-badge-pill`)
-- **Input:** Khảo sát các quy tắc CSS tùy biến trong `wwwroot/css/epic-games.css` và `wwwroot/design/atlas.css`.
-- **Expected:** Toàn bộ các class badge và chip áp dụng trên card sản phẩm và store đạt tối thiểu `11px` hoặc `12px` (text-xs) với line-height $\ge$ 16px.
-- **Actual:** `.egs-card-badge-pill` vẫn giữ nguyên `font-size: 10px;` không có line-height và không có thuộc tính chống tràn (`white-space: nowrap`).
-- **Root Cause:** Implementer chỉ quét regex chuỗi Tailwind như `text-[10px]` mà không kiểm tra các quy tắc CSS thuần của Epic Games design system.
+## 2. What I changed
+- `src/NexusKeys.Storefront/Services/GameMediaHelper.cs`:
+  - Thêm điều kiện bảo vệ độ dài `(name.Length >= 5 && kvp.Key.Contains(name, ...))` trong `FindAppId` để tránh việc các chuỗi ký tự ngắn bị khớp nhầm.
+  - Mở rộng chữ ký của `GetCover`, `GetHeroBanner`, `GetCapsule`, `GetMediaGallery` hỗ trợ `string? type = null, IEnumerable<string>? categories = null`.
+  - Cập nhật logic fallback ảnh: Khi `IsApp(name, type, categories)` là `true`, fallback sang hình ảnh phần mềm chất lượng cao (Wallpaper Engine `431960`), tuyệt đối không fallback sang poster game.
+- `src/NexusKeys.Storefront/Components/Shared/ProductCard.razor`:
+  - Truyền `Product.Type` và `Product.Categories` vào `GameMediaHelper.GetCover`.
+- `src/NexusKeys.Storefront/Components/Pages/Products/ProductDetail.razor`:
+  - Truyền `product.Type` và `product.Categories` vào `GetCover`, `GetHeroBanner`, `GetCapsule`, `GetMediaGallery` và khi thêm vào giỏ hàng.
+  - Tối ưu ngữ cảnh văn bản cho ứng dụng: Placeholder đánh giá, subtext đánh giá cộng đồng, tỷ lệ hài lòng, tiêu đề và mô tả gói Standard / Deluxe Edition.
+  - Xóa bỏ chú thích cũ còn nhắc đến Gift Card.
+- `src/NexusKeys.Storefront/Components/Layout/Navbar.razor`:
+  - Truyền `product.Type` và `product.Categories` vào `GetCover` trong kết quả tìm kiếm live search cả trên desktop và mobile drawer.
+- `src/NexusKeys.Storefront/Components/Pages/Home.razor`:
+  - Cập nhật liên kết thẻ mini Blender 3D Studio, Wallpaper Engine và cả 4 thẻ Section 5 Creative Software sang `/products?type=App`.
 
-### Vấn đề 2: Bỏ sót quy chuẩn R2 đối với văn bản mô tả chính sách và hướng dẫn
-- **Input:** `Cart.razor` (dòng 247), `Distribution.razor` (dòng 260, 270, 278, 317, 327, 337), `Profile.razor` (dòng 110, 121), `ProductDetail.razor` (dòng 500-502), `Assistant.razor` (dòng 60), `Login.razor` (dòng 100, 183), `Register.razor` (dòng 137), `ForgotPassword.razor` (dòng 88), `ResetPassword.razor` (dòng 93).
-- **Expected:** Các đoạn văn bản mô tả chính sách, giải thích tính năng và hướng dẫn người dùng phải đạt chuẩn `text-sm` (14px) hoặc `text-xs` (12px) kèm khoảng cách dòng thoáng (`leading-relaxed`), không bị ép ở mức `text-[11px]`.
-- **Actual:** Các đoạn văn này bị đặt ở mức `text-[11px]` (ví dụ: chú thích doanh thu creator trong Cart, 6 khối mô tả tính năng đối tác trong Distribution, chú thích trường tài khoản trong Profile, ghi chú bản quyền buybox trong ProductDetail).
-- **Root Cause:** Implementer nâng cấp chưa triệt để các khối văn bản đoạn dài mà chỉ tập trung vào một số view chính.
+## 3. Verification Record
+- **Deep Verification (ran actual tests):**
+  - `git diff --stat tests/` -> 0 diff (Bảo toàn 100% test suite, tuyệt đối không chỉnh sửa test).
+  - `dotnet test tests/GameStore.API.ProductKeyTests/` -> Passed! Failed: 0, Passed: 72, Skipped: 0, Total: 72 (thời gian chạy 13s).
+  - `dotnet build GameStore.slnx` -> Build succeeded. 0 Error(s).
+  - `dotnet build src/NexusKeys.Storefront/NexusKeys.Storefront.csproj` -> Build succeeded. 0 Warning(s), 0 Error(s).
+- **Shallow Verification (manual inspection):**
+  - Kiểm tra toàn bộ codebase không còn nhãn Steam badge trên card, không còn bộ lọc nền tảng trên sidebar `/products`, không còn emoji `👍` / `👎`.
+  - Kiểm tra tính nhất quán giữa CSS Grid (`repeat(3, 1fr)`) và Tailwind class (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`) trên `.egs-mini-grid`.
+- **Unverified aspects:**
+  - Chưa chạy live UI browser automation test với headless Chrome / Playwright trên runtime Blazor Server.
 
-### Vấn đề 3: Thiếu bảo vệ chống co ngắt dòng (`white-space: nowrap`) trên Badge và Pill giảm giá
-- **Input:** Card game và discount pill trên thiết bị có độ rộng cực hẹp (320px - 360px).
-- **Expected:** Badge giảm giá `-50%` hoặc `-75%` và tag trạng thái phải hiển thị trên một dòng duy nhất, có `min-height >= 16px` và `line-height >= 16px`.
-- **Actual:** Trong `ProductCard.razor`, discount badge dùng `leading-none` (12px line-height) và thiếu `whitespace-nowrap`, có nguy cơ bị cắt mép hoặc gãy dòng khi flex cha co lại. Class `.egs-pill-discount` cũng thiếu `white-space: nowrap !important; flex-shrink: 0 !important;`.
-- **Root Cause:** Chưa cấu hình đầy đủ CSS flex-shrink và nowrap cho discount pill.
+## 4. Known Issues
+- `Shallow Verification` — Chưa có bài test E2E mô phỏng hành vi click chuyển tab trực tiếp trên trình duyệt thực tế.
+- `Minor Robustness Risk` — Dữ liệu danh mục và sản phẩm phụ thuộc vào cơ chế ánh xạ chuỗi tiếng Việt không dấu (RemoveDiacritics), nếu tên nhập vào có ký tự unicode đặc biệt ngoài bảng mã Latin/Việt có thể fallback về phân loại mặc định.
 
-### Vấn đề 4: Tiến trình dev server chạy nền khóa nhị phân làm hỏng lệnh `dotnet build`
-- **Input:** Chạy `dotnet build GameStore.slnx` hoặc `dotnet build src/NexusKeys.Storefront/NexusKeys.Storefront.csproj`.
-- **Expected:** Lệnh build biên dịch thành công với 0 lỗi (0 errors).
-- **Actual:** Build thất bại với lỗi `MSB3021` / `MSB3027` do tiến trình `Frontend.exe` (PID 61744) và `Backend.exe` (PID 64380) đang chạy và chiếm quyền khóa file trong `bin/Debug/net10.0/`.
-- **Root Cause:** Tiến trình demo nền không được quản lý giải phóng trước khi biên dịch, khiến việc kiểm thử build không thể đạt 0 errors.
-
----
-
-## 2. Những nội dung đã khắc phục & điều chỉnh (What I changed)
-
-1. **`src/NexusKeys.Storefront/wwwroot/css/epic-games.css` & `src/NexusKeys.Storefront/wwwroot/design/atlas.css`**:
-   - Nâng cấp `.egs-card-badge-pill`: Từ `font-size: 10px` lên `font-size: 11px; line-height: 16px; min-height: 20px; font-weight: 600; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center;`.
-   - Nâng cấp `.egs-pill-discount`: Bổ sung `white-space: nowrap !important; flex-shrink: 0 !important;` để loại bỏ hoàn toàn rủi ro vỡ dòng ở màn hình nhỏ $\le 360px$.
-
-2. **`src/NexusKeys.Storefront/wwwroot/css/site.css` & `src/NexusKeys.Admin/wwwroot/css/site.css`**:
-   - Thiết lập chốt an toàn (defense-in-depth): Map `.text-\[9px\]` và `.text-\[10px\]` về `font-size: 11px !important; line-height: 16px !important;` để bảo đảm không có bất kỳ thành phần nào có thể render dưới 11px.
-
-3. **`src/NexusKeys.Storefront/Components/Shared/ProductCard.razor`**:
-   - Chuẩn hóa pill giảm giá: Đổi `leading-none` thành `leading-[16px] min-h-[16px] inline-flex items-center whitespace-nowrap shrink-0`.
-
-4. **`src/NexusKeys.Storefront/Components/Layout/Navbar.razor`**:
-   - Chuẩn hóa cart count badge: Đổi class lỗi `min-w-4 h-4` thành `min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none bg-[#0078F2] text-white rounded-full flex items-center justify-center shadow-sm`, đảm bảo số lượng > 99 hiển thị sắc nét không bị cắt chữ.
-
-5. **`src/NexusKeys.Storefront/Components/Pages/Cart/Cart.razor`**:
-   - Nâng cấp chú thích doanh thu Creator tag (dòng 247) từ `text-[11px]` lên `text-sm text-white/70 mt-1.5 leading-relaxed`.
-
-6. **`src/NexusKeys.Storefront/Components/Pages/Products/ProductDetail.razor`**:
-   - Nâng cấp ghi chú bản quyền điện tử từ `text-xs leading-normal` lên `text-sm text-white/70 leading-relaxed`.
-   - Nâng cấp thông báo hạn ưu đãi từ `text-[11px] text-amber-400 font-medium` lên `text-xs text-amber-400 font-semibold`.
-
-7. **`src/NexusKeys.Storefront/Components/Pages/Profile/Profile.razor`**:
-   - Nâng cấp chú thích hướng dẫn form (Tên tài khoản không thể chỉnh sửa, Dùng để nhận License Key) từ `text-[11px]` lên `text-xs text-white/70 mt-1.5 block font-medium`.
-
-8. **`src/NexusKeys.Storefront/Components/Pages/Distribution.razor`**:
-   - Nâng cấp 6 đoạn mô tả tính năng đối tác phát triển từ `text-[11px] text-white/50 leading-relaxed` lên `text-sm text-white/60 leading-relaxed`.
-   - Nâng cấp tiêu đề tính năng tương ứng từ `text-xs font-bold` lên `text-sm font-bold`.
-   - Nâng cấp phụ đề First Run từ `text-[11px]` lên `text-xs text-white/70`.
-
-9. **`src/NexusKeys.Storefront/Components/Pages/Assistant.razor`**:
-   - Nâng cấp thông tin giới thiệu Nexus AI từ `text-[11px]` lên `text-xs leading-relaxed text-white/70`.
-
-10. **`src/NexusKeys.Storefront/Components/Pages/Auth/` (`Login.razor`, `Register.razor`, `ForgotPassword.razor`, `ResetPassword.razor`)**:
-    - Nâng cấp các liên kết chính sách bảo mật và phụ đề đăng nhập console từ `text-[11px]` lên `text-xs text-white/60 hover:text-white`.
-
-11. **`frontend/wwwroot/`**:
-    - Đồng bộ cập nhật `.egs-card-badge-pill` lên `font-size: 11px; line-height: 16px; min-height: 20px; white-space: nowrap;` trong `frontend/wwwroot/css/epic-games.css` và `frontend/wwwroot/design/atlas.css`.
-
----
-
-## 3. Biên bản kiểm tra xác minh (Verification Record)
-
-### Deep Verification (Thực thi build và test thực tế)
-- **Kiểm tra biên dịch Solution:**
-  `dotnet build GameStore.slnx`
-  $\rightarrow$ **Build succeeded: 0 Error(s), 12 Warning(s)** (chỉ có cảnh báo bảo mật phụ thuộc gói gốc của hệ thống).
-- **Kiểm tra biên dịch Storefront:**
-  `dotnet build src/NexusKeys.Storefront/NexusKeys.Storefront.csproj`
-  $\rightarrow$ **Build succeeded: 0 Error(s), 0 Warning(s)**.
-- **Kiểm tra bộ Test Suite:**
-  `dotnet test tests/GameStore.API.ProductKeyTests/GameStore.API.ProductKeyTests.csproj`
-  $\rightarrow$ **Passed! Failed: 0, Passed: 72, Skipped: 0, Total: 72, Duration: 23 s - GameStore.API.ProductKeyTests.dll (net10.0)**.
-- **Kiểm tra tính bất biến của Tests:**
-  `git diff --stat tests/`
-  $\rightarrow$ **Trống 100% (0 diff, 0 file thay đổi)**.
-- **Kiểm tra triệt để class cỡ chữ < 11px:**
-  - Regex `text-\[(?:[0-9]|10)px\]` trên `src/`: **0 kết quả**.
-  - Regex `font-size:\s*(?:[1-9]|10)px` trên `src/` và `frontend/`: **0 kết quả**.
-- **Kiểm tra hoạt động máy chủ HTTP (Live Run):**
-  - Storefront (`http://localhost:5205`): **HTTP 200 OK**.
-  - Admin (`http://localhost:3001`): **HTTP 200 OK**.
-
-### Shallow Verification (Kiểm tra thủ công bằng code audit)
-- Rà soát thuộc tính input form (`id`, `type`, `@bind`) trên toàn bộ các trang Auth (`Login.razor`, `Register.razor`, `ForgotPassword.razor`, `ResetPassword.razor`, `Profile.razor`) bảo đảm giữ nguyên 100%.
-
-### Unverified aspects
-- Chưa thực hiện kiểm thử tự động chụp ảnh màn hình (pixel-by-pixel automated visual regression) trên toàn bộ các tỷ lệ màn hình vật lý khác nhau; chỉ thực hiện kiểm tra cấu trúc DOM, CSS rules, HTTP 200 và unit tests.
-
----
-
-## 4. Các vấn đề đã biết (Known Issues)
-- Không có lỗi chức năng nghiêm trọng (`Fatal Functional Bug`: Không có).
-- `Minor Robustness Risk`: Khi viewport quá nhỏ dưới 300px, tiêu đề game cực dài có thể bị cắt bớt bằng ellipsis (hành vi được chủ đích cấu hình qua `truncate` / `line-clamp-1`).
-
----
-
-## 5. Kết luận & Đánh giá mức độ hoàn thành
-Nhiệm vụ nâng cấp và chuẩn hóa toàn diện hệ thống Typography Scale & Font Size Hierarchy đã được thẩm định, sửa đổi bổ sung và kiểm tra hoàn tất. Toàn bộ các tiêu chí nghiệm thu đã đạt 100%. Không cần thêm lượt chỉnh sửa cho hạng mục này.
+## 5. Remaining risk & next step
+- Toàn bộ 7 yêu cầu cốt lõi (R1 - R7) cùng các tiêu chí chấp nhận đã được hoàn thành, nghiệm thu và khắc phục triệt để. Task đã hoàn tất, sẵn sàng để bàn giao.

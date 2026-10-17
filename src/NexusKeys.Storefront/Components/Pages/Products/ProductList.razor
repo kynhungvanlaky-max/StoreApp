@@ -8,14 +8,14 @@
 <div class="egs-wrap">
     <div class="egs-content">
 
-        @* R1: Quick Type Navigation Tabs (Game vs App vs All) *@
-        <div class="mb-6 pb-2" role="tablist" aria-label="Phân loại cấp cao sản phẩm">
-            <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+        @* R1 & R3: Quick Type Navigation Tabs (Game vs App vs All) *@
+        <div class="mb-6" role="tablist" aria-label="Phân loại cấp cao sản phẩm">
+            <div class="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#18181c] border border-[#303030] shadow-sm max-w-full overflow-x-auto no-scrollbar">
                 <button type="button" role="tab"
                         id="tab-all-products"
                         aria-selected="@(string.IsNullOrEmpty(ViewModel.SelectedType) ? "true" : "false")"
                         @onclick='() => SelectType(null)'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(string.IsNullOrEmpty(ViewModel.SelectedType) ? "bg-[#0078f2] text-white shadow-lg shadow-[#0078f2]/30 ring-2 ring-[#0078f2]/50 border-transparent font-black" : "bg-[#202024] hover:bg-white/10 text-white/80 hover:text-white border border-white/10")">
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(string.IsNullOrEmpty(ViewModel.SelectedType) ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30 font-black border border-[#0078f2]" : "text-white/75 hover:text-white hover:bg-white/5 border border-transparent")">
                     <span>🌐</span>
                     <span>Tất cả sản phẩm</span>
                 </button>
@@ -23,15 +23,15 @@
                         id="tab-game-products"
                         aria-selected="@(string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase) ? "true" : "false")"
                         @onclick='() => SelectType("Game")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase) ? "bg-[#0078f2] text-white shadow-lg shadow-[#0078f2]/30 ring-2 ring-[#0078f2]/50 border-transparent font-black" : "bg-[#202024] hover:bg-white/10 text-white/80 hover:text-white border border-white/10")">
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase) ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30 font-black border border-[#0078f2]" : "text-white/75 hover:text-white hover:bg-white/5 border border-transparent")">
                     <span>🎮</span>
                     <span>Trò chơi (Game)</span>
                 </button>
                 <button type="button" role="tab"
                         id="tab-app-products"
                         aria-selected="@((string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase)) ? "true" : "false")"
-                        @onclick='() => SelectType("Software")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @((string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase)) ? "bg-[#0078f2] text-white shadow-lg shadow-[#0078f2]/30 ring-2 ring-[#0078f2]/50 border-transparent font-black" : "bg-[#202024] hover:bg-white/10 text-white/80 hover:text-white border border-white/10")">
+                        @onclick='() => SelectType("App")'
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @((string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase)) ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30 font-black border border-[#0078f2]" : "text-white/75 hover:text-white hover:bg-white/5 border border-transparent")">
                     <span>💻</span>
                     <span>Ứng dụng & Phần mềm (App)</span>
                 </button>
@@ -221,7 +221,7 @@
 
             @* Right Column: Epic Filter Sidebar (270px - 280px) *@
             <aside class="egs-filter-sidebar @(_showMobileFilter ? "block" : "hidden") lg:block">
-                <div class="lg:sticky lg:top-[104px] bg-[#18181c] border border-white/10 rounded-2xl p-5 shadow-xl space-y-5">
+                <div class="lg:sticky lg:top-[104px] bg-[#18181c] border border-[#303030] rounded-2xl p-5 shadow-xl space-y-5">
                     
                     @* Filter Header *@
                     <div class="flex items-center justify-between pb-4 border-b border-white/10">
@@ -282,15 +282,14 @@
                                     {
                                         (null, "Tất cả sản phẩm", "🌐"),
                                         ("Game", "Trò chơi (Game)", "🎮"),
-                                        ("Software", "Ứng dụng (App/Software)", "💻"),
-                                        ("GiftCard", "Thẻ quà tặng", "🎁")
+                                        ("App", "Ứng dụng & Phần mềm (App)", "💻")
                                     };
                                 }
                                 @foreach (var opt in typeOptions)
                                 {
                                     var isTypeSelected = opt.Key == null
                                         ? string.IsNullOrEmpty(ViewModel.SelectedType)
-                                        : (string.Equals(opt.Key, "Software", StringComparison.OrdinalIgnoreCase)
+                                        : ((string.Equals(opt.Key, "App", StringComparison.OrdinalIgnoreCase) || string.Equals(opt.Key, "Software", StringComparison.OrdinalIgnoreCase))
                                             ? (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
                                             : string.Equals(ViewModel.SelectedType, opt.Key, StringComparison.OrdinalIgnoreCase));
 
@@ -377,7 +376,7 @@
                     </div>
 
                     @* Filter Group 2: Price / Khoảng giá *@
-                    <div class="border-b border-white/10 pb-4">
+                    <div class="pb-1">
                         <button type="button" @onclick="@(() => _showPriceRanges = !_showPriceRanges)" 
                                 class="flex items-center justify-between w-full py-2.5 min-h-[44px] text-left group cursor-pointer">
                             <span class="text-xs font-bold text-white/90 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
@@ -433,33 +432,6 @@
                                 }
                             </div>
                         }
-                    </div>
-
-                    @* Filter Group 3: Platform / Nền tảng *@
-                    <div class="pb-1">
-                        <span class="text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-2 mb-2.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            Nền tảng hỗ trợ
-                        </span>
-                        <div class="space-y-1.5">
-                            <div class="flex items-center justify-between px-2.5 py-2 rounded-lg bg-[#202024]/60 border border-white/10">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-4 h-4 rounded bg-[#0078f2] flex items-center justify-center">
-                                        <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                    </div>
-                                    <span class="text-xs text-white font-bold">Windows PC</span>
-                                </div>
-                                <span class="text-xs uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Tối ưu</span>
-                            </div>
-                            <div class="flex items-center justify-between px-2.5 py-2 rounded-lg opacity-70">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-4 h-4 rounded border border-white/20 bg-[#202024]"></div>
-                                    <span class="text-xs text-white/80">macOS (Sắp hỗ trợ)</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                 </div>
@@ -535,8 +507,6 @@
         if (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
             return "Kho Ứng Dụng & Phần Mềm (Apps)";
-        if (string.Equals(ViewModel.SelectedType, "GiftCard", StringComparison.OrdinalIgnoreCase))
-            return "Kho Thẻ Quà Tặng (Gift Cards)";
         return "Kho Game & Ứng Dụng Bản Quyền";
     }
 
@@ -547,8 +517,6 @@
         if (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
             return "Bộ công cụ phần mềm đồ họa, biên tập video, âm thanh và tiện ích bản quyền chuyên nghiệp.";
-        if (string.Equals(ViewModel.SelectedType, "GiftCard", StringComparison.OrdinalIgnoreCase))
-            return "Thẻ nạp tài khoản Steam, Epic Games và các nền tảng chính hãng tiện lợi, an toàn.";
         return "Khám phá toàn bộ kho game bản quyền, phần mềm chuyên nghiệp và ưu đãi độc quyền.";
     }
 
@@ -559,8 +527,6 @@
         if (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
             return "Nhóm phần mềm & Tiện ích";
-        if (string.Equals(ViewModel.SelectedType, "GiftCard", StringComparison.OrdinalIgnoreCase))
-            return "Loại thẻ";
         return "Thể loại & Chuyên mục";
     }
 
@@ -570,7 +536,7 @@
         {
             return new[]
             {
-                "Hành động", "Nhập vai RPG", "Chiến thuật", "Bắn súng", "Thể thao",
+                "Hành động", "Nhập vai (RPG)", "Chiến thuật", "Bắn súng", "Thể thao",
                 "Mô phỏng", "Thế giới mở", "Sinh tồn", "Kinh dị", "Đua xe"
             };
         }
@@ -584,18 +550,12 @@
             };
         }
 
-        if (string.Equals(ViewModel.SelectedType, "GiftCard", StringComparison.OrdinalIgnoreCase))
-        {
-            return new[] { "Thẻ quà tặng" };
-        }
-
         // Tất cả sản phẩm (All)
         return new[]
         {
-            "Hành động", "Nhập vai RPG", "Chiến thuật", "Bắn súng", "Thể thao",
+            "Hành động", "Nhập vai (RPG)", "Chiến thuật", "Bắn súng", "Thể thao",
             "Mô phỏng", "Thế giới mở", "Sinh tồn", "Kinh dị", "Đua xe",
-            "Đồ họa & Thiết kế 3D", "Biên tập Video & Âm thanh", "Lập trình & Tiện ích", "Công cụ bản quyền",
-            "Thẻ quà tặng"
+            "Đồ họa & Thiết kế 3D", "Biên tập Video & Âm thanh", "Lập trình & Tiện ích", "Công cụ bản quyền"
         };
     }
 
@@ -603,7 +563,6 @@
     {
         "Game" => "🎮 Loại: Trò chơi",
         "Software" or "App" => "💻 Loại: Ứng dụng & Phần mềm",
-        "GiftCard" => "🎁 Loại: Thẻ quà tặng",
         _ => $"Loại: {type}"
     };
 

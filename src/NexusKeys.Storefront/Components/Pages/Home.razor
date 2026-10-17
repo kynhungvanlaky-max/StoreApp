@@ -5,7 +5,7 @@
 @inject Frontend.ViewModels.WishlistViewModel WishlistViewModel
 @implements IDisposable
 
-<PageTitle>NexusKeys | Cửa Hàng Game Bản Quyền Chính Hãng</PageTitle>
+<PageTitle>NexusKeys | Cửa Hàng Game & Ứng Dụng Bản Quyền Chính Hãng</PageTitle>
 
 <div class="egs-wrap">
     <div class="egs-content">
@@ -83,7 +83,7 @@
         </section>
 
         @* ================================================================= *@
-        @* SECTION 2: DISCOVER SOMETHING NEW & 4 MINI CARDS                   *@
+        @* SECTION 2: DISCOVER SOMETHING NEW & 6 MINI CARDS                   *@
         @* ================================================================= *@
         <section aria-label="Khám phá tựa game mới">
             <div class="egs-section-header mb-4">
@@ -108,7 +108,7 @@
                     </div>
                 </a>
 
-                <div class="egs-mini-grid">
+                <div class="egs-mini-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                     @* Mini 1: Chop Chop Together (From User Screenshot) *@
                     <a href="/products" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
@@ -122,7 +122,7 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag">Game cơ bản</span>
+                            <span class="egs-mini-tag">Trò chơi cơ bản</span>
                             <span class="egs-mini-title">Chop Chop Together</span>
                             <span class="egs-mini-price">136.000 <u>đ</u></span>
                         </div>
@@ -147,22 +147,22 @@
                         </div>
                     </a>
 
-                    @* Mini 3: Dave The Diver *@
-                    <a href="/products" class="egs-mini-card group">
+                    @* Mini 3: Blender 3D Studio *@
+                    <a href="/products?type=App" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
-                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/1868140/library_600x900.jpg" alt="Dave The Diver" class="egs-mini-thumb" />
-                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Dave The Diver") ? "is-active text-[#0078f2]" : "")"
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/365670/library_600x900.jpg" alt="Blender 3D Studio" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Blender 3D Studio") ? "is-active text-[#0078f2]" : "")"
                                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
-                                    @onclick='() => ToggleWishlist("Dave The Diver")'
-                                    title="@(_wishlistedTitles.Contains("Dave The Diver") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    @onclick='() => ToggleWishlist("Blender 3D Studio")'
+                                    title="@(_wishlistedTitles.Contains("Blender 3D Studio") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
                                     aria-label="Thêm vào danh sách ước">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Dave The Diver") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Blender 3D Studio") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag">Game cơ bản</span>
-                            <span class="egs-mini-title">Dave The Diver</span>
-                            <span class="egs-mini-price">260.000 <u>đ</u></span>
+                            <span class="egs-mini-tag text-emerald-400">Đồ họa & Thiết kế 3D</span>
+                            <span class="egs-mini-title">Blender 3D Studio</span>
+                            <span class="egs-mini-price text-emerald-400 font-bold">Miễn phí</span>
                         </div>
                     </a>
 
@@ -182,6 +182,44 @@
                             <span class="egs-mini-tag">Truy cập sớm</span>
                             <span class="egs-mini-title">Hades II</span>
                             <span class="egs-mini-price">385.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 5: Wallpaper Engine *@
+                    <a href="/products?type=App" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/431960/library_600x900.jpg" alt="Wallpaper Engine" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Wallpaper Engine") ? "is-active text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick='() => ToggleWishlist("Wallpaper Engine")'
+                                    title="@(_wishlistedTitles.Contains("Wallpaper Engine") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Wallpaper Engine") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag text-emerald-400">Lập trình & Tiện ích</span>
+                            <span class="egs-mini-title">Wallpaper Engine</span>
+                            <span class="egs-mini-price">99.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 6: Dave The Diver *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/1868140/library_600x900.jpg" alt="Dave The Diver" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Dave The Diver") ? "is-active text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick='() => ToggleWishlist("Dave The Diver")'
+                                    title="@(_wishlistedTitles.Contains("Dave The Diver") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Dave The Diver") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Trò chơi cơ bản</span>
+                            <span class="egs-mini-title">Dave The Diver</span>
+                            <span class="egs-mini-price">260.000 <u>đ</u></span>
                         </div>
                     </a>
                 </div>
@@ -309,7 +347,7 @@
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Outward Definitive Edition") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
                         </button>
                     </div>
-                    <span class="egs-card-tag text-amber-300">Phiên bản đặc biệt</span>
+                    <span class="egs-card-tag text-amber-300">Bản đặc biệt</span>
                     <h3 class="egs-card-name">Outward Definitive Edition</h3>
                     <div class="egs-price-row">
                         <span class="egs-pill-discount">-85%</span>
@@ -337,6 +375,160 @@
                         <span class="egs-pill-discount">-50%</span>
                         <span class="egs-old-price">490.000 đ*</span>
                         <span class="egs-new-price">245.000 đ</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 5: CREATIVE & PRODUCTIVITY SOFTWARE SHOWCASE              *@
+        @* ================================================================= *@
+        <section aria-label="Ứng dụng sáng tạo & Lập trình">
+            <div class="egs-section-header mb-4">
+                <div class="egs-section-title-wrap">
+                    <a href="/products?type=App" class="egs-section-title hover:text-white flex items-center gap-2">
+                        <span>Ứng Dụng Đồ Họa, Sáng Tạo & Lập Trình</span>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+                <a href="/products?type=App" class="egs-outline-btn">Xem tất cả ứng dụng</a>
+            </div>
+
+            @* Apps Spotlight Banner *@
+            <div class="rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-r from-[#121216] via-[#181820] to-[#14141a] p-6 sm:p-8 mb-6 relative">
+                <div class="absolute -right-16 -top-16 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-16 -bottom-16 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-black uppercase tracking-wider">
+                            <span>💻 PHẦN MỀM BẢN QUYỀN CHÍNH HÃNG</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
+                            Nâng tầm sáng tạo với bộ công cụ đồ họa, dựng phim & lập trình chuyên nghiệp
+                        </h3>
+                        <p class="text-white/70 text-sm leading-relaxed max-w-2xl">
+                            Trang bị giấy phép bản quyền chính hãng vĩnh viễn và theo gói cho các nhà sáng tạo nội dung, kiến trúc sư, nhà sản xuất âm nhạc và lập trình viên. Kích hoạt trực tiếp, cập nhật bảo mật liên tục.
+                        </p>
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <a href="/products?type=App" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95 inline-flex items-center gap-2">
+                                <span>Khám phá bộ sưu tập App</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 grid grid-cols-2 gap-3">
+                        <div class="p-4 rounded-xl bg-[#202024]/80 border border-white/5 backdrop-blur-sm">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg mb-2">🎨</div>
+                            <h4 class="text-white font-bold text-sm">Đồ Họa & Thiết Kế</h4>
+                            <p class="text-white/60 text-xs mt-1">Photoshop, Blender, Substance Painter</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-[#202024]/80 border border-white/5 backdrop-blur-sm">
+                            <div class="w-10 h-10 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-lg mb-2">🎬</div>
+                            <h4 class="text-white font-bold text-sm">Dựng Video & Âm Thanh</h4>
+                            <p class="text-white/60 text-xs mt-1">Premiere Pro, FL Studio, VEGAS</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-[#202024]/80 border border-white/5 backdrop-blur-sm">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg mb-2">⚡</div>
+                            <h4 class="text-white font-bold text-sm">Lập Trình & Dev</h4>
+                            <p class="text-white/60 text-xs mt-1">Visual Studio, JetBrains, Windows 11</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-[#202024]/80 border border-white/5 backdrop-blur-sm">
+                            <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg mb-2">📐</div>
+                            <h4 class="text-white font-bold text-sm">Kỹ Thuật & CAD</h4>
+                            <p class="text-white/60 text-xs mt-1">AutoCAD, 3DMark, Tiện ích</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Featured Software Cards Grid *@
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                @* Software Card 1: Adobe Photoshop CC *@
+                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800" alt="Adobe Photoshop CC" class="object-cover w-full h-full" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Adobe Photoshop CC") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Adobe Photoshop CC")'
+                                title="@(_wishlistedTitles.Contains("Adobe Photoshop CC") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Adobe Photoshop CC") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag text-emerald-400">Đồ họa & Thiết kế 3D</span>
+                    <h3 class="egs-card-name">Adobe Photoshop CC</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-20%</span>
+                        <span class="egs-old-price">750.000 đ*</span>
+                        <span class="egs-new-price">590.000 đ</span>
+                    </div>
+                </a>
+
+                @* Software Card 2: Adobe Premiere Pro *@
+                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800" alt="Adobe Premiere Pro" class="object-cover w-full h-full" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Adobe Premiere Pro") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Adobe Premiere Pro")'
+                                title="@(_wishlistedTitles.Contains("Adobe Premiere Pro") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Adobe Premiere Pro") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag text-emerald-400">Biên tập Video & Âm thanh</span>
+                    <h3 class="egs-card-name">Adobe Premiere Pro</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-15%</span>
+                        <span class="egs-old-price">780.000 đ*</span>
+                        <span class="egs-new-price">650.000 đ</span>
+                    </div>
+                </a>
+
+                @* Software Card 3: Visual Studio Professional *@
+                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800" alt="Visual Studio Professional 2022" class="object-cover w-full h-full" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Visual Studio Professional 2022") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Visual Studio Professional 2022")'
+                                title="@(_wishlistedTitles.Contains("Visual Studio Professional 2022") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Visual Studio Professional 2022") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag text-emerald-400">Lập trình & Tiện ích</span>
+                    <h3 class="egs-card-name">Visual Studio Professional 2022</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-30%</span>
+                        <span class="egs-old-price">1.500.000 đ*</span>
+                        <span class="egs-new-price">1.050.000 đ</span>
+                    </div>
+                </a>
+
+                @* Software Card 4: FL Studio Producer Edition *@
+                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800" alt="FL Studio Producer Edition" class="object-cover w-full h-full" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("FL Studio Producer Edition") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("FL Studio Producer Edition")'
+                                title="@(_wishlistedTitles.Contains("FL Studio Producer Edition") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("FL Studio Producer Edition") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag text-emerald-400">Biên tập Video & Âm thanh</span>
+                    <h3 class="egs-card-name">FL Studio Producer Edition</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-10%</span>
+                        <span class="egs-old-price">5.500.000 đ*</span>
+                        <span class="egs-new-price">4.950.000 đ</span>
                     </div>
                 </a>
             </div>

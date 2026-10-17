@@ -53,10 +53,10 @@ else if (ViewModel.Product == null)
 else
 {
     var product = ViewModel.Product;
-    var authenticCover = GameMediaHelper.GetCover(product.Name, product.ImageUrl);
-    var authenticHero = GameMediaHelper.GetHeroBanner(product.Name, product.ImageUrl);
-    var authenticCapsule = GameMediaHelper.GetCapsule(product.Name, product.ImageUrl);
-    var gallery = GameMediaHelper.GetMediaGallery(product.Name, product.ImageUrl);
+    var authenticCover = GameMediaHelper.GetCover(product.Name, product.ImageUrl, product.Type, product.Categories);
+    var authenticHero = GameMediaHelper.GetHeroBanner(product.Name, product.ImageUrl, product.Type, product.Categories);
+    var authenticCapsule = GameMediaHelper.GetCapsule(product.Name, product.ImageUrl, product.Type, product.Categories);
+    var gallery = GameMediaHelper.GetMediaGallery(product.Name, product.ImageUrl, product.Type, product.Categories);
 
     @* Breadcrumbs *@
     <div class="flex items-center gap-2 text-xs text-white/70 mb-4 font-semibold">
@@ -64,11 +64,7 @@ else
         <span>›</span>
         @if (GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
         {
-            <a href="/products?type=Software" class="hover:text-white transition-colors">Kho ứng dụng</a>
-        }
-        else if (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-        {
-            <a href="/products?type=GiftCard" class="hover:text-white transition-colors">Thẻ quà tặng</a>
+            <a href="/products?type=App" class="hover:text-white transition-colors">Kho ứng dụng</a>
         }
         else
         {
@@ -85,19 +81,12 @@ else
         </h1>
 
         <div class="flex flex-wrap items-center gap-3 mb-6">
-            @* R4: Product Type Badge *@
+            @* Product Type Badge *@
             @if (GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
             {
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-purple-600/90 text-white text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/40">
                     <span>💻</span>
                     <span>Ứng dụng & Phần mềm</span>
-                </span>
-            }
-            else if (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-            {
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-600/90 text-white text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-amber-400/40">
-                    <span>🎁</span>
-                    <span>Thẻ quà tặng</span>
                 </span>
             }
             else
@@ -190,7 +179,7 @@ else
                     </button>
                     <button type="button" @onclick='() => _activeTab = "Editions"'
                             class="pb-3 border-b-2 min-h-[44px] transition-all whitespace-nowrap cursor-pointer @(_activeTab == "Editions" ? "border-white text-white font-black" : "border-transparent text-white/70 hover:text-white")">
-                        Tiện ích bổ sung & Phiên bản
+                        @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Gói bản quyền & Tiện ích" : "Tiện ích bổ sung & Phiên bản")
                     </button>
                     <button type="button" @onclick='() => _activeTab = "Specs"'
                             class="pb-3 border-b-2 min-h-[44px] transition-all whitespace-nowrap cursor-pointer @(_activeTab == "Specs" ? "border-white text-white font-black" : "border-transparent text-white/70 hover:text-white")">
@@ -203,10 +192,10 @@ else
                 {
                     <div class="flex flex-col gap-10" id="overview-section">
                         @* About The Game *@
-                        @* About The Game / App / Gift Card *@
+                        @* About The Game / App *@
                         <div>
                             <h2 class="text-xl sm:text-2xl font-black text-white mb-4">
-                                @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Giới thiệu về ứng dụng" : (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories) ? "Thông tin thẻ quà tặng" : "Giới thiệu về trò chơi"))
+                                @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Giới thiệu về ứng dụng" : "Giới thiệu về trò chơi")
                             </h2>
                             
                             @* Features / Attributes Row (NexusKeys style) *@
@@ -235,21 +224,6 @@ else
                                         <span class="text-xs font-semibold text-white/90 block">Cloud Sync & Local SSD</span>
                                     </div>
                                 }
-                                else if (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-                                {
-                                    <div class="space-y-1">
-                                        <span class="text-[11px] font-bold text-white/70 uppercase tracking-wider block">Định dạng</span>
-                                        <span class="text-xs font-semibold text-white/90 block">Mã code điện tử (Digital Key)</span>
-                                    </div>
-                                    <div class="space-y-1">
-                                        <span class="text-[11px] font-bold text-white/70 uppercase tracking-wider block">Nạp tiền</span>
-                                        <span class="text-xs font-semibold text-white/90 block">Kích hoạt ngay lập tức</span>
-                                    </div>
-                                    <div class="space-y-1">
-                                        <span class="text-[11px] font-bold text-white/70 uppercase tracking-wider block">Hạn sử dụng</span>
-                                        <span class="text-xs font-semibold text-white/90 block">Vô thời hạn</span>
-                                    </div>
-                                }
                                 else
                                 {
                                     <div class="space-y-1">
@@ -272,10 +246,6 @@ else
                                     @if (GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
                                     {
                                         <span>Khám phá bộ công cụ và tính năng chuyên nghiệp của <span class="text-white font-bold">@product.Name</span>. Tối ưu hóa hiệu suất làm việc, xử lý mượt mà và hỗ trợ bản quyền chính hãng tại NexusKeys.</span>
-                                    }
-                                    else if (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-                                    {
-                                        <span>Thẻ nạp điện tử chính hãng <span class="text-white font-bold">@product.Name</span>. Kích hoạt an toàn, tiện lợi và hỗ trợ tài khoản trên hệ thống NexusKeys.</span>
                                     }
                                     else
                                     {
@@ -326,7 +296,7 @@ else
                         <div class="border-t border-white/10 pt-8">
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-xl sm:text-2xl font-black text-white">Đánh giá từ cộng đồng</h2>
-                                <span class="text-xs text-white/70">Dựa trên người chơi đã mua</span>
+                                <span class="text-xs text-white/70">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Dựa trên người dùng đã mua" : "Dựa trên người chơi đã mua")</span>
                             </div>
 
                             @* Satisfaction Bar *@
@@ -335,7 +305,7 @@ else
                                     <div class="text-4xl sm:text-5xl font-black text-white">94%</div>
                                     <div>
                                         <div class="text-sm font-bold text-white mb-0.5">Tỷ lệ đánh giá rất tích cực</div>
-                                        <div class="text-xs text-white/70">Hầu hết người chơi đều hài lòng với chất lượng tựa game.</div>
+                                        <div class="text-xs text-white/70">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Hầu hết người dùng đều hài lòng với chất lượng sản phẩm." : "Hầu hết người chơi đều hài lòng với chất lượng tựa game.")</div>
                                     </div>
                                 </div>
                                 
@@ -354,15 +324,17 @@ else
                                     <div class="space-y-4">
                                         <textarea @bind="newReviewContent" aria-label="Nội dung đánh giá" 
                                                   class="w-full bg-[#121216] border border-white/15 text-white p-3.5 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#0078f2] min-h-[90px] resize-none"
-                                                  placeholder="Bạn cảm thấy trải nghiệm tựa game này như thế nào?"></textarea>
+                                                  placeholder="@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Bạn cảm thấy trải nghiệm ứng dụng này như thế nào?" : "Bạn cảm thấy trải nghiệm tựa game này như thế nào?")"></textarea>
                                         
                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                             <div class="flex items-center gap-2">
-                                                <button type="button" @onclick="() => newReviewIsPositive = true" class="px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer @(newReviewIsPositive == true ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-[#202024] text-white/70 border border-white/10 hover:text-white")">
-                                                    <span>👍</span> Khuyên dùng
+                                                <button type="button" @onclick="() => newReviewIsPositive = true" class="px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer @(newReviewIsPositive == true ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm" : "bg-[#202024] text-white/70 border border-white/10 hover:text-white hover:bg-white/5")">
+                                                    <Icon Name="HeroiconName.HandThumbUp" Class="w-4 h-4 text-emerald-400" IconType="HeroiconType.Solid" />
+                                                    <span>Khuyên dùng</span>
                                                 </button>
-                                                <button type="button" @onclick="() => newReviewIsPositive = false" class="px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer @(newReviewIsPositive == false ? "bg-rose-500/20 text-rose-400 border border-rose-500/40" : "bg-[#202024] text-white/70 border border-white/10 hover:text-white")">
-                                                    <span>👎</span> Không khuyên dùng
+                                                <button type="button" @onclick="() => newReviewIsPositive = false" class="px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer @(newReviewIsPositive == false ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-sm" : "bg-[#202024] text-white/70 border border-white/10 hover:text-white hover:bg-white/5")">
+                                                    <Icon Name="HeroiconName.HandThumbDown" Class="w-4 h-4 text-rose-400" IconType="HeroiconType.Solid" />
+                                                    <span>Không khuyên dùng</span>
                                                 </button>
                                             </div>
                                             
@@ -400,9 +372,20 @@ else
                                                             <span class="text-xs text-white/70">@rev.CreatedAt.ToString("dd/MM/yyyy")</span>
                                                         </div>
                                                     </div>
-                                                    <span class="px-2.5 py-1 rounded text-[11px] font-bold @(rev.IsPositive ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400")">
-                                                        @(rev.IsPositive ? "👍 Khuyên dùng" : "👎 Không khuyên dùng")
-                                                    </span>
+                                                    @if (rev.IsPositive)
+                                                    {
+                                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                                            <Icon Name="HeroiconName.HandThumbUp" Class="w-3.5 h-3.5 text-emerald-400" IconType="HeroiconType.Solid" />
+                                                            <span>Khuyên dùng</span>
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                                            <Icon Name="HeroiconName.HandThumbDown" Class="w-3.5 h-3.5 text-rose-400" IconType="HeroiconType.Solid" />
+                                                            <span>Không khuyên dùng</span>
+                                                        </span>
+                                                    }
                                                 </div>
                                                 <p class="text-sm text-white/85 leading-relaxed">@rev.Content</p>
                                             </div>
@@ -429,7 +412,7 @@ else
                         {
                             <div class="border-t border-white/10 pt-8">
                                 <h2 class="text-xl sm:text-2xl font-black text-white mb-6">
-                                    @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Ứng dụng tương tự" : (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories) ? "Sản phẩm liên quan" : "Tựa game tương tự"))
+                                    @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Ứng dụng tương tự" : "Tựa game tương tự")
                                 </h2>
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     @foreach (var related in ViewModel.RelatedProducts.Take(4))
@@ -445,7 +428,7 @@ else
                 {
                     @* Editions & Add-ons Content *@
                     <div id="editions-section">
-                        <h2 class="text-xl sm:text-2xl font-black text-white mb-6">Các phiên bản & Tiện ích bổ sung</h2>
+                        <h2 class="text-xl sm:text-2xl font-black text-white mb-6">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Các gói bản quyền & Tiện ích bổ sung" : "Các phiên bản & Tiện ích bổ sung")</h2>
                         
                         <div class="space-y-4">
                             @* Standard Edition *@
@@ -453,7 +436,7 @@ else
                                 <div class="space-y-1">
                                     <span class="text-[11px] font-black text-[#0078f2] uppercase tracking-wider">Phiên bản chuẩn</span>
                                     <h3 class="text-lg font-bold text-white">@product.Name — Standard Edition</h3>
-                                    <p class="text-xs text-white/75">Bao gồm trò chơi gốc và toàn bộ các bản vá cập nhật mới nhất.</p>
+                                    <p class="text-xs text-white/75">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Bao gồm ứng dụng gốc và toàn bộ các bản vá cập nhật mới nhất." : "Bao gồm trò chơi gốc và toàn bộ các bản vá cập nhật mới nhất.")</p>
                                 </div>
                                 <div class="flex items-center gap-4 sm:flex-shrink-0">
                                     <div class="text-right">
@@ -478,12 +461,19 @@ else
                                 <div class="space-y-1">
                                     <span class="text-[11px] font-black text-amber-400 uppercase tracking-wider">Phiên bản đặc biệt</span>
                                     <h3 class="text-lg font-bold text-white">@product.Name — Deluxe Edition</h3>
-                                    <p class="text-xs text-white/75">Bao gồm game gốc, Season Pass mở rộng, Artbook kỹ thuật số và gói trang phục độc quyền.</p>
+                                    <p class="text-xs text-white/75">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Bao gồm bản quyền đầy đủ, các tiện ích mở rộng (Plugins), tài liệu hướng dẫn và hỗ trợ kỹ thuật ưu tiên." : "Bao gồm game gốc, Season Pass mở rộng, Artbook kỹ thuật số và gói trang phục độc quyền.")</p>
                                 </div>
                                 <div class="flex items-center gap-4 sm:flex-shrink-0">
                                     <div class="text-right">
-                                        <div class="text-xs text-white/65 line-through">@((product.BasePrice * 1.3m).ToString("N0")) ₫</div>
-                                        <div class="text-base font-black text-white">@((product.BasePrice * 1.15m).ToString("N0")) ₫</div>
+                                        @if (product.BasePrice == 0)
+                                        {
+                                            <div class="text-base font-black text-white">Miễn phí (Bản đầy đủ)</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-xs text-white/65 line-through">@((product.BasePrice * 1.3m).ToString("N0")) ₫</div>
+                                            <div class="text-base font-black text-white">@((product.BasePrice * 1.15m).ToString("N0")) ₫</div>
+                                        }
                                     </div>
                                     <button type="button" @onclick="AddToCart" class="px-5 py-2.5 min-h-[44px] rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg cursor-pointer flex items-center justify-center">
                                         Nâng cấp
@@ -658,7 +648,7 @@ else
                 <div class="flex justify-between items-center py-1.5 border-b border-white/5">
                     <span class="text-white/70">Loại sản phẩm</span>
                     <span class="text-white font-semibold text-right">
-                        @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Ứng dụng & Phần mềm" : (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories) ? "Thẻ quà tặng" : "Trò chơi (Game)"))
+                        @(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Ứng dụng & Phần mềm" : "Trò chơi (Game)")
                     </span>
                 </div>
                 <div class="flex justify-between items-center py-1.5 border-b border-white/5">
@@ -702,16 +692,6 @@ else
                         </div>
                     </div>
                 }
-                else if (GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-                {
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-1 rounded bg-[#202024] border border-amber-500/30 text-amber-400 font-black text-xs uppercase">🎁 GIFT</span>
-                        <div>
-                            <span class="font-bold block text-white">Thẻ điện tử chính hãng 100%</span>
-                            <span class="text-[11px] text-white/70">Kích hoạt an toàn qua mã thẻ</span>
-                        </div>
-                    </div>
-                }
                 else
                 {
                     <div class="flex items-center gap-3">
@@ -747,7 +727,7 @@ else
             </div>
 
             <div class="flex items-center gap-3 p-3 bg-[#202024] rounded-xl border border-white/10 mb-5">
-                <img src="@GameMediaHelper.GetCover(p.Name, p.ImageUrl)" alt="@p.Name" class="w-12 h-16 rounded-lg object-cover" />
+                <img src="@GameMediaHelper.GetCover(p.Name, p.ImageUrl, p.Type, p.Categories)" alt="@p.Name" class="w-12 h-16 rounded-lg object-cover" />
                 <div class="flex-1 min-w-0">
                     <h4 class="text-white font-bold text-sm truncate">@p.Name</h4>
                     <span class="text-xs text-white/70 block">Phiên bản Bản quyền NexusKeys</span>
@@ -797,7 +777,7 @@ else
                 <button type="button" @onclick="() => _showLightboxModal = false" class="w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-white/10 text-white/70 hover:text-white cursor-pointer" aria-label="Đóng">✕</button>
             </div>
             <div class="aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center">
-                <img src="@(_selectedMediaUrl ?? GameMediaHelper.GetHeroBanner(p.Name, p.ImageUrl))" alt="@p.Name" class="w-full h-full object-contain" />
+                <img src="@(_selectedMediaUrl ?? GameMediaHelper.GetHeroBanner(p.Name, p.ImageUrl, p.Type, p.Categories))" alt="@p.Name" class="w-full h-full object-contain" />
             </div>
         </div>
     </div>
@@ -861,10 +841,11 @@ else
     {
         if (total <= 0) return;
         _currentMediaIndex = (_currentMediaIndex + 1) % total;
-        var gallery = GameMediaHelper.GetMediaGallery(ViewModel.Product?.Name, ViewModel.Product?.ImageUrl);
+        var gallery = GameMediaHelper.GetMediaGallery(ViewModel.Product?.Name, ViewModel.Product?.ImageUrl, ViewModel.Product?.Type, ViewModel.Product?.Categories);
         if (_currentMediaIndex < gallery.Count)
         {
             _selectedMediaUrl = gallery[_currentMediaIndex].Url;
+            _selectedMediaType = gallery[_currentMediaIndex].Type;
         }
     }
 
@@ -872,14 +853,16 @@ else
     {
         if (total <= 0) return;
         _currentMediaIndex = (_currentMediaIndex - 1 + total) % total;
-        var gallery = GameMediaHelper.GetMediaGallery(ViewModel.Product?.Name, ViewModel.Product?.ImageUrl);
+        var gallery = GameMediaHelper.GetMediaGallery(ViewModel.Product?.Name, ViewModel.Product?.ImageUrl, ViewModel.Product?.Type, ViewModel.Product?.Categories);
         if (_currentMediaIndex < gallery.Count)
         {
             _selectedMediaUrl = gallery[_currentMediaIndex].Url;
+            _selectedMediaType = gallery[_currentMediaIndex].Type;
         }
     }
 
     private int _lastLoadedId = 0;
+    private int _recordedRecentlyViewedId = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -910,12 +893,13 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && ViewModel.Product != null)
+        if (ViewModel.Product != null && ViewModel.Product.Id != _recordedRecentlyViewedId)
         {
+            _recordedRecentlyViewedId = ViewModel.Product.Id;
             await RecentlyViewedService.AddRecentlyViewedAsync(
                 ViewModel.Product.Id,
                 ViewModel.Product.Name,
-                ViewModel.Product.ImageUrl,
+                GameMediaHelper.GetCover(ViewModel.Product.Name, ViewModel.Product.ImageUrl, ViewModel.Product.Type, ViewModel.Product.Categories),
                 ViewModel.Product.BasePrice
             );
         }
@@ -946,7 +930,7 @@ else
             ProductId = p.Id,
             Name = p.Name,
             Price = price,
-            ImageUrl = GameMediaHelper.GetCover(p.Name, p.ImageUrl)
+            ImageUrl = GameMediaHelper.GetCover(p.Name, p.ImageUrl, p.Type, p.Categories)
         });
 
         if (showModal)
@@ -1003,7 +987,7 @@ else
     private async Task CopyShareUrl()
     {
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", NavigationManager.Uri);
-        ToastService.ShowSuccess("Đã sao chép liên kết trò chơi!");
+        ToastService.ShowSuccess(GameMediaHelper.IsApp(ViewModel.Product?.Name, ViewModel.Product?.Type, ViewModel.Product?.Categories) ? "Đã sao chép liên kết ứng dụng!" : "Đã sao chép liên kết trò chơi!");
     }
 
     private void ConfirmAgeGate()

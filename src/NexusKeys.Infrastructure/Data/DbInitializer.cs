@@ -100,6 +100,35 @@ namespace GameStore.API.Data
                     }
                     db.SaveChanges();
                 }
+
+                // Clean up obsolete gift cards and category
+                var obsoleteGiftCards = db.Products.Where(p => 
+                    p.Type == "GiftCard" || 
+                    p.Name.Contains("Gift Card") || 
+                    p.Name.Contains("Wallet Card") ||
+                    p.Name.Contains("Thẻ quà tặng") ||
+                    p.Name.Contains("Thẻ nạp")).ToList();
+                if (obsoleteGiftCards.Count > 0)
+                {
+                    foreach (var gp in obsoleteGiftCards)
+                    {
+                        db.ProductMedia.RemoveRange(db.ProductMedia.Where(m => m.ProductId == gp.Id));
+                        db.ProductCategories.RemoveRange(db.ProductCategories.Where(c => c.ProductId == gp.Id));
+                        db.ProductKeys.RemoveRange(db.ProductKeys.Where(k => k.ProductId == gp.Id));
+                        db.Wishlists.RemoveRange(db.Wishlists.Where(w => w.ProductId == gp.Id));
+                        db.CartItems.RemoveRange(db.CartItems.Where(c => c.ProductId == gp.Id));
+                        db.Products.Remove(gp);
+                    }
+                    db.SaveChanges();
+                }
+
+                var obsoleteGiftCat = db.Categories.FirstOrDefault(c => c.Name == "Thẻ quà tặng");
+                if (obsoleteGiftCat != null)
+                {
+                    db.ProductCategories.RemoveRange(db.ProductCategories.Where(pc => pc.CategoryId == obsoleteGiftCat.Id));
+                    db.Categories.Remove(obsoleteGiftCat);
+                    db.SaveChanges();
+                }
             }
             catch { }
         }
@@ -128,7 +157,7 @@ namespace GameStore.API.Data
             string[] catNames = new[]
             {
                 "Hành động", "Nhập vai (RPG)", "Chiến thuật", "Bắn súng", "Thể thao",
-                "Mô phỏng", "Phần mềm", "Thẻ quà tặng", "Giải đố", "Phiêu lưu",
+                "Mô phỏng", "Phần mềm", "Giải đố", "Phiêu lưu",
                 "Đua xe", "Sinh tồn", "Kinh dị", "Thế giới mở", "Anime",
                 "Đồ họa & Thiết kế 3D", "Biên tập Video & Âm thanh", "Lập trình & Tiện ích", "Công cụ bản quyền"
             };
@@ -188,11 +217,11 @@ namespace GameStore.API.Data
                 ("Helldivers 2", "Bắn súng góc nhìn thứ ba phối hợp đồng đội chiến đấu vì dân chủ và sinh tồn trong vũ trụ.", 690000m, "Game", "Paid", "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800", new[] { "Bắn súng", "Hành động", "Sinh tồn" }, 1),
                 ("Call of Duty: Modern Warfare III", "Bắn súng FPS đỉnh cao với chiến dịch cốt truyện gay cấn và chế độ Multiplayer trực tuyến rực lửa.", 1750000m, "Game", "Paid", "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800", new[] { "Bắn súng", "Hành động" }, 0),
                 ("EA SPORTS FC 24", "Trải nghiệm bóng đá đỉnh cao thế giới với công nghệ HyperMotionV và hàng ngàn cầu thủ bản quyền.", 1090000m, "Game", "Paid", "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800", new[] { "Thể thao", "Mô phỏng" }, 1),
-                ("Photoshop Clone Pro", "Bộ công cụ chỉnh sửa ảnh chuyên nghiệp đầy đủ tính năng AI thần thánh cho sáng tạo không giới hạn.", 500000m, "Software", "Paid", "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800", new[] { "Phần mềm", "Đồ họa & Thiết kế 3D", "Công cụ bản quyền" }, 0),
-                ("3D Modeler Max", "Phần mềm thiết kế và dựng hình 3D cho các nhà phát triển game và đồ họa kiến trúc chuyên nghiệp.", 1500000m, "Software", "Paid", "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800", new[] { "Phần mềm", "Đồ họa & Thiết kế 3D" }, 1),
-                ("Video Editor Pro", "Chỉnh sửa video 4K/8K tốc độ cao, hỗ trợ nhiều hiệu ứng chuyển cảnh mượt mà.", 800000m, "Software", "Paid", "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800", new[] { "Phần mềm", "Biên tập Video & Âm thanh" }, 0),
-                ("Music Studio Pro", "Phần mềm sản xuất âm thanh chuyên nghiệp, biên soạn nhạc cụ ảo và thu âm đa kênh.", 1200000m, "Software", "Paid", "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800", new[] { "Phần mềm", "Biên tập Video & Âm thanh", "Công cụ bản quyền" }, 1),
-                ("DevStudio Code IDE", "Môi trường lập trình chuyên nghiệp và tiện ích tối ưu hóa mã nguồn đa nền tảng.", 750000m, "Software", "Paid", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800", new[] { "Phần mềm", "Lập trình & Tiện ích", "Công cụ bản quyền" }, 0),
+                ("Adobe Photoshop CC", "Bộ công cụ thiết kế đồ họa và chỉnh sửa ảnh kỹ thuật số hàng đầu thế giới với các tính năng AI chuyên nghiệp.", 590000m, "App", "Paid", "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800", new[] { "Phần mềm", "Đồ họa & Thiết kế 3D", "Công cụ bản quyền" }, 0),
+                ("Blender 3D Studio", "Bộ công cụ sáng tạo đồ họa và dựng hình 3D mã nguồn mở chuyên nghiệp dành cho thiết kế, hoạt hình và game.", 0m, "App", "Free", "https://cdn.akamai.steamstatic.com/steam/apps/365670/library_600x900.jpg", new[] { "Phần mềm", "Đồ họa & Thiết kế 3D" }, 1),
+                ("Adobe Premiere Pro", "Phần mềm biên tập dựng phim và video 4K/8K chuẩn công nghiệp điện ảnh với hiệu ứng chuyển cảnh mượt mà.", 650000m, "App", "Paid", "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800", new[] { "Phần mềm", "Biên tập Video & Âm thanh", "Công cụ bản quyền" }, 0),
+                ("FL Studio Producer Edition", "Môi trường sản xuất âm nhạc và hòa âm phối khí chuyên nghiệp với nhạc cụ ảo và thu âm đa kênh.", 4950000m, "App", "Paid", "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800", new[] { "Phần mềm", "Biên tập Video & Âm thanh", "Công cụ bản quyền" }, 1),
+                ("Visual Studio Professional 2022", "Môi trường phát triển tích hợp (IDE) toàn diện dành cho lập trình viên phần mềm hiện đại.", 1050000m, "App", "Paid", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800", new[] { "Phần mềm", "Lập trình & Tiện ích", "Công cụ bản quyền" }, 0),
                 ("Starfield", "Khám phá vũ trụ bao la với hàng ngàn hành tinh trong tựa game RPG không gian đình đám từ Bethesda.", 1190000m, "Game", "Paid", "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=800", new[] { "Nhập vai (RPG)", "Phiêu lưu", "Thế giới mở" }, 0),
                 ("Sekiro: Shadows Die Twice", "Làm ninja Nhật Bản thời Chiến Quốc, chinh phục những trận đánh trùm nghẹt thở và kịch tính.", 990000m, "Game", "Paid", "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800", new[] { "Hành động", "Nhập vai (RPG)" }, 2),
                 ("Black Myth: Wukong", "Hành động nhập vai thần thoại lấy cảm hứng từ Tây Du Ký với đồ họa Unreal Engine 5 rực rỡ.", 1290000m, "Game", "Paid", "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800", new[] { "Hành động", "Nhập vai (RPG)", "Phiêu lưu" }, 0),
@@ -209,8 +238,10 @@ namespace GameStore.API.Data
                 ("Counter-Strike 2", "Tựa game bắn súng góc nhìn thứ nhất thi đấu huyền thoại nhất mọi thời đại.", 0m, "Game", "Free", "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800", new[] { "Bắn súng", "Hành động" }, 1),
                 ("Apex Legends", "Bắn súng sinh tồn Battle Royale với hàng loạt nhân vật sở hữu kỹ năng độc đáo.", 0m, "Game", "Free", "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800", new[] { "Bắn súng", "Sinh tồn" }, 0),
                 ("Overwatch 2", "Bắn súng anh hùng 5v5 trực tuyến sôi động với kho anh hùng phong phú.", 0m, "Game", "Free", "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800", new[] { "Bắn súng" }, 1),
-                ("Steam Wallet Card 500.000đ", "Thẻ nạp tiền vào tài khoản Steam trực tiếp để mua hàng ngàn game yêu thích.", 500000m, "GiftCard", "Paid", "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800", new[] { "Thẻ quà tặng" }, 0),
-                ("Epic Games Gift Card 200.000đ", "Thẻ nạp tiền tài khoản Epic Games Store chính hãng tiện lợi.", 200000m, "GiftCard", "Paid", "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800", new[] { "Thẻ quà tặng" }, 0)
+                ("Windows 11 Pro License", "Bản quyền hệ điều hành Windows 11 Pro chính hãng với bảo mật doanh nghiệp và ảo hóa nâng cao.", 2490000m, "App", "Paid", "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800", new[] { "Phần mềm", "Lập trình & Tiện ích", "Công cụ bản quyền" }, 1),
+                ("AutoCAD Architecture & Design", "Phần mềm thiết kế đồ họa kỹ thuật CAD 2D/3D chuyên nghiệp dành cho kiến trúc và cơ khí.", 3850000m, "App", "Paid", "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800", new[] { "Phần mềm", "Đồ họa & Thiết kế 3D", "Công cụ bản quyền" }, 0),
+                ("Wallpaper Engine", "Ứng dụng hình nền động đỉnh cao cho PC, hỗ trợ đồ họa thời gian thực và cá nhân hóa không gian làm việc.", 99000m, "App", "Paid", "https://cdn.akamai.steamstatic.com/steam/apps/431960/library_600x900.jpg", new[] { "Phần mềm", "Lập trình & Tiện ích" }, 1),
+                ("Substance 3D Painter", "Vẽ chất liệu và kết cấu 3D chuẩn ngành game AAA và kỹ xảo điện ảnh.", 3490000m, "App", "Paid", "https://cdn.akamai.steamstatic.com/steam/apps/1775390/library_600x900.jpg", new[] { "Phần mềm", "Đồ họa & Thiết kế 3D", "Công cụ bản quyền" }, 0)
             };
 
             foreach (var item in productSeedList)
@@ -238,6 +269,29 @@ namespace GameStore.API.Data
                     };
                     db.Products.Add(prod);
                     db.SaveChanges();
+                }
+                else
+                {
+                    bool changed = false;
+                    if (prod.Type != item.Type)
+                    {
+                        prod.Type = item.Type;
+                        changed = true;
+                    }
+                    if (prod.Pricing != item.Pricing)
+                    {
+                        prod.Pricing = item.Pricing;
+                        changed = true;
+                    }
+                    if (prod.BasePrice != item.Price)
+                    {
+                        prod.BasePrice = item.Price;
+                        changed = true;
+                    }
+                    if (changed)
+                    {
+                        db.SaveChanges();
+                    }
                 }
 
                 // Categories

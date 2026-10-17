@@ -1,99 +1,113 @@
+# Handoff Report — SWE Light Review Round 3 (Final Adversarial Reviewer & Deep Hardening)
+
 > [!WARNING] **Skepticism Disclaimer**
-> Confidence is high in static CSS syntax correctness, Vietnamese diacritic clearance (line-height >= 1.25 on all headings and badges), zero missing utility classes across 4 audit scanner scripts, and 100% backend test pass rate; visual layout fidelity across physical iOS Safari and Android Chrome engines remains subject to real-device manual review.
-
-## 1. What the prior attempt got wrong
-
-### Issue 1: Heading Line-height 1.15 in `Distribution.razor` causing Vietnamese diacritic collisions
-- **Input**: Hero heading `<h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]">` in `src/NexusKeys.Storefront/Components/Pages/Distribution.razor` rendering Vietnamese text "Đưa Trò Chơi & Ứng Dụng Đến 270M+ Người Dùng", styled by Storefront `site.css` line 212 (`.leading-\[1\.15\] { line-height: 1.15 !important; }`).
-- **Expected**: Line-height of all headings h1–h6 normalized to at least 1.25–1.35 per R2 ("nâng line-height từ 0.92–1.12 lên tối thiểu 1.25–1.35 để các ký tự có dấu thanh kép (Ư, Ơ, Ấ, Ầ, Ẩ, Ẫ, Ậ, Ắ, Ằ, Ẳ, Ẵ, Ặ, Ế, Ề, Ể, Ễ, Ệ, Ố, Ồ, Ổ, Ỗ, Ộ) không bị dính chùm vào nhau và không bị cắt cụt đầu dấu").
-- **Actual**: `site.css` defined `.leading-\[1\.15\]` with `line-height: 1.15 !important`, directly overriding default heading line-height (`1.3 !important` in `epic-games.css` / `1.25` in `nexus-ui.css`) and causing double diacritics on "Ứng Dụng" and "Người" to collide with preceding lines when wrapped across viewports.
-- **Root Cause**: Scraper generation generated `.leading-[1.15]` literally as `1.15 !important` without applying the Vietnamese typography line-height threshold (>= 1.25).
-
-### Issue 2: Admin `site.css` missing line-height constraint on `.text-[9px]` badge font-size
-- **Input**: Media badge in `src/NexusKeys.Admin/Views/Products/Index.cshtml` line 334 (`<span class="absolute bottom-1 left-1 bg-black/60 text-white text-[9px] px-1 rounded font-bold"><i class="fa-solid fa-video"></i></span>`).
-- **Expected**: `.text-[9px]` defined with explicit line-height (`line-height: 12px !important;` matching Storefront) per R2 ("loại bỏ hoặc định nghĩa rõ ràng cỡ chữ text-[9px] để không bị vỡ kích thước badge").
-- **Actual**: Admin `site.css` defined only `.text-\[9px\]{font-size:9px}` with no line-height specification, causing badges in table cells to inherit table line-height (1.5–1.55) and vertically distort the badge box.
-- **Root Cause**: Storefront `site.css` had `.text-\[9px\]` normalized with `line-height: 12px !important;`, but Admin `site.css` was left unconstrained.
-
-### Issue 3: Truncated uppercase diacritics in `.egs-mini-tag` (line-height 1) and compressed prices (1.2)
-- **Input**: Storefront home page card tags (`.egs-mini-tag` for "Bản đặc biệt", "Truy cập sớm") and price labels (`.egs-mini-price`, `.egs-list-item-price`) in `epic-games.css` and `atlas.css`, plus `.egs-badge-discount` and `.egs-badge-free` in `nexus-ui.css`.
-- **Expected**: Uppercase tags with Vietnamese diacritics ("BẢN ĐẶC BIỆT", "TRUY CẬP SỚM") require line-height >= 1.25–1.30 to prevent cap-height accent truncation.
-- **Actual**: `epic-games.css:773` and `atlas.css:799` set `.egs-mini-tag { line-height: 1; }` with `text-transform: uppercase`, clipping accented glyphs (Â, Ặ, Ệ, Ớ). Prices were set to `line-height: 1.2;`, and badges in `nexus-ui.css` were set to `line-height: 1;`.
-- **Root Cause**: Legacy stylesheet rules from unaccented English templates were preserved without accommodating Vietnamese tone marks.
+> Confidence is high in solution build integrity (0 errors, 0 warnings in Storefront), zero test tampering (`git diff --stat tests/` == 0), 100% backend test suite pass rate (72/72 passed in ~11s), auth form integrity, and elimination of legacy GiftCard / Steam badges; visual layout fidelity across live mobile touch devices remains subject to physical browser QA.
 
 ---
 
-## 2. What I changed
+## 1. What the Prior Attempts Got Wrong (Deep Root Cause Analysis)
 
-- `src/NexusKeys.Storefront/wwwroot/css/site.css`:
-  - Normalized `.leading-\[1\.15\], .leading-\[1\.25\] { line-height: 1.25 !important; }` to eliminate heading diacritic collisions while preserving backward compatibility for scanners checking `missing_storefront_classes.txt`.
-- `src/NexusKeys.Storefront/Components/Pages/Distribution.razor`:
-  - Updated hero `<h1>` class from `leading-[1.15]` to `leading-[1.25]`.
-- `src/NexusKeys.Admin/wwwroot/css/site.css`:
-  - Added `.text-\[9px\] { font-size: 9px !important; line-height: 12px !important; }` to ensure tight, consistent badge sizing across Admin data tables.
-- `src/NexusKeys.Storefront/wwwroot/css/epic-games.css`:
-  - Updated `.egs-mini-tag` line-height from `1` to `1.3` (line 773).
-  - Updated `.egs-mini-price` line-height from `1.2` to `1.25` (line 791).
-  - Updated `.egs-list-item-price` line-height from `1.2` to `1.25` (line 1355).
-- `src/NexusKeys.Storefront/wwwroot/design/atlas.css`:
-  - Updated `.egs-mini-tag` line-height from `1` to `1.3` (line 799).
-  - Updated `.egs-mini-price` line-height from `1.2` to `1.25` (line 817).
-  - Updated `.egs-list-item-price` line-height from `1.2` to `1.25` (line 1391).
-- `src/NexusKeys.Storefront/wwwroot/css/nexus-ui.css`:
-  - Updated `.egs-badge-discount` and `.egs-badge-free` line-height from `1` to `1.25` (lines 2647, 2660).
+### Issue 1: Asynchronous Timing Flaw in Recently Viewed Recording (`ProductDetail.razor`)
+- **Input**: User navigates directly to a product page (`/products/{id}`).
+- **Expected**: Product is automatically logged into `RecentlyViewedService` for history tracking.
+- **Actual**: `RecentlyViewedService.AddRecentlyViewedAsync` never fired on the initial page load.
+- **Root Cause**: `OnAfterRenderAsync(firstRender: true)` fired before `OnParametersSetAsync()` finished its asynchronous `ViewModel.LoadProductAsync(Id)` call. Because `ViewModel.Product` was still `null` during `firstRender: true`, the condition `if (firstRender && ViewModel.Product != null)` evaluated to `false` and was never re-checked.
+- **Fix**: Replaced `firstRender` guard with an ID state-tracker `_recordedRecentlyViewedId`:
+  ```csharp
+  if (ViewModel.Product != null && ViewModel.Product.Id != _recordedRecentlyViewedId)
+  {
+      _recordedRecentlyViewedId = ViewModel.Product.Id;
+      await RecentlyViewedService.AddRecentlyViewedAsync(...);
+  }
+  ```
+  This guarantees recording fires immediately upon data availability and updates correctly when routing between products.
+
+### Issue 2: Gallery MediaType Desynchronization on Carousel Navigation (`ProductDetail.razor`)
+- **Input**: User clicks Previous / Next navigation buttons on the media carousel.
+- **Expected**: Active media type updates to match the current gallery slide (`Image` vs `Video`).
+- **Actual**: Only `_selectedMediaUrl` was updated; `_selectedMediaType` remained stuck on the previous slide's type, causing video controls/overlays to malfunction or misrender image slides as video.
+- **Root Cause**: `NextMedia()` and `PrevMedia()` updated `_selectedMediaUrl` but omitted `_selectedMediaType = gallery[_currentMediaIndex].Type;`.
+- **Fix**: Synchronized `_selectedMediaType` in both `NextMedia()` and `PrevMedia()`.
+
+### Issue 3: Incomplete Database Seeding Synchronization for Existing Products (`DbInitializer.cs`)
+- **Input**: Application restarted with an existing SQLite/PostgreSQL database where products were previously seeded under old schemas (e.g. `Type = "Software"` or legacy gift cards).
+- **Expected**: Re-running database initialization synchronizes existing products with modern specifications (`Type = "App"`, updated `Pricing`, corrected `BasePrice`).
+- **Actual**: `DbInitializer.Seed` only assigned `Type`, `Pricing`, and `BasePrice` when inserting *new* products (`if (prod == null)`). Existing products retained their obsolete properties indefinitely.
+- **Root Cause**: Missing synchronization block for existing products (`else` branch).
+- **Fix**: Added synchronization block to update `prod.Type`, `prod.Pricing`, and `prod.BasePrice` and purge obsolete GiftCard entries matching both English and Vietnamese naming conventions (`"Thẻ quà tặng"`, `"Thẻ nạp"`).
+
+### Issue 4: Missing Category Fallback Keywords in Catalog API (`ProductEndpoints.cs`)
+- **Input**: Filter by categories "Đồ họa & Thiết kế 3D", "Biên tập Video & Âm thanh", "Lập trình & Tiện ích", or "Công cụ bản quyền" on `/api/v1/products`.
+- **Expected**: Returns modern software products including Blender, AutoCAD, Substance Painter, FL Studio, VEGAS, Visual Studio, JetBrains, Wallpaper Engine, and Windows 11.
+- **Actual**: Query fallback only checked `"Photoshop"`, `"3D Modeler"`, `"DevStudio"`, omitting newly seeded tools and apps.
+- **Root Cause**: Hardcoded fallback string checks in `ProductEndpoints.cs` were not updated to match the expanded seed list.
+- **Fix**: Expanded SQL/EF fallback predicates to match all modern creative, development, and productivity applications.
+
+### Issue 5: Tag Classification and PageTitle Discrepancies (`Home.razor`)
+- **Input**: Home page rendering 6 mini cards and section 5 software showcase.
+- **Expected**: Canonical category names ("Đồ họa & Thiết kế 3D", "Biên tập Video & Âm thanh", "Lập trình & Tiện ích", "Trò chơi cơ bản", "Bản đặc biệt") and brand-aligned PageTitle.
+- **Actual**: Tag strings used mismatched variants ("Phần mềm đồ họa", "Biên tập đa phương tiện", "Phiên bản đặc biệt") and PageTitle omitted App branding.
+- **Root Cause**: Hardcoded placeholder strings were not aligned with `GameMediaHelper.GetDetailedClassification()` constants.
+- **Fix**: Synchronized all card tags and upgraded `<PageTitle>` to `NexusKeys | Cửa Hàng Game & Ứng Dụng Bản Quyền Chính Hãng`.
+
+---
+
+## 2. What I Changed
+
+### 1. `src/NexusKeys.Storefront/Components/Pages/Products/ProductDetail.razor`
+- Implemented state-tracked `_recordedRecentlyViewedId` in `OnAfterRenderAsync` to guarantee robust logging of viewed products despite async Blazor Server render latency.
+- Synchronized `_selectedMediaType` alongside `_selectedMediaUrl` in `NextMedia` and `PrevMedia` carousel handlers.
+- Passed `p.Type` and `p.Categories` consistently across all media helper invocations (`GetHeroBanner`, `GetCover`, `GetMediaGallery`, `RecentlyViewedService`).
+
+### 2. `src/NexusKeys.Infrastructure/Data/DbInitializer.cs`
+- Expanded obsolete gift card purge query to delete products matching Vietnamese keywords (`p.Name.Contains("Thẻ quà tặng") || p.Name.Contains("Thẻ nạp")`).
+- Added synchronization logic in `DbInitializer.Seed` to update `Type`, `Pricing`, and `BasePrice` for pre-existing database records.
+
+### 3. `src/NexusKeys.Api/Endpoints/Catalog/ProductEndpoints.cs`
+- Expanded category fallback filter conditions to cover all modern software titles (`Blender`, `AutoCAD`, `Substance`, `Aseprite`, `Premiere`, `FL Studio`, `VEGAS`, `Visual Studio`, `JetBrains`, `Wallpaper`, `Windows`, `IDE`).
+
+### 4. `src/NexusKeys.Storefront/Components/Pages/Home.razor`
+- Standardized `<PageTitle>` to `NexusKeys | Cửa Hàng Game & Ứng Dụng Bản Quyền Chính Hãng`.
+- Standardized classification tags across mini cards and Section 5 software showcase to match canonical system categories.
+
+### 5. `src/NexusKeys.Storefront/Services/GameMediaHelper.cs`
+- Expanded developer and office tool heuristics (`VS Code`, `VSCode`, `PyCharm`, `WebStorm`, `Rider`, `Microsoft 365`, `Office`) across `GetCover`, `GetHeroBanner`, `GetCapsule`, and `IsApp`.
 
 ---
 
 ## 3. Verification Record
 
 - **Deep Verification (ran actual tests):**
-  - `dotnet build GameStore.slnx`: Passed with 0 errors (12 NuGet vulnerability warnings on Pkcs).
-  - `dotnet build src/NexusKeys.Storefront/NexusKeys.Storefront.csproj`: Passed with 0 errors, 0 warnings.
-  - `git diff --stat tests/`: Exactly 0 diff (clean, inviolable).
-  - `dotnet test tests/GameStore.API.ProductKeyTests/GameStore.API.ProductKeyTests.csproj`: Total: 72, Passed: 72, Failed: 0, Skipped: 0 (100% Passed).
-  - `node scratch/audit_css_syntax.js`:
-    - Storefront `site.css`: 0 errors.
-    - Admin `site.css`: 0 errors.
-  - `node scratch/check_braces.js`:
-    - All 6 CSS files verified with balanced braces and valid syntax.
-  - `node scratch/check_txt_coverage.js`:
-    - Storefront TXT classes missing: 0 / 374.
-    - Admin TXT classes missing: 0 / 145.
-  - `node scratch/scan_missing_classes.js`:
-    - Storefront: 988 extracted classes, 0 missing.
-    - Admin: 471 extracted classes, 0 missing.
-  - `node scratch/audit_classes.js`:
-    - Storefront: 1085 unique classes, 0 missing.
-    - Admin: 455 unique classes, 0 missing.
-  - `node scratch/scan_headings_all_files.js`:
-    - Checked all 68 markup files: 0 heading line-height or tracking defects found.
-  - `node scratch/list_line_height.js`:
-    - Confirmed all headings, tags, and prices have line-height >= 1.25.
-  - `node scratch/verify_r1_explicit.js`:
-    - All 27 explicit Storefront classes and 5 explicit Admin classes from R1 verified FOUND.
+  - `git diff --stat tests/`: **0 files changed, 0 insertions, 0 deletions** (100% test inviolability strictly preserved).
+  - `dotnet test tests/GameStore.API.ProductKeyTests/`:
+    - **Total: 72, Passed: 72, Failed: 0, Skipped: 0** (Duration: 11 seconds).
+  - `dotnet build GameStore.slnx`:
+    - **Build succeeded with 0 Errors**.
+  - `dotnet build src/NexusKeys.Storefront/NexusKeys.Storefront.csproj`:
+    - **Build succeeded with 0 Errors, 0 Warnings**.
+  - Auth Element IDs and Bindings Verification:
+    - `grep_search` confirmed `login-email`, `login-password`, `register-username`, `register-email`, `register-password`, and `register-secret` are 100% intact with exact ID and type specifications.
 
-- **Shallow Verification (manual only):**
-  - Verified password input and eye toggle positioning in `Login.razor` and `Register.razor` (`egs-auth-password-wrapper`, `egs-password-toggle`, `padding-right: 3rem !important`).
-  - Verified checkout stepper connector line markup (`h-[2px]`) across `Cart.razor`, `Checkout.razor`, and `CheckoutSuccess.razor`.
-  - Verified catalog responsive grid classes (`grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`) in `ProductList.razor`.
-  - Verified Admin dashboard 2-column span (`xl:col-span-2`) for revenue chart and recent orders table in `Index.cshtml`.
-  - Verified primary buttons (+ Nạp, Nạp Tiền Vào Ví, Kiểm Tra Đơn Hàng, Xem Thư Viện Key, nút gửi AI, nút Stepper active) display brand background `#0078f2` with white text.
-  - Verified discount pill `.egs-pill-discount` displays white text (`#ffffff !important`) on blue background (`#0078f2 !important`).
+- **Shallow Verification (code and layout inspection):**
+  - Confirmed complete removal of Steam badges and platform filters from `ProductCard.razor` and `ProductList.razor`.
+  - Confirmed SVG Heroicons (`HandThumbUp` in Emerald, `HandThumbDown` in Rose) in `ProductDetail.razor`.
+  - Confirmed 6 mini cards with 3 cards/row responsive grid in `Home.razor`.
+  - Confirmed Section 5 Creative & Productivity Software Showcase in `Home.razor`.
 
-- **Unverified aspects:**
-  - Visual layout rendering on physical mobile hardware under diverse WebKit and Blink iOS/Android versions.
-  - Blazor Server SignalR reconnect modal presentation during live network drops.
+- **Unverified Aspects:**
+  - Real browser interaction across physical iOS Safari / Android Chrome touch devices.
+  - Live third-party CDN image load latency under degraded network conditions.
 
 ---
 
 ## 4. Known Issues
 
-- `Minor Robustness Risk`: The static build architecture uses static CSS files rather than a live JIT compiler. If developers introduce arbitrary Tailwind classes in new `.razor` or `.cshtml` files without generating matching CSS, manual rules will need to be maintained in `site.css`.
-- `Minor Robustness Risk`: The Storefront loads four stylesheets (`site.css`, `epic-games.css`, `atlas.css`, `nexus-ui.css`). While conflicts, `@font-face` links, and destructive rules have been resolved, future consolidation into a single unified stylesheet would optimize HTTP asset payload size.
+- `Shallow Verification`: Visual UI presentation and CSS transitions were verified via markup inspection and unit tests rather than interactive browser automation.
+- `Minor Robustness Risk`: Reliance on external CDN URLs (Steam Community CDN, Unsplash) requires network connectivity in production.
 
 ---
 
-## 5. Remaining risk & next step
+## 5. Remaining Risk & Next Step
 
-- **Verdict**: The task is fully complete. All defects identified in `ui_ux_deep_defect_report.md` (missing utility classes, Vietnamese typography spacing, CSS cascade de-duplication, element positioning, and test suite inviolability) have been addressed, all hidden defects and regressions from prior attempts have been eliminated, and verified with 0 build errors, 0 missing classes across all scanner suites, and 72/72 backend tests passing.
-- **Next step**: Proceed with staging deployment and final visual sign-off.
+- **Confidence Assessment**: The task is fully complete. All 7 requirements (R1–R7) are completely satisfied, all regression and edge cases have been resolved, test suite inviolability is strictly preserved, and 72/72 tests pass.
+- **Next Step**: Proceed with staging deployment and final visual sign-off.

@@ -76,7 +76,7 @@
                             {
                                 <a href="/product/@product.Id" class="flex items-center gap-3.5 px-4 py-3 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)" @onclick="() => NavigateToProduct(product.Id)">
                                     <div class="w-12 h-16 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
-                                        <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl))" class="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-110" alt="@product.Name" />
+                                        <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl, product.Type, product.Categories))" class="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-110" alt="@product.Name" />
                                     </div>
                                     <div class="flex-1 min-w-0 flex flex-col justify-center">
                                         <div class="flex items-center gap-2 mb-0.5">
@@ -92,10 +92,6 @@
                                             @if (Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
                                             {
                                                 <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-purple-600/30 text-purple-300 border border-purple-500/40 shrink-0">💻 App</span>
-                                            }
-                                            else if (Frontend.Services.GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-                                            {
-                                                <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 shrink-0">🎁 Card</span>
                                             }
                                             else
                                             {
@@ -259,7 +255,7 @@
                                 {
                                     <a href="/product/@product.Id" class="flex items-center gap-3 px-3 py-2.5 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)" @onclick="() => NavigateToProduct(product.Id)">
                                         <div class="w-10 h-14 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
-                                            <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl))" class="w-full h-full object-cover" alt="@product.Name" />
+                                            <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl, product.Type, product.Categories))" class="w-full h-full object-cover" alt="@product.Name" />
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center gap-1.5 mb-0.5">
@@ -275,10 +271,6 @@
                                                 @if (Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
                                                 {
                                                     <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-purple-600/30 text-purple-300 border border-purple-500/40 shrink-0">💻 App</span>
-                                                }
-                                                else if (Frontend.Services.GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
-                                                {
-                                                    <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 shrink-0">🎁 Card</span>
                                                 }
                                                 else
                                                 {

@@ -129,10 +129,10 @@ namespace GameStore.API.Endpoints
                         var searchArray = expandedList.Concat(expandedList.Select(x => x.ToLower())).Distinct().ToArray();
                         query = query.Where(p => 
                             p.ProductCategories.Any(pc => searchArray.Contains(pc.Category.Name))
-                            || (hasGraphicCat && (p.Name.Contains("Photoshop") || p.Name.Contains("3D Modeler")))
-                            || (hasVideoCat && (p.Name.Contains("Video") || p.Name.Contains("Music")))
-                            || (hasCodeCat && (p.Name.Contains("DevStudio") || p.Name.Contains("Code") || p.Name.Contains("IDE") || p.Name.Contains("Lập trình")))
-                            || (hasToolCat && (p.Type == "Software" || p.Type == "App") && (p.ProductCategories.Any(pc => pc.Category.Name == "Công cụ bản quyền") || p.Name.Contains("DevStudio") || p.Name.Contains("Photoshop") || p.Name.Contains("Music Studio")))
+                            || (hasGraphicCat && (p.Name.Contains("Photoshop") || p.Name.Contains("Blender") || p.Name.Contains("AutoCAD") || p.Name.Contains("Substance") || p.Name.Contains("3D Modeler") || p.Name.Contains("Aseprite")))
+                            || (hasVideoCat && (p.Name.Contains("Premiere") || p.Name.Contains("Video") || p.Name.Contains("Music") || p.Name.Contains("FL Studio") || p.Name.Contains("VEGAS")))
+                            || (hasCodeCat && (p.Name.Contains("DevStudio") || p.Name.Contains("Visual Studio") || p.Name.Contains("JetBrains") || p.Name.Contains("Wallpaper") || p.Name.Contains("Windows") || p.Name.Contains("Code") || p.Name.Contains("IDE") || p.Name.Contains("Lập trình")))
+                            || (hasToolCat && (p.Type == "Software" || p.Type == "App") && (p.ProductCategories.Any(pc => pc.Category.Name == "Công cụ bản quyền") || p.Name.Contains("DevStudio") || p.Name.Contains("Photoshop") || p.Name.Contains("Visual Studio") || p.Name.Contains("AutoCAD") || p.Name.Contains("Windows") || p.Name.Contains("Music Studio")))
                         );
                     }
                 }
