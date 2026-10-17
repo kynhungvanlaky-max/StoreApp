@@ -1767,3 +1767,44 @@ a.btn:active,
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #0078f2;
 }
+
+/* Cyber Edge Angled Product Badges */
+.badge-cyber-edge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 15;
+    display: inline-block;
+    padding: 2px 10px;
+    color: #ffffff !important;
+    font-size: 10px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    pointer-events: none;
+    clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.badge-cyber-game {
+    background: linear-gradient(135deg, #0078f2 0%, #005fb8 100%) !important;
+    box-shadow: 0 4px 14px rgba(0, 120, 242, 0.45) !important;
+}
+
+.badge-cyber-app {
+    background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%) !important;
+    box-shadow: 0 4px 14px rgba(147, 51, 234, 0.5) !important;
+}
+
+/* Mini Card Cyber Edge Badges */
+.badge-cyber-mini {
+    display: inline-block;
+    padding: 1px 7px;
+    color: #ffffff !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    pointer-events: none;
+    clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%);
+}
