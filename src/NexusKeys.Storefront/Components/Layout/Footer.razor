@@ -1,0 +1,179 @@
+<footer class="egs-footer">
+    <div class="egs-footer-content">
+        @* Social Links *@
+        <div class="egs-footer-social">
+            <a href="https://facebook.com/nexuskeys" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95C18.05 21.45 22 17.19 22 12z"/></svg>
+            </a>
+            <a href="https://twitter.com/nexuskeys" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://youtube.com/nexuskeys" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
+            </a>
+            <a href="#top" class="ml-auto min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl border border-white/20 hover:border-white/40 hover:bg-white/10 flex items-center justify-center text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078F2]" title="Lên đầu trang" aria-label="Lên đầu trang">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+            </a>
+        </div>
+
+        @* Links Columns *@
+        <div class="egs-footer-cols">
+            <div class="egs-footer-col">
+                <h4>Tài nguyên</h4>
+                <ul>
+                    <li><a href="/creator">Chương trình Nhà sáng tạo</a></li>
+                    <li><a href="/distribution">Phát hành trên NexusKeys</a></li>
+                    <li><a href="/careers">Cơ hội nghề nghiệp</a></li>
+                    <li><a href="/support">Hỗ trợ & Liên hệ</a></li>
+                    <li><a href="/terms">Chính sách cộng đồng</a></li>
+                    <li><a href="/distribution">Nghiên cứu trải nghiệm</a></li>
+                    <li><a href="/terms">Thỏa thuận người dùng cuối (EULA)</a></li>
+                    <li><a href="/distribution">Dịch vụ trực tuyến Nexus</a></li>
+                </ul>
+            </div>
+            <div class="egs-footer-col">
+                <h4>Phát triển bởi NexusKeys</h4>
+                <ul>
+                    <li><a href="/products?search=Black%20Myth">Black Myth: Wukong</a></li>
+                    <li><a href="/products?search=Elden%20Ring">Elden Ring</a></li>
+                    <li><a href="/products?search=Cyberpunk">Cyberpunk 2077</a></li>
+                    <li><a href="/products?search=God%20of%20War">God of War</a></li>
+                    <li><a href="/products?search=Witcher">The Witcher 3</a></li>
+                    <li><a href="/products?search=Red%20Dead">Red Dead Redemption 2</a></li>
+                </ul>
+            </div>
+        </div>
+
+        @* Copyright notice *@
+        <p class="egs-footer-legal text-white/60">
+            © 2026, NexusKeys, Inc. Tất cả quyền được bảo lưu. NexusKeys, biểu tượng NexusKeys và các nhãn hiệu liên quan là thương hiệu hoặc thương hiệu đã đăng ký của NexusKeys tại Việt Nam và quốc tế. Tất cả tên sản phẩm, thương hiệu game và tài sản trí tuệ khác thuộc về chủ sở hữu tương ứng.
+        </p>
+
+        @* Bottom bar *@
+        <div class="egs-footer-bottom flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="egs-footer-bottom-links flex items-center flex-wrap gap-4 text-xs text-white/70">
+                <a href="/terms" class="hover:text-white transition-colors">Điều khoản dịch vụ</a>
+                <a href="/privacy" class="hover:text-white transition-colors">Chính sách quyền riêng tư</a>
+                <a href="/refund-policy" class="hover:text-white transition-colors">Chính sách hoàn tiền</a>
+                <button type="button" @onclick="() => _showCookieModal = true" class="hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0 text-white/70 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#0078F2] rounded">
+                    Tùy chọn Cookie
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/" class="text-white hover:text-[#0078F2] transition-colors flex items-center gap-2 font-black tracking-tight" aria-label="Trang chủ NexusKeys">
+                    <Icon Name="HeroiconName.PuzzlePiece" Class="w-6 h-6 text-[#0078F2]" IconType="HeroiconType.Solid" />
+                    <span class="text-sm font-black text-white">NEXUS<span class="text-[#0078F2]">KEYS</span></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+@* Cookie Preferences Modal *@
+@if (_showCookieModal)
+{
+    <div class="egs-modal-backdrop" @onclick="() => _showCookieModal = false" role="dialog" aria-modal="true" aria-labelledby="cookie-modal-title">
+        <div class="egs-modal-card max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8" @onclick:stopPropagation="true">
+            <button type="button" 
+                    class="absolute top-5 right-5 min-w-[40px] min-h-[40px] w-10 h-10 rounded-xl text-white/70 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078f2]"
+                    aria-label="Đóng hộp thoại"
+                    @onclick="() => _showCookieModal = false">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0078f2]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="cookie-modal-title" class="font-black text-xl text-white tracking-tight">Tùy Chọn Cookie & Quyền Riêng Tư</h3>
+                    <p class="text-sm text-white/70">Quản lý cách NexusKeys thu thập và bảo vệ dữ liệu của bạn</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-6 text-xs text-white/90 max-h-80 overflow-y-auto pr-1">
+                @* Essential Cookies *@
+                <div class="p-3.5 rounded-xl bg-[#202024] border border-white/10 flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-sm flex items-center gap-2">
+                            <span>Cookie Thiết Yếu</span>
+                            <span class="text-xs uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30 min-h-[16px] inline-flex items-center">Bắt buộc</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-white/75 mt-1 leading-relaxed">Cần thiết cho đăng nhập, giỏ hàng, bảo mật phiên làm việc và thanh toán. Không thể tắt.</p>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-400 shrink-0">Luôn bật</span>
+                </div>
+
+                @* Performance & Analytics *@
+                <div class="p-3.5 rounded-xl bg-[#202024] border border-white/10 flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-sm">Cookie Hiệu Năng & Phân Tích</div>
+                        <p class="text-xs sm:text-sm text-white/75 mt-1 leading-relaxed">Giúp chúng tôi đo lường lượt truy cập, tốc độ tải trang và cải thiện trải nghiệm cửa hàng.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+                        <input type="checkbox" @bind="_allowAnalytics" class="sr-only peer" />
+                        <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0078f2]"></div>
+                    </label>
+                </div>
+
+                @* Personalization *@
+                <div class="p-3.5 rounded-xl bg-[#202024] border border-white/10 flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-sm">Cookie Cá Nhân Hóa & Gợi Ý Game</div>
+                        <p class="text-xs sm:text-sm text-white/75 mt-1 leading-relaxed">Gợi ý các tựa game, ưu đãi giảm giá và sự kiện ưu đãi phù hợp với sở thích của bạn.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+                        <input type="checkbox" @bind="_allowPersonalization" class="sr-only peer" />
+                        <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0078f2]"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-4 border-t border-white/10 flex-wrap">
+                <button type="button" class="text-xs text-white/60 hover:text-white underline" @onclick="RejectOptionalCookies">
+                    Chỉ dùng thiết yếu
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl border border-white/15 text-white text-xs font-semibold hover:bg-white/10 transition-colors" @onclick="AcceptAllCookies">
+                        Chấp nhận tất cả
+                    </button>
+                    <button type="button" class="px-5 py-2 rounded-xl bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-md shadow-[#0078f2]/30" @onclick="SaveCookiePreferences">
+                        Lưu lựa chọn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Inject] private Frontend.Services.ToastService ToastService { get; set; } = default!;
+
+    private bool _showCookieModal = false;
+    private bool _allowAnalytics = true;
+    private bool _allowPersonalization = true;
+
+    private void AcceptAllCookies()
+    {
+        _allowAnalytics = true;
+        _allowPersonalization = true;
+        _showCookieModal = false;
+        ToastService.ShowSuccess("Đã lưu tùy chọn: Cho phép tất cả cookie.");
+    }
+
+    private void RejectOptionalCookies()
+    {
+        _allowAnalytics = false;
+        _allowPersonalization = false;
+        _showCookieModal = false;
+        ToastService.ShowSuccess("Đã lưu tùy chọn: Chỉ sử dụng cookie thiết yếu.");
+    }
+
+    private void SaveCookiePreferences()
+    {
+        _showCookieModal = false;
+        ToastService.ShowSuccess("Tùy chọn cookie của bạn đã được cập nhật thành công.");
+    }
+}

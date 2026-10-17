@@ -1,0 +1,405 @@
+@page "/support"
+@layout Frontend.Components.Layout.MainLayout
+@inject Frontend.Services.SupportService SupportService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Trung Tâm Hỗ Trợ — NexusKeys Support</PageTitle>
+
+<div class="egs-wrap">
+    <div class="egs-content space-y-12 pb-16">
+
+        @* HERO SECTION: EPIC GAMES HELP CENTER STYLE *@
+        <div class="relative overflow-hidden rounded-3xl bg-[#18181c] border border-white/10 p-8 sm:p-14 text-center shadow-2xl">
+            @* Ambient Glow *@
+            <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-[#0078f2]/20 blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-3xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] text-[11px] font-black uppercase tracking-wider mb-4">
+                    <span class="w-2 h-2 rounded-full bg-[#0078f2] animate-pulse"></span>
+                    <span>NexusKeys Help Center • Hỗ Trợ 24/7</span>
+                </div>
+                
+                <h1 class="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight leading-tight mb-4">
+                    Chúng Tôi Có Thể Giúp Gì Cho Bạn?
+                </h1>
+                <p class="text-sm sm:text-base text-white/60 mb-8 max-w-xl mx-auto">
+                    Tra cứu giải pháp kích hoạt License Key, nạp ví, chính sách hoàn tiền hoặc trò chuyện trực tiếp với đội ngũ CSKH.
+                </p>
+
+                @* Support Search Input *@
+                <div class="relative max-w-xl mx-auto">
+                    <Icon Name="HeroiconName.MagnifyingGlass" Class="w-5 h-5 absolute left-4 top-4 text-white/40" />
+                    <input type="text" @bind="_faqSearch" @bind:event="oninput" placeholder="Tìm kiếm câu hỏi: kích hoạt key, nạp tiền ví, hoàn tiền..." class="w-full h-13 pl-12 pr-4 bg-[#202024] border border-white/15 rounded-2xl text-sm text-white placeholder-white/30 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none shadow-inner transition-all" />
+                </div>
+
+                @* Quick Suggestion Tags *@
+                <div class="flex items-center justify-center gap-2 mt-4 flex-wrap text-xs text-white/50">
+                    <span class="font-bold">Từ khóa nổi bật:</span>
+                    <button type="button" @onclick='() => SetSearch("Kích hoạt key")' class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors">Kích hoạt key</button>
+                    <button type="button" @onclick='() => SetSearch("Hoàn tiền")' class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors">Hoàn tiền 48h</button>
+                    <button type="button" @onclick='() => SetSearch("Ví NexusPay")' class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors">Ví NexusPay</button>
+                    <button type="button" @onclick='() => SetSearch("Steam")' class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors">Steam / Epic</button>
+                </div>
+            </div>
+        </div>
+
+        @* 6 VISUAL HELP TOPIC CARDS *@
+        <div>
+            <div class="mb-6">
+                <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">Chủ Đề Trợ Giúp Phổ Biến</h2>
+                <p class="text-xs sm:text-sm text-white/50 mt-1">Lựa chọn danh mục tương ứng với sự cố bạn đang gặp phải.</p>
+            </div>
+
+            <div class="egs-topics-grid">
+                @* Topic 1 *@
+                <div class="bg-[#18181c] p-6 rounded-2xl border border-white/10 hover:border-[#0078f2]/60 transition-all hover:-translate-y-1 group shadow-lg cursor-pointer" @onclick='() => SelectCategory("key")'>
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Icon Name="HeroiconName.Key" Class="w-6 h-6" />
+                    </div>
+                    <h3 class="text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mb-1.5">Key &amp; Kích Hoạt Bản Quyền</h3>
+                    <p class="text-xs text-white/50 leading-relaxed">Hướng dẫn nhập mã bản quyền trên Steam, Epic Games, Ubisoft Connect và EA Play.</p>
+                </div>
+
+                @* Topic 2 *@
+                <div class="bg-[#18181c] p-6 rounded-2xl border border-white/10 hover:border-[#0078f2]/60 transition-all hover:-translate-y-1 group shadow-lg cursor-pointer" @onclick='() => SelectCategory("wallet")'>
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Icon Name="HeroiconName.Wallet" Class="w-6 h-6" />
+                    </div>
+                    <h3 class="text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mb-1.5">Thanh Toán &amp; Ví NexusPay</h3>
+                    <p class="text-xs text-white/50 leading-relaxed">Nạp tiền ví, tra cứu số dư, thanh toán tự động qua VNPay QR, MoMo và Thẻ Quốc Tế.</p>
+                </div>
+
+                @* Topic 3 *@
+                <div class="bg-[#18181c] p-6 rounded-2xl border border-white/10 hover:border-[#0078f2]/60 transition-all hover:-translate-y-1 group shadow-lg cursor-pointer" @onclick='() => SelectCategory("refund")'>
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Icon Name="HeroiconName.ArrowPath" Class="w-6 h-6" />
+                    </div>
+                    <h3 class="text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mb-1.5">Chính Sách Hoàn Tiền (Refund)</h3>
+                    <p class="text-xs text-white/50 leading-relaxed">Cam kết hoàn tiền 100% trong 48h nếu mã Key bị lỗi hoặc không kích hoạt được.</p>
+                </div>
+
+                @* Topic 4 *@
+                <div class="bg-[#18181c] p-6 rounded-2xl border border-white/10 hover:border-[#0078f2]/60 transition-all hover:-translate-y-1 group shadow-lg cursor-pointer" @onclick='() => SelectCategory("account")'>
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Icon Name="HeroiconName.ShieldCheck" Class="w-6 h-6" />
+                    </div>
+                    <h3 class="text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mb-1.5">Tài Khoản &amp; Bảo Mật 2FA</h3>
+                    <p class="text-xs text-white/50 leading-relaxed">Khôi phục mật khẩu, xác thực 2 bước, bảo vệ tài khoản khỏi truy cập trái phép.</p>
+                </div>
+
+                @* Topic 5 *@
+                <div class="bg-[#18181c] p-6 rounded-2xl border border-white/10 hover:border-[#0078f2]/60 transition-all hover:-translate-y-1 group shadow-lg cursor-pointer" @onclick='() => SelectCategory("order")'>
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Icon Name="HeroiconName.DocumentText" Class="w-6 h-6" />
+                    </div>
+                    <h3 class="text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mb-1.5">Đơn Hàng &amp; Hóa Đơn</h3>
+                    <p class="text-xs text-white/50 leading-relaxed">Tra cứu mã hóa đơn điện tử, trạng thái xử lý đơn hàng và cấp phát bản quyền.</p>
+                </div>
+
+                @* Topic 6 *@
+                <a href="/assistant" class="bg-[#18181c] p-6 rounded-2xl border border-[#0078f2]/40 hover:border-[#0078f2] transition-all hover:-translate-y-1 group shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#0078f2] to-indigo-600 text-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
+                            <Icon Name="HeroiconName.Sparkles" Class="w-6 h-6" />
+                        </div>
+                        <h3 class="text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mb-1.5">Trợ Lý AI Thông Minh</h3>
+                        <p class="text-xs text-white/50 leading-relaxed">Nhận câu trả lời ngay lập tức trong 5 giây cho mọi thắc mắc và kiểm tra trạng thái đơn.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-white/5 text-xs font-black text-[#0078f2] uppercase tracking-wider flex items-center gap-1">
+                        <span>Trò chuyện ngay</span>
+                        <Icon Name="HeroiconName.ArrowRight" Class="w-3.5 h-3.5" />
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        @* MAIN CONTENT: FAQ ON LEFT, TICKET ON RIGHT *@
+        <div class="egs-support-grid">
+            @* FAQ Accordion *@
+            <div class="egs-support-faq space-y-6">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div class="flex items-center gap-2.5">
+                        <Icon Name="HeroiconName.QuestionMarkCircle" Class="w-6 h-6 text-[#0078f2]" />
+                        <h2 class="text-xl font-bold text-white">Câu Hỏi Thường Gặp</h2>
+                    </div>
+                    <span class="text-xs text-white/40">@GetFilteredFaqs().Count câu hỏi</span>
+                </div>
+
+                @* Category Filters *@
+                <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                    <button type="button" @onclick='() => SelectCategory("all")' class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 @(_activeCategory == "all" ? "bg-[#0078f2] text-white" : "bg-[#18181c] text-white/60 hover:text-white border border-white/10")">
+                        Tất cả
+                    </button>
+                    <button type="button" @onclick='() => SelectCategory("key")' class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 @(_activeCategory == "key" ? "bg-[#0078f2] text-white" : "bg-[#18181c] text-white/60 hover:text-white border border-white/10")">
+                        Key & Kích hoạt
+                    </button>
+                    <button type="button" @onclick='() => SelectCategory("wallet")' class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 @(_activeCategory == "wallet" ? "bg-[#0078f2] text-white" : "bg-[#18181c] text-white/60 hover:text-white border border-white/10")">
+                        Thanh toán & Ví
+                    </button>
+                    <button type="button" @onclick='() => SelectCategory("refund")' class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 @(_activeCategory == "refund" ? "bg-[#0078f2] text-white" : "bg-[#18181c] text-white/60 hover:text-white border border-white/10")">
+                        Hoàn tiền 48h
+                    </button>
+                    <button type="button" @onclick='() => SelectCategory("account")' class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 @(_activeCategory == "account" ? "bg-[#0078f2] text-white" : "bg-[#18181c] text-white/60 hover:text-white border border-white/10")">
+                        Tài khoản
+                    </button>
+                </div>
+
+                @* FAQ List *@
+                <div class="space-y-3">
+                    @foreach (var faq in GetFilteredFaqs())
+                    {
+                        var isOpen = _openFaqIds.Contains(faq.Id);
+                        <div class="bg-[#18181c] border border-white/10 hover:border-white/20 rounded-2xl overflow-hidden transition-all shadow-md">
+                            <button type="button" class="w-full p-4 sm:p-5 flex items-center justify-between gap-4 text-left hover:bg-white/[0.02] transition-colors" @onclick="() => ToggleFaq(faq.Id)">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-md bg-[#0078f2]/15 text-[#0078f2] text-xs font-black flex items-center justify-center shrink-0">?</span>
+                                    <h3 class="text-sm sm:text-base font-bold text-white @(isOpen ? "text-[#0078f2]" : "")">@faq.Question</h3>
+                                </div>
+                                <Icon Name="@(isOpen ? HeroiconName.ChevronUp : HeroiconName.ChevronDown)" Class="w-5 h-5 text-white/50 shrink-0" />
+                            </button>
+                            @if (isOpen)
+                            {
+                                <div class="px-5 pb-5 pt-1 border-t border-white/5 text-xs sm:text-sm text-white/70 leading-relaxed bg-[#202024]/40">
+                                    <p class="pt-2">@faq.Answer</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* Support Ticket Form *@
+            <div class="egs-support-ticket">
+                <div class="bg-[#18181c] rounded-2xl border border-white/10 shadow-2xl overflow-hidden sticky top-[104px]">
+                    <div class="p-5 sm:p-6 border-b border-white/10 bg-[#202024]/60 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <Icon Name="HeroiconName.Envelope" Class="w-5 h-5 text-[#0078f2]" />
+                            <h2 class="text-base sm:text-lg font-bold text-white">Gửi Yêu Cầu Hỗ Trợ</h2>
+                        </div>
+                        <span class="text-xs font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Phản hồi &lt; 2h</span>
+                    </div>
+
+                    <div class="p-5 sm:p-6">
+                        @if (_isTicketSubmitted)
+                        {
+                            <div class="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-center space-y-3">
+                                <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+                                    <Icon Name="HeroiconName.CheckCircle" Class="w-7 h-7" IconType="HeroiconType.Solid" />
+                                </div>
+                                <h3 class="font-black text-base text-white">Đã Gửi Yêu Cầu Thành Công!</h3>
+                                <p class="text-sm text-white/70 leading-relaxed">
+                                    Đội ngũ kỹ thuật NexusKeys đã tiếp nhận thông tin và sẽ phản hồi chi tiết tới địa chỉ email của bạn trong thời gian sớm nhất.
+                                </p>
+                                <button type="button" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors mt-2" @onclick="ResetForm">
+                                    Gửi thêm yêu cầu khác
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <form @onsubmit="SubmitTicket" @onsubmit:preventDefault="true" class="space-y-4">
+                                <div>
+                                    <label for="support-topic" class="block text-xs font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                                        Chủ đề cần trợ giúp <span class="text-red-400">*</span>
+                                    </label>
+                                    <select id="support-topic" @bind="_ticketTopic" required class="w-full bg-[#202024] border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all">
+                                        <option value="" disabled selected>Chọn chủ đề phù hợp...</option>
+                                        <option value="key_error">Mã Key bị lỗi / Không thể kích hoạt</option>
+                                        <option value="payment">Lỗi giao dịch / Đã trừ tiền chưa nhận được key</option>
+                                        <option value="refund">Yêu cầu hoàn tiền (Refund trong 48h)</option>
+                                        <option value="account">Vấn đề tài khoản & Bảo mật 2FA</option>
+                                        <option value="other">Hỗ trợ kỹ thuật / Câu hỏi khác</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="support-email" class="block text-xs font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                                        Email nhận phản hồi <span class="text-red-400">*</span>
+                                    </label>
+                                    <input id="support-email" type="email" @bind="_ticketEmail" @bind:event="oninput" required placeholder="nhapemail@example.com" class="w-full bg-[#202024] border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-white/30 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all" />
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label for="support-order" class="block text-xs font-bold uppercase tracking-wider text-white/70">
+                                            Mã đơn hàng
+                                        </label>
+                                        <span class="text-xs text-white/40">Tùy chọn</span>
+                                    </div>
+                                    <input id="support-order" type="text" @bind="_ticketOrderId" @bind:event="oninput" placeholder="VD: ORD-99824" class="w-full bg-[#202024] border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-white/30 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all font-mono" />
+                                </div>
+
+                                <div>
+                                    <label for="support-content" class="block text-xs font-bold uppercase tracking-wider text-white/70 mb-1.5">
+                                        Mô tả chi tiết sự cố <span class="text-red-400">*</span>
+                                    </label>
+                                    <textarea id="support-content" @bind="_ticketContent" @bind:event="oninput" required rows="4" placeholder="Vui lòng cung cấp chi tiết lỗi bạn gặp phải hoặc đính kèm mô tả để chúng tôi hỗ trợ nhanh nhất..." class="w-full bg-[#202024] border border-white/10 rounded-xl p-3.5 text-xs sm:text-sm text-white placeholder-white/30 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all resize-none"></textarea>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(_errorMessage))
+                                {
+                                    <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs">
+                                        @_errorMessage
+                                    </div>
+                                }
+
+                                <button type="submit" class="w-full py-3.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50" disabled="@_isSubmitting">
+                                    @if (_isSubmitting)
+                                    {
+                                        <span class="loading loading-spinner loading-xs"></span>
+                                        <span>Đang gửi yêu cầu...</span>
+                                    }
+                                    else
+                                    {
+                                        <Icon Name="HeroiconName.PaperAirplane" Class="w-4 h-4" />
+                                        <span>Gửi Yêu Cầu Hỗ Trợ</span>
+                                    }
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* BOTTOM CONTACT CHANNELS *@
+        <div class="pt-8 border-t border-white/10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-[#18181c] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/10 text-[#0078f2] flex items-center justify-center shrink-0">
+                        <Icon Name="HeroiconName.Sparkles" Class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Trợ Lý AI Nexus</h4>
+                        <p class="text-xs text-white/50 mt-0.5">Phản hồi tự động trong 5 giây</p>
+                        <a href="/assistant" class="text-xs text-[#0078f2] font-bold hover:underline mt-1 inline-block">Mở cửa sổ chat ➔</a>
+                    </div>
+                </div>
+
+                <div class="bg-[#18181c] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/10 text-[#0078f2] flex items-center justify-center shrink-0">
+                        <Icon Name="HeroiconName.Envelope" Class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Email Kỹ Thuật</h4>
+                        <p class="text-xs text-white/50 mt-0.5">support@nexuskeys.com</p>
+                        <span class="text-xs text-white/40 mt-1 inline-block">Xử lý trong vòng 2 giờ</span>
+                    </div>
+                </div>
+
+                <div class="bg-[#18181c] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/10 text-[#0078f2] flex items-center justify-center shrink-0">
+                        <Icon Name="HeroiconName.Phone" Class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Hotline Khẩn Cấp</h4>
+                        <p class="text-xs text-white/50 mt-0.5">1900-8888 (Nhánh 2)</p>
+                        <span class="text-xs text-white/40 mt-1 inline-block">8:00 - 23:00 Hàng ngày</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _subnavSearch = "";
+
+    private void HandleSubnavSearch(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_subnavSearch))
+        {
+            NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(_subnavSearch.Trim())}");
+        }
+    }
+
+    private string _ticketTopic = "";
+    private string _ticketEmail = "";
+    private string _ticketOrderId = "";
+    private string _ticketContent = "";
+    
+    private bool _isSubmitting = false;
+    private bool _isTicketSubmitted = false;
+    private string _errorMessage = "";
+
+    private string _faqSearch = "";
+    private string _activeCategory = "all";
+    private HashSet<int> _openFaqIds = new() { 1 };
+
+    private record FaqItem(int Id, string Category, string Question, string Answer);
+
+    private readonly List<FaqItem> _faqList = new()
+    {
+        new(1, "key", "Làm sao để nhận và kích hoạt License Key sau khi mua?", "Ngay sau khi thanh toán thành công, hệ thống sẽ cấp phát License Key ngay lập tức trên màn hình hóa đơn. Bạn cũng có thể xem lại toàn bộ mã đã mua tại mục 'Kho Game & Bản Quyền' trong menu tài khoản cá nhân."),
+        new(2, "key", "Cách kích hoạt game trên Steam, Epic Games, Ubisoft Connect?", "Mở ứng dụng launcher trên máy tính của bạn (Steam hoặc Epic Games), chọn mục 'Redeem Code' hoặc 'Activate a Product', dán mã key gồm 15-25 ký tự được cấp và ấn Xác nhận. Game sẽ vĩnh viễn được thêm vào thư viện của bạn."),
+        new(3, "wallet", "Tôi nạp tiền qua VNPay/MoMo nhưng số dư chưa cộng?", "Cổng thanh toán tự động xử lý trong 5-30 giây. Trong một số trường hợp nghẽn mạng ngân hàng, thời gian có thể kéo dài 1-3 phút. Nếu sau 5 phút số dư chưa cập nhật, vui lòng gửi Ticket hỗ trợ kèm mã giao dịch để nhân viên đối soát ngay."),
+        new(4, "refund", "Chính sách hoàn tiền (Refund) 48 giờ áp dụng như thế nào?", "NexusKeys cam kết hoàn tiền 100% nếu License Key bị lỗi, không thể kích hoạt do lỗi từ nhà phát hành và bạn báo lỗi trong vòng 48 giờ kể từ khi mua. Trường hợp mua nhầm nền tảng không tương thích sẽ không đủ điều kiện hoàn trả."),
+        new(5, "account", "Làm sao để bật bảo mật 2 bước (2FA) bảo vệ tài khoản?", "Tại trang Cài đặt tài khoản (/profile), mục Bảo Mật Tài Khoản cho phép bạn kích hoạt 2FA. Mỗi khi đăng nhập từ thiết bị lạ, hệ thống sẽ yêu cầu mã OTP xác thực được gửi tới email chính thức của bạn.")
+    };
+
+    private void ToggleFaq(int id)
+    {
+        if (_openFaqIds.Contains(id))
+            _openFaqIds.Remove(id);
+        else
+            _openFaqIds.Add(id);
+    }
+
+    private void SelectCategory(string category)
+    {
+        _activeCategory = category;
+        _faqSearch = "";
+    }
+
+    private void SetSearch(string keyword)
+    {
+        _faqSearch = keyword;
+        _activeCategory = "all";
+    }
+
+    private List<FaqItem> GetFilteredFaqs()
+    {
+        return _faqList
+            .Where(f => (_activeCategory == "all" || f.Category == _activeCategory))
+            .Where(f => string.IsNullOrWhiteSpace(_faqSearch) || 
+                        f.Question.Contains(_faqSearch, StringComparison.OrdinalIgnoreCase) || 
+                        f.Answer.Contains(_faqSearch, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private async Task SubmitTicket()
+    {
+        _isSubmitting = true;
+        _errorMessage = "";
+        
+        var request = new Frontend.Services.CreateSupportTicketDto
+        {
+            Topic = _ticketTopic,
+            Email = _ticketEmail,
+            OrderId = string.IsNullOrWhiteSpace(_ticketOrderId) ? null : _ticketOrderId,
+            Content = _ticketContent
+        };
+
+        var success = await SupportService.CreateTicketAsync(request);
+        
+        _isSubmitting = false;
+        
+        if (success)
+        {
+            _isTicketSubmitted = true;
+        }
+        else
+        {
+            _errorMessage = "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau giây lát.";
+        }
+    }
+    
+    private void ResetForm()
+    {
+        _ticketTopic = "";
+        _ticketEmail = "";
+        _ticketOrderId = "";
+        _ticketContent = "";
+        _isTicketSubmitted = false;
+    }
+}

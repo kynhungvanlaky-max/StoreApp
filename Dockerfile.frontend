@@ -1,17 +1,19 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-
-COPY ["frontend/Frontend.csproj", "frontend/"]
-RUN dotnet restore "frontend/Frontend.csproj"
-
-COPY . .
-WORKDIR "/src/frontend"
-RUN dotnet publish -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS base
 WORKDIR /app
 EXPOSE 5205
-COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:5205
-ENV ASPNETCORE_ENVIRONMENT=Production
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+WORKDIR /src
+
+COPY ["src/NexusKeys.Storefront/NexusKeys.Storefront.csproj", "src/NexusKeys.Storefront/"]
+RUN dotnet restore "src/NexusKeys.Storefront/NexusKeys.Storefront.csproj"
+
+COPY ["src/NexusKeys.Storefront/", "src/NexusKeys.Storefront/"]
+WORKDIR "/src/src/NexusKeys.Storefront"
+RUN dotnet publish "NexusKeys.Storefront.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Frontend.dll"]

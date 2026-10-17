@@ -5,6 +5,7 @@
 @implements IDisposable
 
 <PageTitle>Danh Sách Yêu Thích — NexusKeys</PageTitle>
+<h1 class="sr-only">Danh sách yêu thích</h1>
 
 <div class="w-full">
             @if (VM.IsLoading && VM.Items.Count == 0)
@@ -80,7 +81,7 @@
             ProductId = item.Product.Id,
             Name = item.Product.Name,
             Price = item.Product.BasePrice,
-            ImageUrl = item.Product.ImageUrl ?? "/images/placeholder-game.jpg"
+            ImageUrl = item.Product.ImageUrl ?? string.Empty
         });
     }
 }

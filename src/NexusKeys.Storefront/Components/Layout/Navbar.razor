@@ -1,0 +1,549 @@
+@inject Frontend.ViewModels.AuthViewModel AuthViewModel
+@inject Frontend.ViewModels.CartViewModel CartViewModel
+@inject Frontend.ViewModels.WishlistViewModel WishlistViewModel
+@inject Frontend.ViewModels.ProfileViewModel ProfileViewModel
+@inject Frontend.Services.ProductService ProductService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IConfiguration Configuration
+@inject Frontend.Services.ToastService ToastService
+@using Microsoft.AspNetCore.Components.Routing
+@implements IDisposable
+
+<div class="h-20 bg-[#121212] sticky top-0 z-40 flex items-center justify-between px-6 border-b border-[#303030] shadow-md">
+    <div class="flex items-center gap-8 h-full">
+        @* Logo *@
+        <a href="/" class="text-2xl font-black text-white tracking-tighter flex items-center gap-2">
+            <Icon Name="HeroiconName.PuzzlePiece" Class="w-8 h-8 text-[#0078F2]" IconType="HeroiconType.Solid" />
+            NEXUS<span class="text-[#0078F2]">KEYS</span>
+        </a>
+
+        @* Mobile Sidebar Toggle *@
+        <button class="btn btn-ghost btn-circle lg:hidden text-white min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212]" @onclick="ToggleMobileMenu" aria-label="Mở menu di động">
+            <Icon Name="HeroiconName.Bars3" Class="w-6 h-6" />
+        </button>
+
+        @* Desktop Navigation *@
+        <nav class="hidden lg:flex h-full items-center gap-1">
+            <a href="/" class="nav-link-storeapp @(IsCurrentPath("/", exact: true) ? "active" : "")">
+                Trang Chủ
+            </a>
+            <a href="/products" class="nav-link-storeapp @(IsCurrentPath("/products") ? "active" : "")">
+                Cửa Hàng
+            </a>
+            <a href="/news" class="nav-link-storeapp @(IsCurrentPath("/news") ? "active" : "")">
+                Tin Tức
+            </a>
+            <a href="/distribution" class="nav-link-storeapp @(IsCurrentPath("/distribution") ? "active" : "")">
+                Phân Phối
+            </a>
+            <a href="/support" class="nav-link-storeapp @(IsCurrentPath("/support") ? "active" : "")">
+                Hỗ Trợ
+            </a>
+            <a href="/assistant" class="nav-link-storeapp assistant @(IsCurrentPath("/assistant") ? "active" : "")">
+                Trợ Lý AI
+            </a>
+        </nav>
+    </div>
+    
+    <div class="flex items-center gap-4">
+        @* Search Bar *@
+        <div class="hidden md:flex relative w-64 lg:w-80 transition-all duration-300 focus-within:w-80 lg:focus-within:w-96 group z-50">
+            <Icon Name="HeroiconName.MagnifyingGlass" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0078F2] transition-colors" />
+            <input type="text" @bind="SearchQuery" @bind:event="oninput" @onkeydown="HandleSearch" @onfocus="HandleFocus" @onblur="HandleBlur" placeholder="Tìm kiếm game, ứng dụng..." class="w-full bg-[#202020] text-white text-sm rounded-full pl-12 pr-4 py-2.5 outline-none focus:bg-[#303030] transition-colors placeholder:text-gray-500 border border-transparent focus:border-[#0078F2] focus:ring-1 focus:ring-[#0078F2]" autocomplete="off" />
+            
+            @if (_showDropdown)
+            {
+                <div class="absolute top-full left-0 w-full lg:w-96 mt-2 bg-[#1a1a1a] border border-[#333] rounded-2xl shadow-2xl overflow-hidden z-50">
+                    <div class="p-3.5 border-b border-[#333]/50 flex items-center justify-between">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Kết quả tìm kiếm</span>
+                        @if (_isSearching)
+                        {
+                            <span class="loading loading-spinner loading-xs text-[#0078F2]"></span>
+                        }
+                    </div>
+                    
+                    @if (_isSearching && !_searchResults.Any())
+                    {
+                        <div class="p-8 flex justify-center items-center">
+                            <span class="loading loading-spinner loading-md text-[#0078F2]"></span>
+                        </div>
+                    }
+                    else if (_searchResults.Any())
+                    {
+                        <div class="flex flex-col py-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                            @foreach (var product in _searchResults)
+                            {
+                                <a href="/product/@product.Id" class="flex items-center gap-3.5 px-4 py-3 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)" @onclick="() => NavigateToProduct(product.Id)">
+                                    <div class="w-12 h-16 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
+                                        <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl))" class="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-110" alt="@product.Name" />
+                                    </div>
+                                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                        <div class="flex items-center gap-2 mb-0.5">
+                                            <span class="text-xs text-gray-400 font-medium truncate max-w-[130px]">@(product.Categories?.FirstOrDefault() ?? "Trò chơi cơ bản")</span>
+                                            @if (product.DiscountPercent is > 0 && product.DiscountPrice.HasValue)
+                                            {
+                                                <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white leading-none shadow-sm min-h-[16px] inline-flex items-center">
+                                                    -@Math.Round(product.DiscountPercent.Value, 0)%
+                                                </span>
+                                            }
+                                        </div>
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            @if (Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
+                                            {
+                                                <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-purple-600/30 text-purple-300 border border-purple-500/40 shrink-0">💻 App</span>
+                                            }
+                                            else if (Frontend.Services.GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
+                                            {
+                                                <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 shrink-0">🎁 Card</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-[#0078f2]/30 text-sky-300 border border-[#0078f2]/40 shrink-0">🎮 Game</span>
+                                            }
+                                            <span class="text-sm font-bold text-gray-200 truncate group-hover/item:text-[#0078F2] transition-colors">
+                                                @HighlightSearchText(product.Name, _searchQuery)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="shrink-0 text-right flex flex-col items-end justify-center ml-2">
+                                        @if (IsProductFree(product))
+                                        {
+                                            <span class="text-xs font-bold text-emerald-400">Miễn phí</span>
+                                        }
+                                        else if (product.DiscountPercent is > 0 && product.DiscountPrice.HasValue)
+                                        {
+                                            <span class="text-[11px] text-gray-400 line-through">@FormatProductPrice(product.BasePrice)</span>
+                                            <span class="text-xs font-bold text-white">@FormatProductPrice(product.DiscountPrice.Value)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-xs font-bold text-white">@FormatProductPrice(product.BasePrice)</span>
+                                        }
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                        <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-left px-5 py-3.5 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-xs font-bold text-[#0078F2] hover:text-white transition-colors" @onmousedown="NavigateToSearch" @onclick="NavigateToSearch">
+                            Xem tất cả kết quả &rarr;
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="p-6 text-center">
+                            <span class="text-sm text-gray-400">Không tìm thấy kết quả nào</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="flex items-center gap-1">
+            <a href="/wishlist" 
+               class="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#202020] text-gray-400 hover:text-white transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212]" 
+               title="Danh sách mong ước" 
+               aria-label="Danh sách mong ước">
+                <Icon Name="HeroiconName.Heart" Class="w-5 h-5" />
+                @if (WishlistViewModel.Items.Count > 0)
+                {
+                    <span class="absolute top-1 right-1 min-w-4 h-4 px-1 text-xs font-bold bg-[#0078F2] text-white rounded-full flex items-center justify-center">@(WishlistViewModel.Items.Count > 99 ? "99+" : WishlistViewModel.Items.Count.ToString())</span>
+                }
+            </a>
+
+            <a href="/cart" 
+               class="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#202020] text-gray-400 hover:text-white transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212]" 
+               title="Giỏ hàng" 
+               aria-label="Giỏ hàng">
+                <Icon Name="HeroiconName.ShoppingCart" Class="w-5 h-5" />
+                @if (CartViewModel.TotalItems > 0)
+                {
+                    <span class="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none bg-[#0078F2] text-white rounded-full flex items-center justify-center shadow-sm">@(CartViewModel.TotalItems > 99 ? "99+" : CartViewModel.TotalItems.ToString())</span>
+                }
+            </a>
+            
+            <div class="dropdown dropdown-end ml-1">
+                <div tabindex="0" 
+                     role="button" 
+                     class="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#202020] text-gray-400 hover:text-white transition-colors cursor-pointer border border-transparent hover:border-[#303030] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212]" 
+                     title="Tài khoản người dùng" 
+                     aria-label="Tài khoản người dùng">
+                    <Icon Name="HeroiconName.User" Class="w-5 h-5" />
+                </div>
+                <ul tabindex="0" class="mt-4 z-[1] p-3 shadow-2xl menu menu-sm dropdown-content bg-[#1a1a1a]/95 backdrop-blur-md rounded-2xl w-64 border border-[#333]">
+                    @if (AuthViewModel.IsLoggedIn)
+                    {
+                        <li class="mb-3 px-2">
+                            <div class="flex items-center gap-3 bg-[#252525] p-3 rounded-xl border border-[#333] hover:border-[#444] transition-colors cursor-default">
+                                <div class="w-10 h-10 rounded-full bg-[#303030] flex items-center justify-center text-gray-400 shrink-0 font-bold text-white">
+                                    @(!string.IsNullOrWhiteSpace(AuthViewModel.Username) ? AuthViewModel.Username.Substring(0, 1).ToUpper() : "U")
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="font-bold text-white text-sm truncate w-full" title="@AuthViewModel.Username">@AuthViewModel.Username</p>
+                                    <p class="text-xs font-medium text-[#0078F2]">@(ProfileViewModel.Profile?.WalletBalance.ToString("N0") ?? "0") đ</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li><a href="/profile" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.UserCircle" Class="w-5 h-5 mr-2" /> Tài khoản của tôi</a></li>
+                        <li><a href="/orders" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.DocumentText" Class="w-5 h-5 mr-2" /> Lịch sử đơn hàng</a></li>
+                        <li><a href="/profile/library" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.Key" Class="w-5 h-5 mr-2" /> Quản lý License Key</a></li>
+                        <li><a href="/profile/wallet" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.Banknotes" Class="w-5 h-5 mr-2" /> Nạp tiền ví Nexus</a></li>
+                        @if (IsStaffOrAdmin)
+                        {
+                            <li class="mt-2 pt-2 border-t border-[#333]">
+                                <button @onclick="GoToAdminPanel" class="hover:bg-purple-500/10 text-purple-400 hover:text-purple-300 rounded-xl py-2.5 font-bold transition-colors text-left w-full">
+                                    <Icon Name="HeroiconName.ShieldCheck" Class="w-5 h-5 mr-2" /> Giao diện Quản Trị
+                                </button>
+                            </li>
+                        }
+                        <li class="mt-2 pt-2 border-t border-[#333]">
+                            <button @onclick="HandleLogout" class="hover:bg-error/10 text-error hover:text-error rounded-xl py-2.5 text-left w-full font-bold transition-colors"><Icon Name="HeroiconName.ArrowRightOnRectangle" Class="w-5 h-5 mr-2" /> Đăng xuất</button>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="px-2 mb-3">
+                            <div class="flex items-center gap-3 bg-[#252525] p-3 rounded-xl border border-[#333] cursor-default">
+                                <div class="w-10 h-10 rounded-full bg-[#303030] flex items-center justify-center text-gray-400 shrink-0">
+                                    <Icon Name="HeroiconName.User" Class="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white text-sm">Khách</p>
+                                    <p class="text-xs text-gray-400">Vui lòng đăng nhập</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li><a href="/login" class="bg-[#0078F2] hover:bg-[#0066cc] text-white font-bold rounded-xl py-2.5 mb-2 justify-center transition-colors shadow-lg shadow-[#0078F2]/20"><Icon Name="HeroiconName.ArrowRightEndOnRectangle" Class="w-5 h-5 mr-1" /> Đăng nhập</a></li>
+                        <li><a href="/register" class="hover:bg-[#303030] text-gray-300 hover:text-white rounded-xl py-2.5 justify-center font-medium border border-[#333] transition-colors"><Icon Name="HeroiconName.UserPlus" Class="w-5 h-5 mr-1" /> Đăng ký tài khoản mới</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    @* Mobile Menu *@
+    @if (IsMobileMenuOpen)
+    {
+        <div class="absolute top-20 left-0 w-full bg-[#121212] border-b border-[#303030] flex flex-col p-4 shadow-lg lg:hidden z-50">
+            <a href="/" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Trang Chủ</a>
+            <a href="/products" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Cửa Hàng</a>
+            <a href="/news" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Tin Tức</a>
+            <a href="/distribution" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Phân Phối</a>
+            <a href="/support" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Hỗ Trợ</a>
+            <a href="/assistant" @onclick="ToggleMobileMenu" class="py-3 px-4 text-[#0078F2] font-bold hover:bg-[#202020] rounded-lg">Trợ Lý AI</a>
+            
+            <div class="mt-4 relative w-full">
+                <Icon Name="HeroiconName.MagnifyingGlass" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="text" @bind="SearchQuery" @bind:event="oninput" @onkeydown="HandleSearch" @onfocus="HandleFocus" @onblur="HandleBlur" placeholder="Tìm kiếm game, ứng dụng..." class="w-full bg-[#202020] text-white text-sm rounded-full pl-12 pr-4 py-3 outline-none focus:bg-[#303030] focus:ring-1 focus:ring-[#0078F2]" autocomplete="off" />
+
+                @if (_showDropdown)
+                {
+                    <div class="mt-2 bg-[#1a1a1a] border border-[#333] rounded-2xl shadow-2xl overflow-hidden z-50">
+                        <div class="p-3 border-b border-[#333]/50 flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Kết quả tìm kiếm</span>
+                            @if (_isSearching)
+                            {
+                                <span class="loading loading-spinner loading-xs text-[#0078F2]"></span>
+                            }
+                        </div>
+                        
+                        @if (_isSearching && !_searchResults.Any())
+                        {
+                            <div class="p-6 flex justify-center items-center">
+                                <span class="loading loading-spinner loading-md text-[#0078F2]"></span>
+                            </div>
+                        }
+                        else if (_searchResults.Any())
+                        {
+                            <div class="flex flex-col py-1 max-h-[50vh] overflow-y-auto custom-scrollbar">
+                                @foreach (var product in _searchResults)
+                                {
+                                    <a href="/product/@product.Id" class="flex items-center gap-3 px-3 py-2.5 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)" @onclick="() => NavigateToProduct(product.Id)">
+                                        <div class="w-10 h-14 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
+                                            <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl))" class="w-full h-full object-cover" alt="@product.Name" />
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-1.5 mb-0.5">
+                                                <span class="text-xs text-gray-400 font-medium">@(product.Categories?.FirstOrDefault() ?? "Trò chơi cơ bản")</span>
+                                                @if (product.DiscountPercent is > 0 && product.DiscountPrice.HasValue)
+                                                {
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white leading-none min-h-[16px] inline-flex items-center">
+                                                        -@Math.Round(product.DiscountPercent.Value, 0)%
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                @if (Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
+                                                {
+                                                    <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-purple-600/30 text-purple-300 border border-purple-500/40 shrink-0">💻 App</span>
+                                                }
+                                                else if (Frontend.Services.GameMediaHelper.IsGiftCard(product.Name, product.Type, product.Categories))
+                                                {
+                                                    <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 shrink-0">🎁 Card</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-[#0078f2]/30 text-sky-300 border border-[#0078f2]/40 shrink-0">🎮 Game</span>
+                                                }
+                                                <p class="text-xs font-bold text-gray-200 truncate group-hover/item:text-[#0078F2]">
+                                                    @product.Name
+                                                </p>
+                                            </div>
+                                            <div class="mt-0.5 flex items-center gap-1.5">
+                                                @if (IsProductFree(product))
+                                                {
+                                                    <span class="text-xs font-bold text-emerald-400">Miễn phí</span>
+                                                }
+                                                else if (product.DiscountPercent is > 0 && product.DiscountPrice.HasValue)
+                                                {
+                                                    <span class="text-xs text-gray-400 line-through">@FormatProductPrice(product.BasePrice)</span>
+                                                    <span class="text-xs font-bold text-white">@FormatProductPrice(product.DiscountPrice.Value)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-xs font-bold text-white">@FormatProductPrice(product.BasePrice)</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                            <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-center px-4 py-3 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-xs font-bold text-[#0078F2] hover:text-white transition-colors" @onmousedown="NavigateToSearch" @onclick="NavigateToSearch">
+                                Xem tất cả kết quả &rarr;
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="p-4 text-center">
+                                <span class="text-xs text-gray-400">Không tìm thấy kết quả phù hợp</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string _searchQuery = "";
+    private string SearchQuery
+    {
+        get => _searchQuery;
+        set
+        {
+            if (_searchQuery != value)
+            {
+                _searchQuery = value;
+                _ = HandleSearchInputAsync();
+            }
+        }
+    }
+
+    private bool IsMobileMenuOpen = false;
+    private bool _showDropdown = false;
+    private bool _isSearching = false;
+    private List<Frontend.Models.Product.ProductDto> _searchResults = new();
+    private CancellationTokenSource? _searchCts;
+
+    private bool IsStaffOrAdmin => AuthViewModel.IsLoggedIn && (
+        string.Equals(AuthViewModel.Role, "Administrator", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(AuthViewModel.Role, "Staff", StringComparison.OrdinalIgnoreCase));
+
+    private string CurrentPath => "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].Trim('/');
+
+    private bool IsCurrentPath(string path, bool exact = false)
+    {
+        var current = CurrentPath == "//" ? "/" : CurrentPath;
+        if (exact || path == "/")
+        {
+            return string.Equals(current, path, StringComparison.OrdinalIgnoreCase);
+        }
+        return current.Equals(path, StringComparison.OrdinalIgnoreCase) || current.StartsWith(path + "/", StringComparison.OrdinalIgnoreCase);
+    }
+
+    protected override void OnInitialized()
+    {
+        AuthViewModel.StateChanged += StateHasChanged;
+        CartViewModel.StateChanged += StateHasChanged;
+        WishlistViewModel.StateChanged += StateHasChanged;
+        ProfileViewModel.StateChanged += StateHasChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        IsMobileMenuOpen = false;
+        _showDropdown = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthViewModel.IsLoggedIn)
+        {
+            await Task.WhenAll(
+                ProfileViewModel.LoadProfileAsync(),
+                WishlistViewModel.LoadWishlistAsync()
+            );
+        }
+    }
+
+    private async Task HandleSearchInputAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_searchQuery) || _searchQuery.Length < 2)
+        {
+            _searchCts?.Cancel();
+            _showDropdown = false;
+            _searchResults.Clear();
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        _searchCts?.Cancel();
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+
+        try
+        {
+            await Task.Delay(300, token); // Debounce
+            
+            if (!token.IsCancellationRequested)
+            {
+                _isSearching = true;
+                _showDropdown = true;
+                await InvokeAsync(StateHasChanged);
+
+                var result = await ProductService.GetProductsAsync(page: 1, pageSize: 6, search: _searchQuery);
+                
+                if (!token.IsCancellationRequested)
+                {
+                    _searchResults = result?.Items ?? new List<Frontend.Models.Product.ProductDto>();
+                    _isSearching = false;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    private void HandleFocus()
+    {
+        if (!string.IsNullOrWhiteSpace(_searchQuery) && _searchQuery.Length >= 2)
+        {
+            _showDropdown = true;
+        }
+    }
+
+    private async Task HandleBlur()
+    {
+        // Give time for mousedown/tap on results to trigger before hiding dropdown
+        await Task.Delay(300);
+        _showDropdown = false;
+        StateHasChanged();
+    }
+
+    private static readonly System.Globalization.CultureInfo ViCulture = new("vi-VN");
+
+    private static bool IsProductFree(Frontend.Models.Product.ProductDto product)
+    {
+        return product.Pricing?.Trim().Equals("Miễn phí", StringComparison.OrdinalIgnoreCase) == true
+            || product.Pricing?.Trim() == "0"
+            || product.BasePrice == 0;
+    }
+
+    private static string FormatProductPrice(decimal price)
+    {
+        return price.ToString("#,##0", ViCulture) + " đ";
+    }
+
+    private void NavigateToProduct(int id)
+    {
+        _showDropdown = false;
+        IsMobileMenuOpen = false;
+        NavigationManager.NavigateTo($"/product/{id}");
+    }
+
+    private void NavigateToSearch()
+    {
+        _showDropdown = false;
+        IsMobileMenuOpen = false;
+        NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(_searchQuery)}");
+    }
+
+    private MarkupString HighlightSearchText(string text, string query)
+    {
+        if (string.IsNullOrWhiteSpace(query)) return new MarkupString(System.Net.WebUtility.HtmlEncode(text));
+        
+        var index = text.IndexOf(query, StringComparison.OrdinalIgnoreCase);
+        if (index < 0) return new MarkupString(System.Net.WebUtility.HtmlEncode(text));
+        
+        var before = System.Net.WebUtility.HtmlEncode(text.Substring(0, index));
+        var match = System.Net.WebUtility.HtmlEncode(text.Substring(index, query.Length));
+        var after = System.Net.WebUtility.HtmlEncode(text.Substring(index + query.Length));
+        
+        return new MarkupString($"{before}<span class=\"text-[#0078F2]\">{match}</span>{after}");
+    }
+
+    private void HandleSearch(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            _searchCts?.Cancel();
+            _showDropdown = false;
+            StateHasChanged();
+            return;
+        }
+
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            _searchCts?.Cancel();
+            _showDropdown = false;
+            IsMobileMenuOpen = false;
+            NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(_searchQuery)}");
+        }
+    }
+
+    private void ToggleMobileMenu()
+    {
+        IsMobileMenuOpen = !IsMobileMenuOpen;
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthViewModel.LogoutAsync();
+        NavigationManager.NavigateTo("/login");
+    }
+
+    private async Task GoToAdminPanel()
+    {
+        var token = await AuthViewModel.GetTokenAsync();
+        if (string.IsNullOrWhiteSpace(token) && await AuthViewModel.TryRefreshAsync())
+        {
+            token = await AuthViewModel.GetTokenAsync();
+        }
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            var adminUrl = Configuration["AdminPortal:BaseUrl"]?.TrimEnd('/') ?? "http://localhost:3001";
+            try
+            {
+                await JS.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
+            }
+            catch
+            {
+                await JS.InvokeVoidAsync("open", $"{adminUrl}/Auth/AutoLogin?token={token}", "_blank");
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthViewModel.StateChanged -= StateHasChanged;
+        CartViewModel.StateChanged -= StateHasChanged;
+        WishlistViewModel.StateChanged -= StateHasChanged;
+        ProfileViewModel.StateChanged -= StateHasChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+        _searchCts?.Dispose();
+    }
+}

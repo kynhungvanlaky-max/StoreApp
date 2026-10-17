@@ -1,0 +1,158 @@
+@page "/orders"
+@inject Frontend.ViewModels.OrderViewModel VM
+@inject Frontend.Services.OrderService OrderService
+@inject Frontend.Services.ToastService ToastService
+@inject NavigationManager NavigationManager
+@layout Frontend.Components.Layout.ProfileLayout
+@implements IDisposable
+
+<PageTitle>Lịch Sử Đơn Hàng — NexusKeys</PageTitle>
+<h1 class="sr-only">Lịch sử đơn hàng</h1>
+
+<div class="w-full">
+            @if (VM.IsLoading && VM.Orders.Count == 0)
+            {
+                <div class="space-y-4">
+                    @for (int i = 0; i < 3; i++)
+                    {
+                        <div class="bg-[#18181c] rounded-2xl p-6 border border-white/10 animate-pulse">
+                            <div class="flex justify-between mb-4">
+                                <div class="h-6 w-32 bg-[#202024] rounded-lg"></div>
+                                <div class="h-6 w-24 bg-[#202024] rounded-full"></div>
+                            </div>
+                            <div class="h-4 w-3/4 bg-[#202024] rounded mb-2"></div>
+                            <div class="h-4 w-1/2 bg-[#202024] rounded"></div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (VM.Orders.Count == 0)
+            {
+                <div class="bg-[#18181c] rounded-2xl border border-white/10 p-12 text-center shadow-xl">
+                    <div class="w-16 h-16 rounded-2xl bg-[#0078f2]/10 text-[#0078f2] flex items-center justify-center mx-auto mb-4 border border-[#0078f2]/20">
+                        <Icon Name="HeroiconName.DocumentText" Class="w-8 h-8" />
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mb-2 tracking-tight">Bạn chưa có đơn hàng nào</h2>
+                    <p class="text-white/60 mb-6 text-xs sm:text-sm max-w-md mx-auto">Hãy đặt mua tựa game đầu tiên để nhận ngay ưu đãi từ NexusKeys.</p>
+                    <a href="/products" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 active:scale-[0.98] inline-flex items-center gap-2">
+                        <Icon Name="HeroiconName.BuildingStorefront" Class="w-5 h-5 mr-1" />
+                        <span>Mua Sắm Ngay</span>
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="space-y-4">
+                    @foreach (var order in VM.Orders)
+                    {
+                        string badgeClass = order.Status switch
+                        {
+                            "Completed" => "bg-emerald-500/15 border-emerald-500/30 text-emerald-400",
+                            "Pending" => "bg-amber-500/15 border-amber-500/30 text-amber-400",
+                            "Failed" => "bg-red-500/15 border-red-500/30 text-red-400",
+                            _ => "bg-white/5 border-white/10 text-white/60"
+                        };
+                        string statusText = order.Status switch
+                        {
+                            "Completed" => "Đã hoàn thành",
+                            "Pending" => "Chờ thanh toán",
+                            "Failed" => "Thất bại",
+                            _ => order.Status
+                        };
+
+                        <div class="bg-[#18181c] rounded-2xl border border-white/10 overflow-hidden shadow-lg hover:border-white/20 transition-all">
+                            <div class="bg-[#202024]/60 p-4 sm:p-5 border-b border-white/10 flex flex-wrap justify-between items-center gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div>
+                                        <div class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Mã đơn hàng</div>
+                                        <div class="font-mono text-white font-bold text-sm">#@order.Id</div>
+                                    </div>
+                                    <div class="hidden sm:block w-px h-8 bg-white/10"></div>
+                                    <div class="hidden sm:block">
+                                        <div class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Ngày đặt</div>
+                                        <div class="text-white text-xs sm:text-sm">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4">
+                                    <div class="text-right">
+                                        <div class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Tổng tiền</div>
+                                        <div class="text-[#0078f2] font-black text-base">@order.TotalAmount.ToString("N0") đ</div>
+                                    </div>
+                                    <a href="/orders/@order.Id" class="px-4 py-2 rounded-xl bg-[#202024] hover:bg-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors border border-white/15">Xem chi tiết</a>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <div class="text-white font-bold text-sm mb-1.5">
+                                        @if (order.Items.Count > 0)
+                                        {
+                                            <span>@order.Items[0]</span>
+                                            if (order.Items.Count > 1)
+                                            {
+                                                <span class="text-white/50 text-xs font-normal ml-1">và @(order.Items.Count - 1) sản phẩm khác</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-white/50">Không có sản phẩm</span>
+                                        }
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full border text-xs font-black uppercase tracking-wider @badgeClass">@statusText</span>
+                                    </div>
+                                </div>
+                                
+                                @if (order.Status == "Pending")
+                                {
+                                    <button type="button" class="px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-[#0078f2]/30 active:scale-[0.98] shrink-0" @onclick="() => RetryPaymentAsync(order.Id)" disabled="@_payingOrderIds.Contains(order.Id)">
+                                        @if (_payingOrderIds.Contains(order.Id))
+                                        {
+                                            <span class="loading loading-spinner loading-xs mr-1"></span>
+                                        }
+                                        Thanh toán ngay
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+</div>
+
+@code {
+    private readonly HashSet<int> _payingOrderIds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadOrdersAsync();
+    }
+
+    private async Task RetryPaymentAsync(int orderId)
+    {
+        if (!_payingOrderIds.Add(orderId)) return;
+
+        try
+        {
+            var response = await OrderService.RetryPaymentAsync(orderId);
+            if (response != null && !string.IsNullOrWhiteSpace(response.PaymentUrl))
+            {
+                NavigationManager.NavigateTo(response.PaymentUrl, forceLoad: true);
+                return;
+            }
+
+            ToastService.ShowError("Không thể khởi tạo lại thanh toán cho đơn hàng này.");
+        }
+        finally
+        {
+            _payingOrderIds.Remove(orderId);
+        }
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

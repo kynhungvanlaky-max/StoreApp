@@ -1,0 +1,31 @@
+@page "/not-found"
+@layout MainLayout
+
+<PageTitle>404 — Không Tìm Thấy Trang — NexusKeys</PageTitle>
+
+<div class="egs-wrap">
+    <div class="egs-content">
+        <section class="py-24 min-h-[65vh] flex items-center justify-center text-center" aria-labelledby="not-found-title">
+            <div class="max-w-md mx-auto egs-card-hover bg-[#18181c] border border-white/10 rounded-3xl p-10 shadow-2xl">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-[#0078f2]/10 border border-[#0078f2]/30 flex items-center justify-center text-[#0078f2] shadow-lg shadow-[#0078f2]/20">
+                    <Icon Name="HeroiconName.PuzzlePiece" Class="w-9 h-9 text-[#0078f2]" IconType="HeroiconType.Solid" />
+                </div>
+                <p class="text-xs font-black uppercase tracking-[0.25em] text-[#0078f2] mb-2">LỖI 404</p>
+                <h1 id="not-found-title" class="text-2xl sm:text-3xl font-black text-white mb-3 tracking-tight">Không Tìm Thấy Trang</h1>
+                <p class="text-white/70 text-sm leading-relaxed mb-8">
+                    Trang bạn đang tìm kiếm không tồn tại, đã bị di dời hoặc tạm thời không khả dụng.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-3">
+                    <a href="/" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white text-xs font-bold tracking-wide transition-all shadow-lg shadow-[#0078f2]/30 flex items-center justify-center gap-2">
+                        <Icon Name="HeroiconName.Home" Class="w-4 h-4" />
+                        <span>Về Trang Chủ</span>
+                    </a>
+                    <a href="/products" class="px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white text-xs font-semibold transition-all flex items-center justify-center gap-2">
+                        <Icon Name="HeroiconName.Squares2x2" Class="w-4 h-4" />
+                        <span>Khám Phá Cửa Hàng</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

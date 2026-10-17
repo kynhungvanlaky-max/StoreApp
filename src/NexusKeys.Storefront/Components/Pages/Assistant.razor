@@ -1,0 +1,133 @@
+@page "/assistant"
+@inject Frontend.ViewModels.AssistantViewModel VM
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Trợ Lý AI NexusKeys — Cửa Hàng Game Bản Quyền</PageTitle>
+
+<div class="egs-wrap">
+    <div class="egs-content">
+
+        @* Main AI Container *@
+        <div class="bg-[#18181c] rounded-2xl border border-white/10 shadow-2xl h-[calc(100vh-200px)] min-h-[580px] flex overflow-hidden">
+            
+            @* Sidebar (Suggestions & Context) *@
+            <aside class="w-80 border-r border-white/10 hidden lg:flex flex-col bg-[#141416]">
+                <div class="p-6 border-b border-white/10">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-[#0078f2]/15 text-[#0078f2] border border-[#0078f2]/30 flex items-center justify-center shadow-lg shadow-[#0078f2]/10">
+                            <Icon Name="HeroiconName.CpuChip" Class="w-6 h-6 text-[#0078f2]" />
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-white text-base tracking-tight">Trợ Lý AI NexusKeys</h2>
+                            <p class="text-xs text-emerald-400 flex items-center gap-1.5 font-medium mt-0.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sẵn sàng phục vụ
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-5 flex-1 overflow-y-auto space-y-4">
+                    <h3 class="text-[11px] font-black uppercase tracking-wider text-white/50 mb-2">Gợi ý câu hỏi</h3>
+                    <div class="space-y-2">
+                        <button type="button" @onclick='@(() => { VM.InputText = "Tôi muốn tìm game nhập vai (RPG) giá dưới 500k?"; _ = VM.SendMessageAsync(); })'
+                                class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
+                            <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
+                            "Tôi muốn tìm game nhập vai (RPG) giá dưới 500k?"
+                        </button>
+                        <button type="button" @onclick='@(() => { VM.InputText = "Làm sao để thanh toán đơn hàng?"; _ = VM.SendMessageAsync(); })'
+                                class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
+                            <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
+                            "Làm sao để thanh toán đơn hàng?"
+                        </button>
+                        <button type="button" @onclick='@(() => { VM.InputText = "Elden Ring yêu cầu cấu hình tối thiểu và khuyến nghị như thế nào?"; _ = VM.SendMessageAsync(); })'
+                                class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
+                            <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
+                            "Elden Ring yêu cầu cấu hình như thế nào?"
+                        </button>
+                        <button type="button" @onclick='@(() => { VM.InputText = "Tựa game nào đang có ưu đãi giảm giá tốt nhất hôm nay?"; _ = VM.SendMessageAsync(); })'
+                                class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
+                            <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
+                            "Tựa game nào đang có ưu đãi tốt nhất?"
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 p-4 rounded-xl bg-[#0078f2]/10 border border-[#0078f2]/20 text-xs text-white/70 space-y-1.5">
+                        <div class="flex items-center gap-1.5 text-[#0078f2] font-bold text-xs">
+                            <Icon Name="HeroiconName.InformationCircle" Class="w-4 h-4 text-[#0078f2]" />
+                            <span>Thông tin AI</span>
+                        </div>
+                        <p class="text-xs leading-relaxed text-white/70">
+                            Nexus AI được hỗ trợ bởi mô hình thông minh giúp tra cứu game, thông số kỹ thuật và hướng dẫn mua hàng 24/7.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+            
+            @* Main Chat Area *@
+            <main class="flex-1 flex flex-col bg-[#121214] min-w-0" aria-label="Khung trò chuyện với AI">
+                @* Mobile Header *@
+                <div class="lg:hidden p-3.5 border-b border-white/10 bg-[#18181c] flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#0078f2]/15 text-[#0078f2] border border-[#0078f2]/30 flex items-center justify-center">
+                        <Icon Name="HeroiconName.CpuChip" Class="w-5 h-5 text-[#0078f2]" />
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-white text-sm">Trợ Lý AI NexusKeys</h2>
+                        <p class="text-[11px] text-emerald-400 font-medium">Trực tuyến • Sẵn sàng</p>
+                    </div>
+                </div>
+                
+                @* Messages List *@
+                <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5" id="assistant-page-messages">
+                    @foreach (var msg in VM.Messages)
+                    {
+                        <Frontend.Components.Shared.ChatBubble Message="msg" />
+                    }
+                    @if (VM.IsTyping)
+                    {
+                        <div class="chat chat-start">
+                            <div class="chat-image avatar">
+                                <div class="w-8 h-8 rounded-full bg-[#0078f2]/15 text-[#0078f2] border border-[#0078f2]/40 flex items-center justify-center shadow-sm">
+                                    <Icon Name="HeroiconName.CpuChip" Class="w-4 h-4 text-[#0078f2]" />
+                                </div>
+                            </div>
+                            <div class="chat-bubble bg-[#202024] border border-white/10 px-5 py-2.5 rounded-2xl shadow-sm">
+                                <span class="loading loading-dots loading-sm text-[#0078f2]"></span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                @* Input Area *@
+                <div class="p-4 sm:p-5 bg-[#18181c] border-t border-white/10">
+                    <form @onsubmit="VM.SendMessageAsync" @onsubmit:preventDefault="true" class="relative max-w-4xl mx-auto">
+                        <label for="assistant-input" class="sr-only">Nhập câu hỏi cho Nexus AI</label>
+                        <input id="assistant-input" @bind="VM.InputText" @bind:event="oninput"
+                               class="w-full bg-[#202024] border border-white/15 focus:border-[#0078f2] focus:ring-2 focus:ring-[#0078f2]/20 rounded-xl px-4 py-3.5 pr-14 text-white text-xs sm:text-sm placeholder-white/50 transition-all outline-none"
+                               placeholder="Hỏi bất kỳ điều gì về kho game, cấu hình, đơn hàng..." />
+                        <button type="submit" aria-label="Gửi câu hỏi" disabled="@(string.IsNullOrWhiteSpace(VM.InputText) || VM.IsTyping)"
+                                class="absolute right-2 top-2 h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] active:scale-95 text-white flex items-center justify-center transition-all shadow-md shadow-[#0078f2]/30 disabled:opacity-30 disabled:cursor-not-allowed">
+                            <Icon Name="HeroiconName.PaperAirplane" Class="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                    </form>
+                    <p class="text-center text-[11px] text-white/60 mt-2.5">
+                        Trợ lý NexusKeys có thể đưa ra kết quả tham khảo. Vui lòng xác nhận lại thông tin chính xác trên trang sản phẩm.
+                    </p>
+                </div>
+            </main>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        VM.StateChanged += StateHasChanged;
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

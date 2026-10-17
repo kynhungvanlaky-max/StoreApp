@@ -1,0 +1,2685 @@
+/* ==========================================================================
+   NEXUSKEYS / ATLAS DESIGN SYSTEM
+   (Unified with Be Vietnam Pro font, zero CORS errors)
+   ========================================================================== */
+
+:root {
+    --egs-bg: #121212;
+    --egs-surface: #18181c;
+    --egs-card: #202024;
+    --egs-card-hover: #28282d;
+    --egs-blue: #0078f2;
+    --egs-blue-hover: #0060c4;
+    --egs-text-primary: #ffffff;
+    --egs-text-secondary: rgba(255, 255, 255, 0.72);
+    --egs-text-muted: rgba(255, 255, 255, 0.45);
+    --egs-border: rgba(255, 255, 255, 0.08);
+    --egs-font: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    font-family: var(--egs-font) !important;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Core Utilities */
+.relative {
+    position: relative !important;
+}
+
+.absolute {
+    position: absolute !important;
+}
+
+/* Container */
+.egs-wrap {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #121212;
+    color: #ffffff;
+    padding-bottom: 80px;
+}
+
+.egs-content {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 24px 64px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+@media (max-width: 640px) {
+    .egs-content {
+        padding: 20px 16px 48px 16px;
+        gap: 28px;
+    }
+}
+
+/* Product Detail Layout (Epic Games Store authentic 2-column) */
+.egs-product-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 340px !important;
+    gap: 40px !important;
+    width: 100% !important;
+    align-items: start !important;
+}
+
+@media (max-width: 1024px) {
+    .egs-product-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.egs-product-main {
+    min-width: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 48px !important;
+}
+
+.egs-product-sidebar {
+    width: 340px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+    position: sticky !important;
+    top: 104px !important;
+}
+
+@media (max-width: 1024px) {
+    .egs-product-sidebar {
+        width: 100% !important;
+        position: static !important;
+    }
+}
+
+/* Global Nav */
+.egs-global-nav {
+    width: 100%;
+    height: 52px;
+    background-color: #121212;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.egs-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.egs-shield-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.egs-nav-tab {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.egs-nav-tab:hover {
+    color: #ffffff;
+}
+
+.egs-nav-tab.active {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.egs-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.egs-btn-signin {
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 6px;
+    background-color: #202024;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background-color 0.15s;
+    border: none;
+}
+
+.egs-btn-signin:hover {
+    background-color: #28282d;
+    color: #ffffff;
+}
+
+.egs-btn-download {
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 6px;
+    background-color: #0078f2;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background-color 0.15s;
+    border: none;
+}
+
+.egs-btn-download:hover {
+    background-color: #0060c4;
+    color: #ffffff;
+}
+
+/* Subnav */
+.egs-subnav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 0 12px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.egs-subnav::-webkit-scrollbar {
+    display: none;
+}
+
+.egs-search-box {
+    position: relative;
+    width: 240px;
+}
+
+.egs-search-box input {
+    width: 100%;
+    height: 38px;
+    background-color: #202024;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    padding: 0 16px 0 38px;
+    color: #ffffff;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-search-box input:focus {
+    background-color: #28282d;
+    border-color: #0078f2;
+    box-shadow: 0 0 0 3px rgba(0, 120, 242, 0.22);
+}
+
+.egs-search-box svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+.egs-search-box:focus-within svg {
+    color: #0078f2;
+}
+
+.egs-subnav-link {
+    color: rgba(255, 255, 255, 0.65) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    padding: 8px 4px 10px 4px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    transition: color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    border: none !important;
+    outline: none !important;
+}
+
+.egs-subnav-link:hover {
+    color: #ffffff !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+.egs-subnav-link.active {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Hero Section */
+.egs-hero-grid {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    align-items: stretch;
+}
+
+.egs-hero-stage {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 480px;
+    background-color: #18181c;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.egs-hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.egs-hero-stage:hover .egs-hero-bg {
+    transform: scale(1.015);
+}
+
+.egs-hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32px 36px;
+    background: linear-gradient(to top, rgba(18, 18, 18, 0.95) 0%, rgba(18, 18, 18, 0.5) 45%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+}
+
+.egs-hero-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.egs-hero-desc {
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 1.45;
+    max-width: 440px;
+    margin: 0;
+}
+
+.egs-hero-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 4px;
+}
+
+.egs-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.egs-hero-btn-buy {
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s, transform 0.15s;
+    border: none;
+}
+
+.egs-hero-btn-buy:hover {
+    background-color: #e2e2e2;
+    color: #000000;
+}
+
+.egs-hero-btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.egs-hero-btn-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.egs-hero-rail-wrap {
+    width: 240px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 480px;
+}
+
+.egs-hero-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.egs-rail-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    border: 1px solid transparent;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    height: 80px;
+}
+
+.egs-rail-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    transform: translateX(4px);
+}
+
+.egs-rail-item.active {
+    background-color: #202024;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    transform: translateX(6px);
+}
+
+.egs-rail-thumb {
+    width: 46px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    object-position: center;
+    flex-shrink: 0;
+    background-color: #18181c;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-rail-item:hover .egs-rail-thumb,
+.egs-rail-item.active .egs-rail-thumb {
+    transform: scale(1.06);
+}
+
+.egs-rail-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.egs-rail-arrows {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.egs-circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.egs-circle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Discover & 4 Mini Cards */
+.egs-discover-row {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    width: 100%;
+    align-items: stretch;
+}
+
+@media (max-width: 960px) {
+    .egs-discover-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.egs-discover-banner {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    height: 100%;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+.egs-discover-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.egs-discover-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 45%, rgba(14,14,16,0.95) 100%);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.egs-discover-badge {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #0078f2;
+}
+
+.egs-discover-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.egs-discover-desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.75);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.egs-discover-btn {
+    height: 38px;
+    padding: 0 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    width: fit-content;
+}
+
+.egs-discover-btn:hover {
+    background-color: #e2e2e2;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.egs-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 640px) {
+    .egs-mini-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+}
+
+.egs-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 12px;
+    margin: 0 -8px;
+    border-radius: 14px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+    text-decoration: none;
+    color: #ffffff;
+    position: relative;
+    cursor: pointer;
+    width: auto;
+    box-sizing: border-box;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                border-color 0.2s ease;
+    will-change: transform;
+}
+
+.egs-mini-card:hover,
+.egs-mini-card:focus-within {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.egs-mini-card:active {
+    transform: translateY(-1px) scale(0.985) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    transition: transform 0.1s ease, background-color 0.1s ease !important;
+}
+
+.egs-mini-thumb-wrap {
+    width: 64px;
+    height: 85px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background-color: #202024;
+    transition: box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-mini-thumb-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: 10px;
+    transition: opacity 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-mini-card:hover .egs-mini-thumb-wrap::before,
+.egs-mini-card:active .egs-mini-thumb-wrap::before,
+.egs-mini-card:focus-within .egs-mini-thumb-wrap::before,
+.group:hover .egs-mini-thumb-wrap::before,
+.group:active .egs-mini-thumb-wrap::before {
+    opacity: 1;
+}
+
+.egs-mini-thumb-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+    z-index: 12;
+}
+
+.egs-mini-card:hover .egs-mini-thumb-wrap::after,
+.egs-mini-card:active .egs-mini-thumb-wrap::after,
+.group:hover .egs-mini-thumb-wrap::after {
+    animation: egsShimmerPass 0.85s ease-in-out;
+}
+
+.egs-mini-card:hover .egs-mini-thumb-wrap,
+.egs-mini-card:active .egs-mini-thumb-wrap {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+.egs-mini-thumb {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    background-color: #18181c;
+    flex-shrink: 0;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease !important;
+    will-change: transform, filter;
+}
+
+.egs-mini-card:hover .egs-mini-thumb,
+.egs-mini-card:active .egs-mini-thumb,
+.egs-mini-card:focus-within .egs-mini-thumb,
+.group:hover .egs-mini-thumb,
+.group:active .egs-mini-thumb {
+    transform: scale(1.06) !important;
+    filter: brightness(1.12) !important;
+}
+
+.egs-mini-bookmark {
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 9999px !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: scale(0.8) !important;
+    transition: opacity 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                background-color 0.18s ease, 
+                border-color 0.18s ease !important;
+    z-index: 25 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+.egs-mini-card:hover .egs-mini-bookmark,
+.egs-mini-card:active .egs-mini-bookmark,
+.egs-mini-card:focus-within .egs-mini-bookmark,
+.egs-list-item:hover .egs-mini-bookmark,
+.egs-list-item:active .egs-mini-bookmark,
+.egs-list-item:focus-within .egs-mini-bookmark,
+.group:hover .egs-mini-bookmark,
+.group:active .egs-mini-bookmark,
+.group:focus-within .egs-mini-bookmark,
+.egs-mini-bookmark:focus,
+.egs-mini-bookmark:active,
+.egs-mini-bookmark.is-active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: scale(1) !important;
+}
+
+.egs-mini-bookmark:hover {
+    transform: scale(1.15) !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    border-color: #ffffff !important;
+}
+
+.egs-mini-bookmark:active {
+    transform: scale(0.9) !important;
+}
+
+.egs-mini-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.egs-mini-tag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.3;
+}
+
+.egs-mini-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.01em;
+}
+
+.egs-mini-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.egs-mini-price u,
+.egs-list-item-price u {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Full Width Banner */
+.egs-full-banner-wrap {
+    width: 100%;
+    position: relative;
+}
+
+.egs-full-banner {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    display: block;
+    background-color: #18181c;
+    position: relative;
+    aspect-ratio: 21 / 8;
+    min-height: 240px;
+}
+
+.egs-full-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.egs-full-banner:hover img {
+    transform: scale(1.02);
+}
+
+.egs-banner-arrows {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* Vault (Free Games) */
+.egs-vault-box {
+    background-color: #202024;
+    border-radius: 16px;
+    padding: 32px 32px 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 640px) {
+    .egs-vault-box {
+        padding: 20px 16px 24px 16px;
+        border-radius: 14px;
+    }
+}
+
+.egs-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.egs-section-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.egs-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.01em;
+}
+
+.egs-outline-btn {
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, background-color 0.15s;
+    background: transparent;
+}
+
+.egs-outline-btn:hover {
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.egs-vault-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .egs-vault-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 560px) {
+    .egs-vault-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.egs-vault-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-vault-card:hover {
+    transform: translateY(-6px);
+}
+
+.egs-vault-poster {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #121216;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    aspect-ratio: 3 / 4;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.egs-vault-card:hover .egs-vault-poster {
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.egs-vault-poster-media {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.egs-vault-poster-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.egs-vault-card:hover .egs-vault-poster-media img {
+    transform: scale(1.06);
+}
+
+.egs-vault-banner {
+    width: 100%;
+    height: 34px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-bottom-left-radius: 11px;
+    border-bottom-right-radius: 11px;
+}
+
+.egs-vault-banner-now {
+    background-color: #0078f2;
+    color: #ffffff;
+}
+
+.egs-vault-banner-soon {
+    background-color: #000000;
+    color: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.egs-vault-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 12px 0 4px 0;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s ease;
+}
+
+.egs-vault-card:hover .egs-vault-title {
+    color: #0078f2;
+}
+
+.egs-vault-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Featured Discounts */
+.egs-discounts-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.egs-discount-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.egs-discount-poster {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #202024;
+    aspect-ratio: 3 / 4;
+    position: relative !important;
+}
+
+.egs-discount-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.egs-discount-card:hover .egs-discount-poster img {
+    transform: scale(1.03);
+}
+
+.egs-card-bookmark {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 9999px !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: scale(0.85) !important;
+    transition: opacity 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.18s ease, border-color 0.18s ease !important;
+    z-index: 25 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+/* Touch or Hover on card reveals the bookmark button */
+.group:hover .egs-card-bookmark,
+.group:focus-within .egs-card-bookmark,
+.egs-discount-card:hover .egs-card-bookmark,
+.egs-discount-poster:hover .egs-card-bookmark,
+.nui-product-card:hover .egs-card-bookmark,
+.egs-card-bookmark:hover,
+.egs-card-bookmark:focus,
+.egs-card-bookmark:active,
+.egs-card-bookmark.is-active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: scale(1) !important;
+}
+
+.egs-card-bookmark:hover {
+    transform: scale(1.15) !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    border-color: #ffffff !important;
+}
+
+.egs-card-bookmark:active {
+    transform: scale(0.92) !important;
+}
+
+.egs-card-bookmark.is-active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    border-color: #0078f2 !important;
+    color: #ffffff !important;
+}
+
+.egs-card-tag {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: none;
+    letter-spacing: normal;
+    margin-top: 4px;
+}
+
+.egs-card-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: #2a2a30;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 11px;
+    line-height: 16px;
+    min-height: 20px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    width: fit-content;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.egs-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.egs-price-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.egs-pill-discount {
+    background-color: #0078f2;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2.5px 8px;
+    border-radius: 9999px;
+    line-height: 16px;
+    min-height: 16px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.egs-old-price {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: line-through;
+}
+
+.egs-new-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* 3 Columns Top Lists */
+.egs-lists-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    padding-top: 8px;
+}
+
+.egs-list-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.egs-list-col-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.egs-list-col-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.egs-list-col-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.egs-list-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 10px;
+    margin: 0 -10px;
+    border-radius: 14px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: #ffffff;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                border-color 0.2s ease;
+    will-change: transform;
+}
+
+.egs-list-item:hover,
+.egs-list-item:focus-within {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.egs-list-item:active {
+    transform: translateY(-1px) scale(0.985) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    transition: transform 0.1s ease, background-color 0.1s ease !important;
+}
+
+.egs-list-thumb-wrap,
+.egs-list-item > div:first-child {
+    width: 64px;
+    height: 85px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background-color: #202024;
+    transition: box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-list-thumb-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: 10px;
+    transition: opacity 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-list-item:hover .egs-list-thumb-wrap::before,
+.egs-list-item:active .egs-list-thumb-wrap::before,
+.egs-list-item:focus-within .egs-list-thumb-wrap::before,
+.group:hover .egs-list-thumb-wrap::before,
+.group:active .egs-list-thumb-wrap::before {
+    opacity: 1;
+}
+
+.egs-list-thumb-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+    z-index: 12;
+}
+
+.egs-list-item:hover .egs-list-thumb-wrap::after,
+.egs-list-item:active .egs-list-thumb-wrap::after,
+.egs-list-item:focus-within .egs-list-thumb-wrap::after,
+.group:hover .egs-list-thumb-wrap::after,
+.group:active .egs-list-thumb-wrap::after {
+    animation: egsShimmerPass 0.85s ease-in-out;
+}
+
+.egs-list-item:hover .egs-list-thumb-wrap,
+.egs-list-item:hover > div:first-child,
+.egs-list-item:active .egs-list-thumb-wrap,
+.group:hover .egs-list-thumb-wrap {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+.egs-list-item-thumb {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    background-color: #18181c;
+    flex-shrink: 0;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease !important;
+    will-change: transform, filter;
+}
+
+.egs-list-item:hover .egs-list-item-thumb,
+.egs-list-item:active .egs-list-item-thumb,
+.egs-list-item:focus-within .egs-list-item-thumb,
+.group:hover .egs-list-item-thumb,
+.group:active .egs-list-item-thumb {
+    transform: scale(1.06) !important;
+    filter: brightness(1.12) !important;
+}
+
+.egs-list-item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+}
+
+.egs-list-item-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.01em;
+}
+
+.egs-list-item-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.egs-list-item-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+/* Duo Banners */
+.egs-duo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.egs-duo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.egs-duo-poster {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #18181c;
+    aspect-ratio: 16 / 9;
+}
+
+.egs-duo-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.egs-duo-card:hover .egs-duo-poster img {
+    transform: scale(1.02);
+}
+
+.egs-duo-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.egs-duo-desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.45;
+}
+
+.egs-duo-btn {
+    height: 36px;
+    padding: 0 20px;
+    border-radius: 8px;
+    background-color: #202024;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s;
+    width: fit-content;
+    border: none;
+    cursor: pointer;
+}
+
+.egs-duo-btn:hover {
+    background-color: #28282d;
+    color: #ffffff;
+}
+
+/* Trending Row */
+.egs-trending-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.egs-trending-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background-color: #18181c;
+    text-decoration: none;
+    display: block;
+    aspect-ratio: 16 / 9;
+}
+
+.egs-trending-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.egs-trending-card:hover img {
+    transform: scale(1.03);
+}
+
+/* Epic Footer */
+.egs-footer {
+    width: 100%;
+    background-color: #121212;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 48px 0 32px 0;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.egs-footer-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.egs-footer-social {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.egs-footer-social a {
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.15s;
+}
+
+.egs-footer-social a:hover {
+    color: #ffffff;
+}
+
+.egs-footer-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.egs-footer-col h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.egs-footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 24px;
+}
+
+.egs-footer-col a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.egs-footer-col a:hover {
+    color: #ffffff;
+}
+
+.egs-footer-legal {
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.6;
+    margin: 0;
+    font-size: 11px;
+}
+
+.egs-footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.egs-footer-bottom-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.egs-footer-bottom-links a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.egs-footer-bottom-links a:hover {
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   Epic Games Authentic Authentication System (Login, Register, Forgot Password)
+   ========================================================================== */
+.egs-auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 120px);
+    padding: 48px 16px;
+    background-color: #121212;
+}
+
+.egs-auth-card {
+    width: 100%;
+    max-width: 480px;
+    background-color: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+}
+
+.egs-auth-input {
+    width: 100%;
+    background-color: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.egs-auth-input:focus {
+    border-color: #0078f2;
+    box-shadow: 0 0 0 1px #0078f2;
+}
+
+.egs-auth-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.egs-auth-btn-primary {
+    width: 100%;
+    height: 48px;
+    background-color: #0078f2;
+    color: #ffffff;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.025em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.05s;
+    box-shadow: 0 4px 14px rgba(0, 120, 242, 0.3);
+}
+
+.egs-auth-btn-primary:hover:not(:disabled) {
+    background-color: #0068d6;
+}
+
+.egs-auth-btn-primary:active:not(:disabled) {
+    background-color: #005bb5;
+}
+
+.egs-auth-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.egs-auth-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #202024;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px 6px;
+    min-height: 76px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-align: center;
+    width: 100%;
+}
+
+.egs-auth-tile:hover {
+    background-color: #28282d;
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
+.egs-auth-grid-3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+.egs-auth-grid-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+.egs-auth-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #fca5a5;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Epic Games Authentic Animation & Micro-Interactions System
+   ========================================================================== */
+
+/* 1. Page Fade-In Entrance */
+@keyframes egsPageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.egs-wrap, .egs-auth-container {
+    animation: egsPageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 2. Hero Rail Timer Progress Bar */
+@keyframes egsRailTimer {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+.egs-rail-timer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0078f2, #40a9ff);
+    border-radius: 9999px;
+    animation: egsRailTimer 5s linear infinite;
+}
+
+/* 3. Hero Stage Cross-Fade & Zoom Transition */
+@keyframes egsHeroSlideFade {
+    0% {
+        opacity: 0.3;
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.egs-hero-stage-animated {
+    animation: egsHeroSlideFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Signature Epic Games Card Elevation & Image Zoom */
+.egs-card-hover {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
+    will-change: transform;
+}
+
+.egs-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.75);
+}
+
+.egs-card-hover img,
+.egs-vault-card img,
+.egs-discount-card img,
+.egs-trending-card img,
+.egs-mini-card img {
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease;
+    will-change: transform;
+}
+
+.egs-card-hover:hover img,
+.egs-vault-card:hover img,
+.egs-discount-card:hover img,
+.egs-trending-card:hover img,
+.egs-mini-card:hover img {
+    transform: scale(1.045);
+    filter: brightness(1.08);
+}
+
+/* 5. Free Games Vault Badges & Subtle Pulsing Glow */
+@keyframes egsPulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 120, 242, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 12px 2px rgba(0, 120, 242, 0.35);
+    }
+}
+
+.egs-badge-free {
+    animation: egsPulseGlow 2.5s infinite ease-in-out;
+}
+
+/* 6. Shimmer Light Reflection on Free Games Vault Cards */
+@keyframes egsShimmerPass {
+    0% { transform: translateX(-150%) skewX(-20deg); }
+    100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+.egs-shimmer-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.egs-shimmer-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+}
+
+.egs-shimmer-card:hover::after {
+    animation: egsShimmerPass 0.85s ease-in-out;
+}
+
+/* 7. Circular Arrow & Nav Buttons Physics */
+.egs-circle-btn {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, box-shadow 0.2s ease !important;
+}
+
+.egs-circle-btn:hover {
+    transform: scale(1.15) !important;
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.egs-circle-btn:active {
+    transform: scale(0.92) !important;
+}
+
+/* 8. Top 3 Lists Column Row Hover */
+.egs-column-row {
+    transition: background-color 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 8px;
+    padding: 6px 8px;
+}
+
+.egs-column-row:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: translateX(4px);
+}
+
+.egs-column-row img {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-column-row:hover img {
+    transform: scale(1.08);
+}
+
+/* 9. SSO & Auth Tiles Micro-Physics */
+.egs-auth-tile {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease !important;
+}
+
+.egs-auth-tile:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.22) !important;
+    background-color: #28282d !important;
+}
+
+.egs-auth-tile:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+.egs-auth-tile svg, .egs-auth-tile span {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.egs-auth-tile:hover svg {
+    transform: scale(1.15);
+}
+
+/* 10. Epic Blue Buttons Hover Glow & Active Ripple */
+.egs-auth-btn-primary, .egs-btn-download {
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.egs-auth-btn-primary:hover:not(:disabled), .egs-btn-download:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 120, 242, 0.45) !important;
+}
+
+.egs-auth-btn-primary:active:not(:disabled), .egs-btn-download:active {
+    transform: translateY(0) scale(0.98) !important;
+}
+
+/* 11. Search Box Interactive Focus Glow */
+.egs-search-box {
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.egs-search-box:focus-within {
+    border-color: #0078f2 !important;
+    background-color: #202024 !important;
+    box-shadow: 0 0 0 3px rgba(0, 120, 242, 0.3) !important;
+}
+
+/* 12. Subnav Links Sliding Underline Animation */
+.egs-subnav-link {
+    position: relative;
+}
+
+.egs-subnav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #0078f2;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+    border-radius: 3px 3px 0 0;
+    box-shadow: 0 0 10px rgba(0, 120, 242, 0.75);
+    transform: scaleX(0);
+    transform-origin: center;
+    opacity: 0;
+}
+
+.egs-subnav-link.active::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+.egs-subnav-link:hover:not(.active)::after {
+    transform: scaleX(0.5);
+    opacity: 0.5;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: none;
+}
+
+/* 13. Hero Action Buttons (Buy Now, Gift, Wishlist) Physics */
+.egs-hero-btn-primary {
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.egs-hero-btn-primary:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.35) !important;
+}
+
+.egs-hero-btn-primary:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+.egs-hero-btn-icon {
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.egs-hero-btn-icon:hover {
+    transform: translateY(-2px) scale(1.08) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+.egs-hero-btn-icon:active {
+    transform: scale(0.92) !important;
+}
+
+/* 14. Vault Ambient Pulsing Glow */
+@keyframes egsVaultPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 120, 242, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    50% {
+        box-shadow: 0 0 28px 4px rgba(0, 120, 242, 0.2), inset 0 0 0 1px rgba(0, 120, 242, 0.35);
+    }
+}
+
+.egs-vault-box {
+    animation: egsVaultPulse 5s infinite ease-in-out;
+}
+
+/* 15. Discount Cards Badge Pop */
+.egs-discount-card {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.egs-discount-card:hover {
+    transform: translateY(-4px);
+    box-shadow: none !important;
+}
+
+.egs-duo-card:hover {
+    box-shadow: none !important;
+}
+
+.egs-discount-card:hover .egs-discount-pill {
+    transform: scale(1.08);
+    box-shadow: 0 2px 10px rgba(0, 120, 242, 0.6);
+}
+
+.egs-discount-pill {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 16. Horizontal Ranking & Mini Cards (Synced with Large Game Card Physics) */
+.egs-mini-card:hover .egs-mini-thumb,
+.egs-list-item:hover .egs-list-item-thumb,
+.egs-list-item:active .egs-list-item-thumb,
+.group:hover .egs-list-item-thumb,
+.group:hover .egs-mini-thumb {
+    transform: scale(1.06) !important;
+    filter: brightness(1.12) !important;
+}
+
+/* 17. Discover Banner Button Physics */
+.egs-discover-btn {
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.egs-discover-btn:hover {
+    transform: translateX(-50%) translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5) !important;
+    background-color: #ffffff !important;
+}
+
+.egs-discover-btn:active {
+    transform: translateX(-50%) translateY(0) scale(0.97) !important;
+}
+
+/* 18. Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+.egs-discounts-track {
+    scroll-behavior: smooth;
+}
+
+/* ==========================================================================
+   19. EPIC GAMES STORE POPUPS, MODALS & FLYOUT ANIMATIONS
+   ========================================================================== */
+
+@keyframes egsModalZoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.93) translateY(14px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes egsFlyoutFadeDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes egsCartFlyoutIn {
+    0% {
+        opacity: 0;
+        transform: translateX(40px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes egsChatPopupOpen {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(24px);
+        transform-origin: bottom right;
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        transform-origin: bottom right;
+    }
+}
+
+@keyframes egsBackdropFade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes egsQuickSearchFade {
+    0% {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Backdrop */
+.egs-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: egsBackdropFade 0.22s ease-out forwards;
+}
+
+/* Modal Card */
+.egs-modal-card {
+    position: relative;
+    width: 100%;
+    background: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1.25rem;
+    box-shadow: 0 25px 65px -12px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    animation: egsModalZoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    overflow: hidden;
+}
+
+/* Flyout Popover */
+.egs-flyout-menu {
+    background: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1rem;
+    box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.95);
+    animation: egsFlyoutFadeDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Quick Search Dropdown */
+.egs-quick-search-dropdown {
+    animation: egsQuickSearchFade 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: 0 18px 45px -5px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Added to Cart Flyout Banner */
+.egs-cart-flyout {
+    animation: egsCartFlyoutIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Chat Widget Animated Window */
+.egs-chat-window-animated {
+    animation: egsChatPopupOpen 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Account Menu Items */
+.egs-account-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+.egs-account-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.egs-account-item svg {
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.15s ease;
+}
+
+.egs-account-item:hover svg {
+    color: #ffffff;
+}
+
+/* Mobile Drawer Animation */
+@keyframes egsDrawerSlideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.egs-drawer-in {
+    background-color: #16161a !important;
+    animation: egsDrawerSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Profile Layout Structure */
+.egs-profile-container {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.egs-profile-sidebar {
+    width: 288px !important;
+    min-width: 288px !important;
+    max-width: 288px !important;
+    flex-shrink: 0 !important;
+    position: sticky;
+    top: 104px;
+}
+
+.egs-profile-content {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: calc(100% - 320px) !important;
+}
+
+@media (max-width: 1024px) {
+    .egs-profile-container {
+        flex-direction: column !important;
+    }
+    .egs-profile-sidebar {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        position: static !important;
+    }
+    .egs-profile-content {
+        width: 100% !important;
+    }
+}
+
+/* Account Flyout & Status Dot */
+.egs-flyout-menu {
+    width: 330px !important;
+    min-width: 330px !important;
+    background-color: #18181c !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95) !important;
+    border-radius: 16px !important;
+    padding: 12px !important;
+}
+
+/* Epic Games Ecosystem Switcher Popover */
+.egs-ecosystem-panel {
+    width: 540px !important;
+    min-width: 540px !important;
+    max-width: min(540px, calc(100vw - 24px)) !important;
+    background-color: #18181c !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 1px rgba(255, 255, 255, 0.2) !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    animation: egsDrawerSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.egs-ecosystem-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+.egs-ecosystem-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background-color: #202024 !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.egs-ecosystem-card:hover {
+    background-color: #28282d !important;
+    border-color: rgba(0, 120, 242, 0.45) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+.egs-ecosystem-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 580px) {
+    .egs-ecosystem-panel {
+        width: calc(100vw - 24px) !important;
+        min-width: 0 !important;
+        left: -8px !important;
+    }
+    .egs-ecosystem-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.egs-status-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #10b981 !important;
+    border: 2px solid #18181c !important;
+    z-index: 2;
+}
+
+/* Support Center Grid & Layout */
+.egs-support-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.egs-support-faq {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+}
+
+.egs-support-ticket {
+    width: 440px !important;
+    min-width: 440px !important;
+    max-width: 440px !important;
+    flex-shrink: 0 !important;
+}
+
+.egs-topics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+@media (max-width: 1024px) {
+    .egs-support-grid {
+        flex-direction: column !important;
+    }
+    .egs-support-ticket {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+    .egs-topics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .egs-topics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Distribution / Developer Publishing Portal */
+.egs-dist-hero {
+    position: relative;
+    border-radius: 24px;
+    background: radial-gradient(circle at 80% 20%, rgba(0, 120, 242, 0.18) 0%, rgba(20, 20, 26, 0.98) 60%, #121216 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.egs-dist-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.egs-dist-hero-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 1024px) {
+    .egs-dist-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+}
+
+.egs-dist-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 640px) {
+    .egs-dist-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.egs-dist-calc-box {
+    background-color: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+}
+
+.egs-dist-calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 32px;
+    align-items: center;
+}
+
+@media (max-width: 1024px) {
+    .egs-dist-calc-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}
+
+.egs-dist-calc-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .egs-dist-calc-results {
+        grid-template-columns: 1fr;
+    }
+}
+
+.egs-dist-stat-pill {
+    background-color: #202024;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px 18px;
+    transition: all 0.2s ease;
+}
+
+.egs-dist-stat-pill:hover {
+    border-color: rgba(0, 120, 242, 0.4);
+    background-color: #26262c;
+    transform: translateY(-2px);
+}
+
+.egs-dist-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .egs-dist-pillars-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .egs-dist-pillars-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.egs-dist-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .egs-dist-tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .egs-dist-tools-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.egs-dist-workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .egs-dist-workflow-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .egs-dist-workflow-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.egs-dist-step-card {
+    position: relative;
+    background-color: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 24px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.egs-dist-step-card:hover {
+    background-color: #202026;
+    border-color: rgba(0, 120, 242, 0.45);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.egs-dist-table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    transition: background-color 0.15s ease;
+}
+
+.egs-dist-table-row:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+@media (max-width: 640px) {
+    .egs-dist-table-row {
+        grid-template-columns: 1.5fr 1fr 1fr;
+        font-size: 12px;
+        padding: 12px 14px;
+    }
+}
+
+/* Dedicated Developer Distribution Navigation Menu */
+.egs-dist-nav-sticky {
+    position: sticky;
+    top: 80px;
+    z-index: 35;
+    background-color: rgba(18, 18, 22, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    width: 100%;
+}
+
+/* Distribution Anchor Targets Offset (Navbar 80px + Subnav 56px = 136px + 16px buffer) */
+.egs-dist-hero,
+#overview,
+#categories,
+#games,
+#apps,
+#calculator,
+#benefits,
+#tools,
+#workflow,
+#faq {
+    scroll-margin-top: 152px !important;
+}
+
+.egs-dist-nav-scroll {
+    overflow-x: auto;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.egs-dist-nav-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.egs-dist-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+}
+
+.egs-dist-nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.egs-dist-nav-link.active {
+    color: #ffffff;
+    background-color: rgba(0, 120, 242, 0.16);
+    border-color: rgba(0, 120, 242, 0.4);
+    box-shadow: 0 0 12px rgba(0, 120, 242, 0.2);
+}
+
+.egs-dist-dual-card {
+    position: relative;
+    border-radius: 20px;
+    background: #18181c;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 28px;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.egs-dist-dual-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+}
+
+
+/* Responsive Home Grids (Defect 3.2 Fix) */
+@media (max-width: 1024px) {
+    .egs-discounts-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (max-width: 640px) {
+    .egs-discounts-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 900px) {
+    .egs-lists-row { grid-template-columns: 1fr !important; gap: 24px !important; }
+    .egs-trending-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 768px) {
+    .egs-duo-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+    .egs-trending-grid { grid-template-columns: 1fr !important; }
+}

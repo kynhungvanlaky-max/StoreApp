@@ -1,0 +1,56 @@
+@namespace Frontend.Components.Shared
+
+<span class="inline-flex items-center justify-center shrink-0 @Class" title="@PlatformName" aria-label="@PlatformName">
+    @switch (NormalizedPlatform)
+    {
+        case "steam":
+            @* Official Steam Vector Icon *@
+            <svg class="w-full h-full" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.477 2 2 6.477 2 12C2 16.326 4.747 19.99 8.625 21.375L11.375 17.5C11.125 16.925 11 16.275 11 15.5C11 13.015 13.015 11 15.5 11C17.985 11 20 13.015 20 15.5C20 17.985 17.985 20 15.5 20C15.025 20 14.575 19.925 14.15 19.775L10.025 21.825C10.65 21.95 11.325 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2ZM15.5 12.5C17.157 12.5 18.5 13.843 18.5 15.5C18.5 17.157 17.157 18.5 15.5 18.5C13.843 18.5 12.5 17.157 12.5 15.5C12.5 13.843 13.843 12.5 15.5 12.5ZM7.75 14C8.993 14 10 15.007 10 16.25C10 16.65 9.875 17.025 9.675 17.325L7.25 16.125C7.25 16.075 7.25 16.025 7.25 16C7.25 15.175 6.575 14.5 5.75 14.5C5.7 14.5 5.65 14.5 5.6 14.525L6.8 12.1C7.1 12.3 7.475 12.425 7.875 12.425C9.118 12.425 10.125 13.432 10.125 14.675" />
+            </svg>
+            break;
+
+        case "epic" or "epicgames" or "epic games":
+            @* Epic Games Shield Logo *@
+            <svg class="w-full h-full" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 2L20 4.5V17L12 22L4 17V2ZM12 5.5L6.5 6.5V15.5L12 19L17.5 15.5V6.5L12 5.5ZM9 8.5H15V10.5H11.5V11.5H14.5V13.5H11.5V15H15V16.5H9V8.5Z" />
+            </svg>
+            break;
+
+        case "xbox" or "gamepass" or "game pass":
+            @* Xbox Logo *@
+            <svg class="w-full h-full" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM5.2 6.8C6.9 5.2 9.3 4.2 12 4.2C14.7 4.2 17.1 5.2 18.8 6.8C16.8 8.9 14.4 12.2 13.5 14C12.9 15.2 12.3 16.5 12 17.2C11.7 16.5 11.1 15.2 10.5 14C9.6 12.2 7.2 8.9 5.2 6.8ZM4 12C4 10.4 4.5 9 5.3 7.8C6.7 9.8 8.8 12.7 9.8 14.6C8.2 17.4 6.5 19.3 5.4 19.3C4.5 17.3 4 14.7 4 12ZM12 19.8C11.6 19.8 9.5 18.5 8.2 16.2C8.9 15 9.7 13.5 10.6 11.8C11.2 10.7 11.7 9.8 12 9.2C12.3 9.8 12.8 10.7 13.4 11.8C14.3 13.5 15.1 15 15.8 16.2C14.5 18.5 12.4 19.8 12 19.8ZM18.7 19.3C17.5 19.3 15.8 17.4 14.2 14.6C15.2 12.7 17.3 9.8 18.7 7.8C19.5 9 20 10.4 20 12C20 14.7 19.5 17.3 18.7 19.3Z" />
+            </svg>
+            break;
+
+        case "playstation" or "psn" or "ps5" or "ps4":
+            @* PlayStation Logo *@
+            <svg class="w-full h-full" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.5 3C7.5 3 6.8 4.2 6.8 5.7V17.8L10 16.7V7.1C10 6.2 10.4 5.7 11.4 5.7C12.4 5.7 12.8 6.2 12.8 7.1V10.2L16 9.1V6.9C16 4.3 14.3 3 11.7 3H9.5ZM2.8 17.4C1.9 17.7 1.8 18.3 2.5 18.6C4.1 19.3 6.5 19.7 9.4 19.8L10.5 19.5V17.6C8.2 17.4 6.2 17.1 4.7 16.6L2.8 17.4ZM11.8 19.1L13.5 18.5C15.6 17.9 17.7 16.9 19.3 15.8C20 15.3 20.3 14.8 19.8 14.5C19.2 14.1 18.2 14.3 17.5 14.7C16 15.6 14.1 16.5 12 16.9L11.8 19.1ZM21.5 18C22.2 17.6 22.3 17 21.6 16.7C20.4 16.2 18.7 15.8 16.5 15.7L15.3 16.1V18C17.2 18.1 18.9 18.4 20.2 18.7L21.5 18Z" />
+            </svg>
+            break;
+
+        default:
+            @* Global Key / License Activation Badge *@
+            <svg class="w-full h-full" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 14C5.34315 14 4 12.6569 4 11C4 9.34315 5.34315 8 7 8C8.65685 8 10 9.34315 10 11C10 11.3506 9.93988 11.6872 9.82987 12H14V14H12V16H10V14H8.82987C8.42398 14.6139 7.75549 15 7 15V14ZM7 12C7.55228 12 8 11.5523 8 11C8 10.4477 7.55228 10 7 10C6.44772 10 6 10.4477 6 11C6 11.5523 6.44772 12 7 12ZM15 4H19C20.1046 4 21 4.89543 21 6V18C21 19.1046 20.1046 20 19 20H15V18H19V6H15V4Z" />
+            </svg>
+            break;
+    }
+</span>
+
+@code {
+    [Parameter] public string Platform { get; set; } = "steam";
+    [Parameter] public string Class { get; set; } = "w-4 h-4";
+
+    private string NormalizedPlatform => Platform.Trim().ToLowerInvariant();
+    private string PlatformName => NormalizedPlatform switch
+    {
+        "steam" => "Kích hoạt trên Steam",
+        "epic" or "epicgames" or "epic games" => "Kích hoạt trên Epic Games",
+        "xbox" or "gamepass" => "Kích hoạt trên Xbox / Microsoft",
+        "playstation" or "psn" => "Kích hoạt trên PlayStation Network",
+        _ => "Key kích hoạt bản quyền"
+    };
+}

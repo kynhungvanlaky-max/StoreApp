@@ -1,0 +1,116 @@
+@inject Frontend.ViewModels.AssistantViewModel VM
+@implements IDisposable
+
+<div class="nui-chat-widget fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none text-white">
+    
+    @* Chat Window Popup *@
+    @if (_isOpen)
+    {
+        <div class="egs-chat-window-animated w-80 sm:w-96 h-[520px] max-h-[75vh] bg-[#18181c] border border-white/10 rounded-2xl flex flex-col overflow-hidden pointer-events-auto shadow-2xl shadow-black/90">
+            @* Header *@
+            <div class="bg-[#202024] px-4 py-3.5 flex items-center gap-3 border-b border-white/10 select-none">
+                <div class="relative">
+                    <div class="w-9 h-9 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center">
+                        <Icon Name="HeroiconName.CpuChip" Class="w-5 h-5 text-[#0078f2]" />
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#202024]"></div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-white text-sm leading-tight truncate">Trợ Lý AI NexusKeys</h3>
+                    <div class="text-[11px] text-white/60 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Trực tuyến • Hỗ trợ 24/7</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <a href="/assistant" class="w-7 h-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors" title="Mở toàn màn hình" aria-label="Mở trang trợ lý đầy đủ">
+                        <Icon Name="HeroiconName.ArrowTopRightOnSquare" Class="w-4 h-4" />
+                    </a>
+                    <button @onclick="ToggleChat" class="w-7 h-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors" title="Đóng" aria-label="Đóng trợ lý">
+                        <Icon Name="HeroiconName.XMark" Class="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+            
+            @* Messages *@
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#141418] custom-scrollbar" id="chat-widget-messages">
+                @foreach (var msg in VM.Messages)
+                {
+                    <Frontend.Components.Shared.ChatBubble Message="msg" />
+                }
+                @if (VM.IsTyping)
+                {
+                    <div class="chat chat-start">
+                        <div class="chat-image avatar">
+                            <div class="w-8 h-8 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center">
+                                <Icon Name="HeroiconName.CpuChip" Class="w-4 h-4" />
+                            </div>
+                        </div>
+                        <div class="chat-bubble bg-[#202024] border border-white/10 text-white/90 px-4 py-2.5 rounded-2xl shadow-sm">
+                            <span class="loading loading-dots loading-sm text-[#0078f2]"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            @* Input Footer *@
+            <div class="p-3 border-t border-white/10 bg-[#18181c]">
+                <form @onsubmit="VM.SendMessageAsync" @onsubmit:preventDefault="true" class="flex gap-2 relative items-center">
+                    <label for="chat-widget-input" class="sr-only">Nội dung tin nhắn</label>
+                    <input id="chat-widget-input" @bind="VM.InputText" @bind:event="oninput"
+                           class="w-full bg-[#202024] text-white placeholder:text-white/50 text-xs sm:text-sm rounded-xl pl-4 pr-11 py-2.5 outline-none focus:border-[#0078f2] border border-white/10 transition-colors"
+                           placeholder="Hỏi về game, đơn hàng, kích hoạt key..." />
+                    <button type="submit" aria-label="Gửi tin nhắn" disabled="@(string.IsNullOrWhiteSpace(VM.InputText) || VM.IsTyping)"
+                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white disabled:opacity-40 disabled:hover:bg-[#0078f2] flex items-center justify-center transition-colors">
+                        <Icon Name="HeroiconName.PaperAirplane" Class="w-4 h-4 transform -rotate-45 ml-0.5" />
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+    
+    @* Toggle Button *@
+    <button @onclick="ToggleChat" 
+            aria-label="@(_isOpen ? "Thu gọn trợ lý" : "Mở trợ lý")" 
+            aria-expanded="@_isOpen.ToString().ToLowerInvariant()"
+            class="pointer-events-auto w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 border shadow-2xl relative
+                   @(_isOpen ? "bg-[#28282d] border-white/20 text-white hover:bg-[#323238]" : "bg-[#0078f2] border-[#0078f2] text-white hover:bg-[#0068d6] hover:scale-105 shadow-[0_0_20px_rgba(0,120,242,0.4)]")">
+        @if (_isOpen)
+        {
+            <Icon Name="HeroiconName.ChevronDown" Class="w-6 h-6" />
+        }
+        else
+        {
+            <Icon Name="HeroiconName.ChatBubbleLeftEllipsis" Class="w-6 h-6" />
+        }
+    </button>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+</style>
+
+@code {
+    private bool _isOpen;
+    
+    protected override void OnInitialized()
+    {
+        VM.StateChanged += StateHasChanged;
+    }
+    
+    void ToggleChat() => _isOpen = !_isOpen;
+    
+    public void Dispose() => VM.StateChanged -= StateHasChanged;
+}

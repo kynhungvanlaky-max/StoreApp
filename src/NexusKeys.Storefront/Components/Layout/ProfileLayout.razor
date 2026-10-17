@@ -1,0 +1,143 @@
+@inherits LayoutComponentBase
+@layout MainLayout
+@inject NavigationManager NavigationManager
+@inject Frontend.ViewModels.ProfileViewModel VM
+@inject Frontend.ViewModels.AuthViewModel AuthVM
+@implements IDisposable
+
+<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    @* Subnav / Breadcrumb bar *@
+    <div class="flex items-center justify-between pb-6 mb-8 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <a href="/" class="text-xs font-bold text-white/60 hover:text-white transition-colors">TRANG CHỦ</a>
+            <span class="text-white/60 text-xs">/</span>
+            <span class="text-xs font-bold text-[#0078f2] tracking-wider uppercase">TRUNG TÂM TÀI KHOẢN</span>
+        </div>
+        <div class="text-xs text-white/60 hidden sm:block font-medium">
+            Hệ Sinh Thái Bản Quyền NexusKeys
+        </div>
+    </div>
+
+    <div class="egs-profile-container">
+        @* Sidebar Navigation *@
+        <aside class="egs-profile-sidebar space-y-4">
+            @* User Identity Card *@
+            <div class="bg-[#18181c] rounded-2xl border border-white/10 p-5 shadow-xl">
+                @{
+                    var displayName = !string.IsNullOrWhiteSpace(VM.Profile?.FullName) ? VM.Profile.FullName : (!string.IsNullOrWhiteSpace(AuthVM.Username) ? AuthVM.Username : "Người chơi");
+                    var email = !string.IsNullOrWhiteSpace(VM.Profile?.Email) ? VM.Profile.Email : (!string.IsNullOrWhiteSpace(AuthVM.Username) ? $"{AuthVM.Username.ToLower()}@nexuskeys.com" : "player@nexuskeys.com");
+                    var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Substring(0, 1).ToUpper() : "U";
+                    var isDev = string.Equals(AuthVM.Role, "Developer", StringComparison.OrdinalIgnoreCase);
+                    var isAdmin = string.Equals(AuthVM.Role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(AuthVM.Role, "Administrator", StringComparison.OrdinalIgnoreCase);
+                    var isStaff = string.Equals(AuthVM.Role, "Staff", StringComparison.OrdinalIgnoreCase);
+                }
+                <div class="flex items-center gap-3.5 mb-4">
+                    <div class="relative shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#0078f2] to-[#005bb5] text-white font-black text-lg flex items-center justify-center border border-white/20 shadow-md">
+                            @initial
+                        </div>
+                        <span class="egs-status-dot"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-sm font-black text-white truncate max-w-[130px]">@displayName</span>
+                            @if (isAdmin || isDev || isStaff)
+                            {
+                                <span class="px-2 py-0.5 rounded text-xs font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] border border-[#0078f2]/40 min-h-[16px] inline-flex items-center">
+                                    @(isAdmin ? "Admin" : (isDev ? "Dev" : "Staff"))
+                                </span>
+                            }
+                        </div>
+                        <span class="text-xs text-white/60 truncate block mt-0.5">@email</span>
+                    </div>
+                </div>
+
+                @* Wallet Balance Mini Widget *@
+                <div class="bg-[#202024] rounded-xl p-3 border border-white/5 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-white/70 uppercase tracking-wider block">Ví NexusPay</span>
+                        <span class="text-sm font-black text-white">@(VM.Profile?.WalletBalance.ToString("N0") ?? "0") ₫</span>
+                    </div>
+                    <a href="/profile/wallet" class="px-2.5 py-1 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] active:scale-95 text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm">
+                        + Nạp
+                    </a>
+                </div>
+            </div>
+
+            @* Navigation Menu Links *@
+            <nav class="bg-[#18181c] rounded-2xl border border-white/10 p-3 shadow-xl">
+                <div class="px-3 pt-2 pb-1 text-xs font-black text-white/70 uppercase tracking-widest">
+                    Cài đặt cá nhân
+                </div>
+                <div class="space-y-1">
+                    <a href="/profile" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/profile") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
+                        <Icon Name="HeroiconName.User" Class="w-4 h-4 shrink-0" />
+                        <span>Thông tin tài khoản</span>
+                    </a>
+                </div>
+
+                <div class="px-3 pt-4 pb-1 text-xs font-black text-white/70 uppercase tracking-widest border-t border-white/5 mt-3">
+                    Bản quyền & Giao dịch
+                </div>
+                <div class="space-y-1">
+                    <a href="/profile/library" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/profile/library") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
+                        <Icon Name="HeroiconName.Key" Class="w-4 h-4 shrink-0" />
+                        <span>Kho game & Key bản quyền</span>
+                    </a>
+                    <a href="/orders" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/orders") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
+                        <Icon Name="HeroiconName.DocumentText" Class="w-4 h-4 shrink-0" />
+                        <span>Lịch sử đơn hàng</span>
+                    </a>
+                    <a href="/profile/wallet" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/profile/wallet") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
+                        <Icon Name="HeroiconName.Wallet" Class="w-4 h-4 shrink-0" />
+                        <span>Ví Nexus & Nạp tiền</span>
+                    </a>
+                    <a href="/wishlist" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/wishlist") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
+                        <Icon Name="HeroiconName.Heart" Class="w-4 h-4 shrink-0" />
+                        <span>Danh sách yêu thích</span>
+                    </a>
+                </div>
+
+                <div class="px-3 pt-4 pb-1 text-xs font-black text-white/70 uppercase tracking-widest border-t border-white/5 mt-3">
+                    Trung tâm hỗ trợ
+                </div>
+                <div class="space-y-1">
+                    <a href="/support" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/support") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
+                        <Icon Name="HeroiconName.QuestionMarkCircle" Class="w-4 h-4 shrink-0" />
+                        <span>Gửi Ticket / Trợ giúp</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        @* Main Content *@
+        <main class="egs-profile-content">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        VM.StateChanged += StateHasChanged;
+    }
+
+    private bool IsActive(string href)
+    {
+        var currentUrl = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].Trim('/').ToLower();
+        
+        if (href == "/profile")
+        {
+            return currentUrl == "/profile";
+        }
+        
+        return currentUrl.StartsWith(href.ToLower());
+    }
+
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

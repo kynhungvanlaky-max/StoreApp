@@ -1,0 +1,129 @@
+@if (IsOpen)
+{
+    <div class="egs-modal-backdrop" 
+         @onclick="HandleBackdropClick"
+         role="dialog" 
+         aria-modal="true"
+         aria-labelledby="@_titleId">
+        
+        <div class="egs-modal-card @_computedMaxWidth p-6 sm:p-8"
+             @onclick:stopPropagation="true">
+            
+            @* Close Button *@
+            <button type="button" 
+                    class="absolute top-5 right-5 w-8 h-8 rounded-lg text-white/50 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors"
+                    aria-label="Đóng hộp thoại"
+                    title="Đóng hộp thoại"
+                    @onclick="CloseAsync">
+                <Icon Name="HeroiconName.XMark" Class="w-5 h-5" />
+            </button>
+
+            @* Header *@
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <div class="mb-6 pr-8">
+                    <h3 id="@_titleId" class="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
+                        @Title
+                    </h3>
+                    @if (!string.IsNullOrWhiteSpace(Subtitle))
+                    {
+                        <p class="text-xs sm:text-sm text-white/60 mt-1.5 leading-relaxed">
+                            @Subtitle
+                        </p>
+                    }
+                </div>
+            }
+
+            @* Body Content *@
+            <div class="text-white/80 text-sm leading-relaxed">
+                @ChildContent
+            </div>
+
+            @* Footer Actions *@
+            @if (ShowFooter)
+            {
+                <div class="mt-8 pt-5 border-t border-white/10 flex items-center justify-end gap-3 flex-wrap">
+                    @if (FooterContent != null)
+                    {
+                        @FooterContent
+                    }
+                    else
+                    {
+                        @if (ShowCancelButton)
+                        {
+                            <button type="button" 
+                                    class="px-5 py-2.5 rounded-lg border border-white/15 bg-transparent hover:bg-white/10 text-white/80 hover:text-white text-xs sm:text-sm font-semibold transition-colors"
+                                    @onclick="CloseAsync">
+                                @CancelText
+                            </button>
+                        }
+
+                        @if (OnConfirm.HasDelegate)
+                        {
+                            <button type="button" 
+                                    disabled="@IsProcessing"
+                                    class="px-6 py-2.5 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 flex items-center gap-2 disabled:opacity-50"
+                                    @onclick="ConfirmAsync">
+                                @if (IsProcessing)
+                                {
+                                    <span class="loading loading-spinner loading-xs"></span>
+                                }
+                                <span>@ConfirmText</span>
+                            </button>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public bool ShowFooter { get; set; } = true;
+    [Parameter] public bool ShowCancelButton { get; set; } = true;
+    [Parameter] public string CancelText { get; set; } = "Hủy";
+    [Parameter] public string ConfirmText { get; set; } = "Xác nhận";
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+    [Parameter] public bool IsProcessing { get; set; } = false;
+    [Parameter] public string MaxWidthClass { get; set; } = "max-w-md";
+
+    private string _titleId = "egs-modal-" + Guid.NewGuid().ToString("N")[..8];
+    private string _computedMaxWidth => MaxWidthClass;
+
+    private async Task HandleBackdropClick()
+    {
+        if (CloseOnBackdropClick)
+        {
+            await CloseAsync();
+        }
+    }
+
+    private async Task CloseAsync()
+    {
+        IsOpen = false;
+        if (IsOpenChanged.HasDelegate)
+        {
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        if (OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+    }
+
+    private async Task ConfirmAsync()
+    {
+        if (OnConfirm.HasDelegate)
+        {
+            await OnConfirm.InvokeAsync();
+        }
+    }
+}

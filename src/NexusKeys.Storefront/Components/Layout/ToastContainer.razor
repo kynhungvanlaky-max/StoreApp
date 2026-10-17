@@ -1,0 +1,128 @@
+@using Frontend.Services
+@inject ToastService ToastService
+@implements IDisposable
+
+<div class="fixed top-20 sm:top-24 right-4 sm:right-6 z-[100] flex flex-col gap-3 pointer-events-none max-w-sm w-full">
+    @foreach (var toast in ToastService.GetToasts())
+    {
+        string borderAccent = toast.Level switch
+        {
+            ToastLevel.Success => "border-l-emerald-500",
+            ToastLevel.Error => "border-l-red-500",
+            ToastLevel.Warning => "border-l-amber-500",
+            _ => "border-l-[#0078f2]"
+        };
+
+        string badgeBg = toast.Level switch
+        {
+            ToastLevel.Success => "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+            ToastLevel.Error => "bg-red-500/15 text-red-400 border-red-500/30",
+            ToastLevel.Warning => "bg-amber-500/15 text-amber-400 border-amber-500/30",
+            _ => "bg-[#0078f2]/15 text-[#0078f2] border-[#0078f2]/30"
+        };
+
+        string progressColor = toast.Level switch
+        {
+            ToastLevel.Success => "bg-emerald-500",
+            ToastLevel.Error => "bg-red-500",
+            ToastLevel.Warning => "bg-amber-500",
+            _ => "bg-[#0078f2]"
+        };
+
+        string labelText = toast.Level switch
+        {
+            ToastLevel.Success => "Thành công",
+            ToastLevel.Error => "Lỗi",
+            ToastLevel.Warning => "Cảnh báo",
+            _ => "Thông báo"
+        };
+        
+        string iconName = toast.Level switch
+        {
+            ToastLevel.Success => "HeroiconName.CheckCircle",
+            ToastLevel.Error => "HeroiconName.ExclamationCircle",
+            ToastLevel.Warning => "HeroiconName.ExclamationTriangle",
+            _ => "HeroiconName.InformationCircle"
+        };
+
+        <div class="relative bg-[#18181c]/95 backdrop-blur-xl border border-white/10 @borderAccent border-l-4 rounded-xl p-4 shadow-2xl shadow-black/80 pointer-events-auto transform transition-all duration-300 toast-enter overflow-hidden group">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg @badgeBg border flex items-center justify-center shrink-0">
+                    <Icon Name="@iconName" Class="w-5 h-5" IconType="HeroiconType.Solid" />
+                </div>
+                
+                <div class="flex-1 min-w-0 pr-1">
+                    <div class="text-xs font-black uppercase tracking-widest text-white/70 mb-0.5">
+                        @labelText
+                    </div>
+                    <p class="text-sm font-semibold text-white/95 leading-snug break-words">
+                        @toast.Message
+                    </p>
+                </div>
+
+                <button type="button" 
+                        class="shrink-0 min-w-[36px] min-h-[36px] w-9 h-9 rounded-lg text-white/70 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078f2]" 
+                        aria-label="Đóng thông báo" 
+                        @onclick="() => ToastService.RemoveToast(toast.Id)">
+                    <Icon Name="HeroiconName.XMark" Class="w-4 h-4" />
+                </button>
+            </div>
+
+            @* NexusKeys subtle progress bar *@
+            <div class="absolute bottom-0 left-0 h-0.5 bg-white/5 w-full">
+                <div class="h-full @progressColor toast-progress"></div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    @@keyframes egsToastSlideIn {
+        0% {
+            transform: translateX(110%);
+            opacity: 0;
+        }
+        70% {
+            transform: translateX(-8px);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @@keyframes egsToastShrink {
+        from {
+            width: 100%;
+        }
+        to {
+            width: 0%;
+        }
+    }
+
+    .toast-enter {
+        animation: egsToastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .toast-progress {
+        animation: egsToastShrink 3s linear forwards;
+    }
+</style>
+
+@code {
+    private void OnToastChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnChange += OnToastChanged;
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnChange -= OnToastChanged;
+    }
+}

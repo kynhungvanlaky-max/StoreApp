@@ -1,0 +1,328 @@
+@page "/orders/{Id:int}"
+@inject Frontend.ViewModels.OrderViewModel VM
+@inject Frontend.Services.OrderService OrderService
+@inject Frontend.Services.ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@layout Frontend.Components.Layout.ProfileLayout
+@implements IDisposable
+
+<PageTitle>Chi Tiết Đơn Hàng #@Id — NexusKeys</PageTitle>
+<h1 class="sr-only">Chi tiết đơn hàng #@Id</h1>
+
+<div class="w-full">
+    @* Breadcrumbs *@
+    <div class="flex items-center gap-2 text-xs text-white/50 mb-6 font-semibold">
+        <a href="/profile" class="hover:text-white transition-colors">Hồ sơ</a>
+        <span>›</span>
+        <a href="/orders" class="hover:text-white transition-colors">Đơn hàng</a>
+        <span>›</span>
+        <span class="text-white">#@Id</span>
+    </div>
+    
+    @if (VM.IsLoading)
+    {
+        <div class="flex justify-center py-20">
+            <span class="loading loading-spinner loading-lg text-[#0078f2]"></span>
+        </div>
+    }
+    else if (VM.CurrentOrder == null)
+    {
+        <div class="p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-sm">Không tìm thấy thông tin đơn hàng này.</div>
+    }
+    else
+    {
+        var order = VM.CurrentOrder;
+        string badgeClass = order.Status switch
+        {
+            "Completed" => "bg-emerald-500/15 border-emerald-500/30 text-emerald-400",
+            "Pending" => "bg-amber-500/15 border-amber-500/30 text-amber-400",
+            "Failed" => "bg-red-500/15 border-red-500/30 text-red-400",
+            _ => "bg-white/5 border-white/10 text-white/60"
+        };
+        string statusText = order.Status switch
+        {
+            "Completed" => "Đã hoàn thành",
+            "Pending" => "Chờ thanh toán",
+            "Failed" => "Thất bại",
+            _ => order.Status
+        };
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-white flex flex-wrap items-center gap-3 tracking-tight">
+                    Đơn Hàng #@order.Id
+                    <span class="px-2.5 py-0.5 rounded-full border text-xs font-black uppercase tracking-wider @badgeClass">@statusText</span>
+                </h2>
+                <p class="text-white/50 text-xs sm:text-sm mt-1">Đặt lúc @order.OrderDate.ToString("HH:mm - dd/MM/yyyy")</p>
+            </div>
+            
+            <div class="flex items-center gap-3 flex-wrap">
+                <button type="button" @onclick="() => _showInvoiceModal = true" class="px-4 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold flex items-center gap-2 transition-colors">
+                    <Icon Name="HeroiconName.DocumentText" Class="w-4 h-4 text-[#0078f2]" />
+                    <span>Hóa đơn điện tử</span>
+                </button>
+
+                @if (order.Status == "Pending")
+                {
+                    <button type="button" class="px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-[#0078f2]/30 active:scale-95" @onclick="() => RetryPaymentAsync(order.Id)" disabled="@_isPaying">
+                        @if (_isPaying)
+                        {
+                            <span class="loading loading-spinner loading-xs mr-1"></span>
+                        }
+                        else
+                        {
+                            <Icon Name="HeroiconName.CreditCard" Class="w-4 h-4 mr-1 inline-block" />
+                        }
+                        Thanh toán ngay
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="bg-[#18181c] rounded-2xl border border-white/10 shadow-xl overflow-hidden mb-8">
+            <div class="p-4 sm:p-5 border-b border-white/10 bg-[#202024]/60">
+                <h3 class="font-bold text-white text-sm uppercase tracking-wider">Sản phẩm đã mua</h3>
+            </div>
+            
+            <div class="divide-y divide-white/5">
+                @foreach (var itemName in order.Items)
+                {
+                    <div class="p-4 sm:p-5 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-[#202024] rounded-xl border border-white/10 flex items-center justify-center">
+                                <Icon Name="HeroiconName.PuzzlePiece" Class="w-6 h-6 text-[#0078f2]" />
+                            </div>
+                            <span class="font-bold text-white text-sm">@itemName</span>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="p-5 sm:p-6 bg-[#202024]/40 border-t border-white/10 flex justify-end">
+                <div class="w-64 space-y-2">
+                    <div class="flex justify-between text-white/50 text-xs">
+                        <span>Tạm tính</span>
+                        <span class="text-white font-medium">@order.TotalAmount.ToString("N0") đ</span>
+                    </div>
+                    <div class="h-[1px] bg-white/10 my-2"></div>
+                    <div class="flex justify-between items-center text-base">
+                        <span class="font-bold text-white">Tổng cộng</span>
+                        <span class="font-black text-[#0078f2]">@order.TotalAmount.ToString("N0") đ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (order.Status == "Completed" && order.Keys != null && order.Keys.Count > 0)
+        {
+            <div class="bg-[#18181c] rounded-2xl border border-[#0078f2]/30 shadow-xl overflow-hidden relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0078f2] to-cyan-400"></div>
+                <div class="p-5 sm:p-6 border-b border-white/10 flex items-center gap-2">
+                    <Icon Name="HeroiconName.Key" Class="w-5 h-5 text-[#0078f2]" />
+                    <h3 class="font-bold text-white text-base">License Keys Kích Hoạt</h3>
+                </div>
+                
+                <div class="p-5 sm:p-6 space-y-4">
+                    @foreach (var key in order.Keys)
+                    {
+                        <div class="bg-[#202024] p-4 rounded-xl border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <div class="text-[11px] text-white/40 uppercase font-bold tracking-wider mb-1">Sản phẩm</div>
+                                <div class="font-bold text-white text-sm">@key.ProductName</div>
+                            </div>
+                            
+                            <div class="flex-1 md:text-right w-full md:w-auto">
+                                <div class="text-[11px] text-white/40 uppercase font-bold tracking-wider mb-1">Mã kích hoạt</div>
+                                <div class="flex gap-2">
+                                    <input type="text" value="@key.KeyCode" aria-label="License Key của @key.ProductName" readonly class="w-full md:w-auto font-mono text-center tracking-widest text-[#0078f2] font-black bg-[#18181c] border border-white/15 rounded-xl px-4 py-2 text-xs outline-none" />
+                                    <button type="button" aria-label="Sao chép License Key của @key.ProductName" class="w-9 h-9 rounded-xl bg-[#18181c] hover:bg-white/15 border border-white/15 text-white flex items-center justify-center transition-colors" title="Sao chép" @onclick="() => CopyToClipboard(key.KeyCode)">
+                                        <Icon Name="HeroiconName.DocumentDuplicate" Class="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="p-4 rounded-xl bg-[#0078f2]/10 text-[#0078f2] border border-[#0078f2]/20 text-xs flex items-center gap-2">
+                        <Icon Name="HeroiconName.InformationCircle" Class="w-5 h-5 shrink-0" />
+                        <span>Vui lòng bảo mật kỹ mã kích hoạt của bạn. Không chia sẻ mã này cho người khác.</span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@* e-Invoice Modal *@
+@if (_showInvoiceModal && VM.CurrentOrder != null)
+{
+    var order = VM.CurrentOrder;
+    <div class="egs-modal-backdrop" @onclick="() => _showInvoiceModal = false" role="dialog" aria-modal="true" aria-labelledby="invoice-modal-title">
+        <div class="egs-modal-card max-w-xl p-6 sm:p-8" style="max-height: 90vh; overflow-y: auto;" @onclick:stopPropagation="true">
+            <button type="button" 
+                    class="absolute top-4 right-4 w-8 h-8 rounded-lg text-white/50 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors"
+                    aria-label="Đóng"
+                    @onclick="() => _showInvoiceModal = false">
+                <Icon Name="HeroiconName.XMark" Class="w-5 h-5" />
+            </button>
+
+            @* Invoice Header *@
+            <div class="border-b border-white/10 pb-5 mb-5">
+                <div class="flex items-center justify-between gap-4 mb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-[#0078f2] flex items-center justify-center text-white font-black text-sm">NK</div>
+                        <div>
+                            <span class="font-bold text-white text-sm block">NEXUSKEYS STORE</span>
+                            <span class="text-xs text-white/50 block">Công Ty CP Công Nghệ Nexus Interactive</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase">Hóa đơn hợp lệ</span>
+                    </div>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 id="invoice-modal-title" class="text-lg font-black text-white tracking-wide uppercase">HÓA ĐƠN ĐIỆN TỬ (e-INVOICE)</h3>
+                    <p class="text-[11px] text-white/50 mt-0.5">Ký hiệu: <span class="font-mono text-white/70">1C26TNK</span> • Số: <span class="font-mono text-[#0078f2] font-bold">#NK-@order.Id.ToString("D6")</span></p>
+                </div>
+            </div>
+
+            @* Meta Info *@
+            <div class="grid grid-cols-2 gap-3 text-xs bg-white/5 p-3.5 rounded-xl border border-white/5 mb-5">
+                <div>
+                    <span class="text-white/40 block text-xs uppercase font-bold">Mã số thuế bên bán</span>
+                    <span class="text-white font-mono font-medium">0317894562</span>
+                </div>
+                <div>
+                    <span class="text-white/40 block text-xs uppercase font-bold">Ngày lập hóa đơn</span>
+                    <span class="text-white font-medium">@order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                </div>
+                <div>
+                    <span class="text-white/40 block text-xs uppercase font-bold">Hình thức thanh toán</span>
+                    <span class="text-white font-medium">VNPay / Thẻ trực tuyến</span>
+                </div>
+                <div>
+                    <span class="text-white/40 block text-xs uppercase font-bold">Mã tra cứu hóa đơn</span>
+                    <span class="text-white font-mono text-[11px] text-emerald-400">@($"TRA-CUU-NK-{order.Id * 9876}")</span>
+                </div>
+            </div>
+
+            @* Products Table *@
+            <div class="mb-5">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="border-b border-white/10 text-white/40 text-xs uppercase">
+                            <th class="pb-2">Sản phẩm / Dịch vụ</th>
+                            <th class="pb-2 text-center">SL</th>
+                            <th class="pb-2 text-right">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        @foreach (var item in order.Items)
+                        {
+                            <tr>
+                                <td class="py-2.5 pr-2">
+                                    <div class="font-bold text-white">@item</div>
+                                    <span class="text-xs text-white/40">Bản quyền phần mềm điện tử (Key)</span>
+                                </td>
+                                <td class="py-2.5 text-center text-white/70">1</td>
+                                <td class="py-2.5 text-right font-bold text-white">
+                                    @((order.TotalAmount / Math.Max(1, order.Items.Count)).ToString("N0")) đ
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @* Total Summary *@
+            <div class="border-t border-white/10 pt-3 space-y-1 text-xs mb-5">
+                <div class="flex justify-between text-white/60">
+                    <span>Tổng tiền chưa thuế:</span>
+                    <span>@order.TotalAmount.ToString("N0") đ</span>
+                </div>
+                <div class="flex justify-between text-white/60">
+                    <span>Thuế suất VAT (0% phần mềm):</span>
+                    <span>0 đ</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-white/10">
+                    <span>Tổng cộng thanh toán:</span>
+                    <span class="text-base text-[#0078f2] font-black">@order.TotalAmount.ToString("N0") đ</span>
+                </div>
+            </div>
+
+            @* Digital Signature Badge *@
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-xs text-emerald-300 mb-6">
+                <Icon Name="HeroiconName.CheckBadge" Class="w-6 h-6 text-emerald-400 shrink-0" />
+                <div class="text-[11px] leading-tight">
+                    <span class="font-bold block text-emerald-400">CHỮ KÝ SỐ HỢP LỆ — NEXUSKEYS CA</span>
+                    <span class="text-emerald-300/70">Ký ngày: @order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss") • Chứng chỉ số còn hiệu lực</span>
+                </div>
+            </div>
+
+            @* Actions *@
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" @onclick="PrintInvoice" class="px-4 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                    <Icon Name="HeroiconName.ArrowDownTray" Class="w-4 h-4" />
+                    <span>In / Tải PDF</span>
+                </button>
+                <button type="button" @onclick="() => _showInvoiceModal = false" class="px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase tracking-wider transition-colors">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private bool _showInvoiceModal = false;
+
+    private async Task PrintInvoice()
+    {
+        await JSRuntime.InvokeVoidAsync("print");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadOrderDetailsAsync(Id);
+    }
+    
+    private bool _isPaying;
+
+    private async Task CopyToClipboard(string text)
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        ToastService.ShowSuccess("Đã sao chép License Key.");
+    }
+
+    private async Task RetryPaymentAsync(int orderId)
+    {
+        if (_isPaying) return;
+
+        _isPaying = true;
+        try
+        {
+            var response = await OrderService.RetryPaymentAsync(orderId);
+            if (response != null && !string.IsNullOrWhiteSpace(response.PaymentUrl))
+            {
+                NavigationManager.NavigateTo(response.PaymentUrl, forceLoad: true);
+                return;
+            }
+
+            ToastService.ShowError("Không thể khởi tạo lại thanh toán cho đơn hàng này.");
+        }
+        finally
+        {
+            _isPaying = false;
+        }
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+}

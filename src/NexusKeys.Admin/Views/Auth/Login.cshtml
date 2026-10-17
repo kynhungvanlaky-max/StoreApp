@@ -1,0 +1,41 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    Layout = null;
+    ViewData["Title"] = "Đang chuyển hướng...";
+    var frontendBaseUrl = Configuration["AppSettings:FrontendBaseUrl"]?.TrimEnd('/') ?? "http://localhost:5205";
+    var redirectTarget = $"{frontendBaseUrl}/login?returnUrl=/admin";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="0;url=@redirectTarget" />
+    <title>Chuyển hướng đăng nhập - NEXUS STORE</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script type="text/javascript">
+        window.location.replace("@Html.Raw(redirectTarget)");
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-xl p-8 text-center space-y-4">
+        <div class="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 text-white items-center justify-center mb-2 shadow-lg shadow-indigo-200">
+            <svg class="w-10 h-10 animate-pulse" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12C12 10.8954 12.8954 10 14 10H16.5C17.6046 10 18.5 10.8954 18.5 12V22L29.5 10.2C30.2 9.4 31.4 9.5 32 10.3C32.3 10.7 32.5 11.2 32.5 11.7V36C32.5 37.1046 31.6046 38 30.5 38H28C26.8954 38 26 37.1046 26 36V26L15 37.8C14.3 38.6 13.1 38.5 12.5 37.7C12.2 37.3 12 36.8 12 36.3V12Z" fill="white" />
+                <polygon points="34,8 37,12 34,16 31,12" fill="#FACC15" />
+            </svg>
+        </div>
+        <h1 class="text-xl font-bold text-slate-900">Đang chuyển hướng đăng nhập...</h1>
+        <p class="text-xs text-slate-500">Vui lòng đăng nhập qua Cổng Người Dùng NexusKeys để truy cập Quản trị.</p>
+        <div class="pt-4">
+            <a href="@redirectTarget" class="inline-block py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all">
+                Bấm vào đây nếu chưa được chuyển hướng
+            </a>
+        </div>
+    </div>
+</body>
+</html>

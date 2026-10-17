@@ -1,23 +1,27 @@
-# .NET
+# .NET Core build outputs
 **/bin/
 **/obj/
+
+# Node modules
+**/node_modules/
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
 *.user
 *.suo
-.vs/
+*.userosscache
+*.sln.docstates
 
-# Node.js
-**/node_modules/
-**/.next/
+# Temporary / Scratch files
+scratch/
+missing_*.txt
+*.log
+concept_*.html
+menu_styles_showcase.html
+Nexus_UI_Design_Report.docx
 
-# Environment / Secrets
-**/appsettings.Development.json
-**/.env
-**/.env.local
-
-# IDE
-.vscode/settings.json
-*.swp
-
-# OS
-**/.DS_Store
-**/Thumbs.db
+# OS files
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store

@@ -1,0 +1,3720 @@
+[
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 56,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-xs font-bold text-slate-800 uppercase tracking-wider\">Trạng Thái AI</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 67,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mô Hình Ưu Tiên (Provider)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 98,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Gemini API Key</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 109,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Model Name</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 121,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"text-xs font-bold text-slate-700 uppercase tracking-wider\">Temperature</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 148,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Ollama Base URL</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 152,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Model Name</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 174,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2\">Nhấp để chèn biến động vào vị trí con tr"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 234,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5\">Gợi ý câu hỏi nhanh:</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AiAssistantConfigs\\Index.cshtml",
+    "line": 550,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<i class=\"fa-solid fa-bolt text-[9px]\"></i> ${data.provider} (${data.latencyMs}ms)"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\AuditLogs\\Index.cshtml",
+    "line": 23,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Comments\\Index.cshtml",
+    "line": 23,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Coupons\\Index.cshtml",
+    "line": 26,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Coupons\\Index.cshtml",
+    "line": 93,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mã Code (Coupon Code)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Coupons\\Index.cshtml",
+    "line": 99,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Giảm (%)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Coupons\\Index.cshtml",
+    "line": 103,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Lượt Dùng Tối Đa</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Coupons\\Index.cshtml",
+    "line": 109,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Ngày Hết Hạn</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Home\\Index.cshtml",
+    "line": 21,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs uppercase tracking-wider font-extrabold text-slate-400\">Tổng doanh thu</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Home\\Index.cshtml",
+    "line": 25,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs uppercase tracking-wider font-extrabold text-slate-400\">Tổng đơn hàng</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Home\\Index.cshtml",
+    "line": 29,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs uppercase tracking-wider font-extrabold text-slate-400\">Key khả dụng</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Home\\Index.cshtml",
+    "line": 33,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs uppercase tracking-wider font-extrabold text-slate-400\">Khách hàng</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Home\\Index.cshtml",
+    "line": 37,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs uppercase tracking-wider font-extrabold text-slate-400\">Sản phẩm</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Home\\Index.cshtml",
+    "line": 41,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs uppercase tracking-wider font-extrabold text-slate-400\">Hỗ trợ đang chờ</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Keys\\Index.cshtml",
+    "line": 92,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/70 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Keys\\Index.cshtml",
+    "line": 106,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<code id=\"key-value-@k.Id\" data-key=\"@k.KeyCode\" data-visible=\"false\" class=\"font-mono font-bold text-indigo-600 trackin"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Keys\\Index.cshtml",
+    "line": 195,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider\">Chọn Sản Phẩm (Game)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Keys\\Index.cshtml",
+    "line": 204,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider\">Mã Key Game</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\News\\Index.cshtml",
+    "line": 29,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\News\\Index.cshtml",
+    "line": 126,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Tiêu Đề Bài Viết</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\News\\Index.cshtml",
+    "line": 131,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Tóm Tắt Nội Dung</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\News\\Index.cshtml",
+    "line": 136,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Hình Ảnh Bìa (Cover Image)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\News\\Index.cshtml",
+    "line": 148,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Nội Dung Chi Tiết</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Orders\\Details.cshtml",
+    "line": 83,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Orders\\Details.cshtml",
+    "line": 106,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl font-black text-slate-900 tracking-tight\">Đơn Hàng #ORD-${o.id}</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Orders\\Details.cshtml",
+    "line": 126,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs font-bold uppercase tracking-wider text-slate-400 mb-2\">Thông Tin Khách Hàng</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Orders\\Details.cshtml",
+    "line": 130,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs font-bold uppercase tracking-wider text-slate-400 mb-2\">Tổng Giá Trị Đơn Hàng</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Orders\\Index.cshtml",
+    "line": 33,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\PaymentConfigs\\Index.cshtml",
+    "line": 35,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mã Website (TmnCode)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\PaymentConfigs\\Index.cshtml",
+    "line": 39,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mã Khóa Bí Mật (HashSecret)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\PaymentConfigs\\Index.cshtml",
+    "line": 59,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mã Đối Tác (PartnerCode)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\PaymentConfigs\\Index.cshtml",
+    "line": 63,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">AccessKey</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 24,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 73,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Tên Game / Sản Phẩm</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 79,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Loại Sản Phẩm</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 87,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Giá Gốc (VNĐ)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 93,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Thể Loại (Danh Mục)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 101,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Nhà Phát Triển</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 105,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Trạng Thái</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 114,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Hình Ảnh & Video Sản Phẩm</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 128,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mô Tả Sản Phẩm</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Products\\Index.cshtml",
+    "line": 334,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "? `<video src=\"${safeUrl(m.url)}\" class=\"w-full h-full object-cover\"></video><span class=\"absolute bottom-1 left-1 bg-bl"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Promotions\\Index.cshtml",
+    "line": 26,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Promotions\\Index.cshtml",
+    "line": 93,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Tên Chiến Dịch Khuyến Mãi</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Promotions\\Index.cshtml",
+    "line": 98,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mức Giảm Giá (%)</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Promotions\\Index.cshtml",
+    "line": 104,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Ngày Bắt Đầu</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Promotions\\Index.cshtml",
+    "line": 108,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Ngày Kết Thúc</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Promotions\\Index.cshtml",
+    "line": 114,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Mô Tả Chiến Dịch</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Shared\\_Layout.cshtml",
+    "line": 59,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] font-extrabold text-slate-400 mb-1.5 px-3 uppercase tracking-wider\">Tổng Quan</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Shared\\_Layout.cshtml",
+    "line": 66,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] font-extrabold text-slate-400 mb-1.5 mt-5 px-3 uppercase tracking-wider\">Quản Lý Thương Mại</div"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Shared\\_Layout.cshtml",
+    "line": 103,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] font-extrabold text-slate-400 mb-1.5 mt-5 px-3 uppercase tracking-wider\">Nội Dung & Cấu Hình</di"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Shared\\_Layout.cshtml",
+    "line": 133,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] font-extrabold text-slate-400 mb-1.5 mt-5 px-3 uppercase tracking-wider\">Hệ Thống</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Shared\\_Layout.cshtml",
+    "line": 183,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl font-black text-slate-900 tracking-tight\">@ViewData[\"Title\"]</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Support\\Index.cshtml",
+    "line": 23,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Support\\Index.cshtml",
+    "line": 98,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider\">Chủ Đề Yêu Cầu</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Support\\Index.cshtml",
+    "line": 103,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider\">Nội Dung Khách Hàng Gửi</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Support\\Index.cshtml",
+    "line": 108,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider\">Nội Dung Phản Hồi Từ Admin</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Transactions\\Index.cshtml",
+    "line": 20,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\Views\\Users\\Index.cshtml",
+    "line": 24,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<tr class=\"text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80 border-b border-slate-200\">"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\nexus-admin.css",
+    "selector": ":where(h1, h2, h3, h4, h5, h6)",
+    "letterSpacing": "-.04em",
+    "lineHeight": "1.15"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\nexus-admin.css",
+    "selector": ".admin-brand-wordmark",
+    "letterSpacing": "-.06em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\nexus-admin.css",
+    "selector": ".admin-brand-subtitle",
+    "letterSpacing": ".01em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\nexus-admin.css",
+    "selector": "#adminSidebar nav > div",
+    "letterSpacing": ".02em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\nexus-admin.css",
+    "selector": "thead th",
+    "letterSpacing": ".02em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\site.css",
+    "selector": "h1,h2,h3,h4,h5,h6",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\site.css",
+    "selector": "button,input,optgroup,select,textarea",
+    "letterSpacing": "inherit",
+    "lineHeight": "inherit"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\site.css",
+    "selector": "blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\site.css",
+    "selector": ".tracking-tight",
+    "letterSpacing": "-.025em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\site.css",
+    "selector": ".tracking-wider",
+    "letterSpacing": ".05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\css\\site.css",
+    "selector": ".tracking-widest",
+    "letterSpacing": ".1em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+    "selector": "h6, h5, h4, h3, h2, h1",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+    "selector": "h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+    "selector": "h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+    "selector": "h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+    "selector": "h1,h2,h3,h4,h5,h6",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+    "selector": "h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+    "selector": "h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+    "selector": "h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+    "selector": "h6, h5, h4, h3, h2, h1",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+    "selector": "h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+    "selector": "h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+    "selector": "h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+    "selector": "h1,h2,h3,h4,h5,h6",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+    "selector": "h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+    "selector": "h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+    "selector": "h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+    "selector": "h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+    "selector": "h1, .h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+    "selector": "h2, .h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+    "selector": "h3, .h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+    "selector": ".tooltip",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+    "selector": ".popover",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+    "selector": ".h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+    "selector": ".h1,h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+    "selector": ".h2,h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+    "selector": ".h3,h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+    "selector": ".tooltip",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+    "selector": ".popover",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+    "selector": "h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+    "selector": "h1, .h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+    "selector": "h2, .h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+    "selector": "h3, .h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+    "selector": ".tooltip",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+    "selector": ".popover",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+    "selector": ".h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6",
+    "letterSpacing": null,
+    "lineHeight": "1.2"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+    "selector": ".h1,h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+    "selector": ".h2,h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+    "selector": ".h3,h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+    "selector": ".tooltip",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Admin\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+    "selector": ".popover",
+    "letterSpacing": "normal",
+    "lineHeight": "1.5"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Footer.razor",
+    "line": 63,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/\" class=\"text-white hover:text-[#0078F2] transition-colors flex items-center gap-2 font-black tracking-tight\" "
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Footer.razor",
+    "line": 91,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h3 id=\"cookie-modal-title\" class=\"font-black text-xl text-white tracking-tight\">Tùy Chọn Cookie & Quyền Riêng Tư</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Footer.razor",
+    "line": 102,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"text-[9px] uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emera"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Footer.razor",
+    "line": 142,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"px-5 py-2 rounded-xl bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Navbar.razor",
+    "line": 16,
+    "tracking": [
+      "tracking-tighter"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/\" class=\"text-2xl font-black text-white tracking-tighter flex items-center gap-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Navbar.razor",
+    "line": 59,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-gray-400 uppercase tracking-widest\">Kết quả tìm kiếm</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Navbar.razor",
+    "line": 228,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-gray-400 uppercase tracking-widest\">Kết quả tìm kiếm</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\Navbar.razor",
+    "line": 255,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#0078f2] text-white leading-none\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 15,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-[#0078f2] tracking-wider uppercase\">TRUNG TÂM TÀI KHOẢN</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 47,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] border "
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 59,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-bold text-white/60 uppercase tracking-wider block\">Ví NexusPay</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 62,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/profile/wallet\" class=\"px-2.5 py-1 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] active:scale-95 text-white text-"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 70,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"px-3 pt-2 pb-1 text-[10px] font-black text-white/60 uppercase tracking-widest\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 80,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"px-3 pt-4 pb-1 text-[10px] font-black text-white/60 uppercase tracking-widest border-t border-white/5 mt-3\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ProfileLayout.razor",
+    "line": 102,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"px-3 pt-4 pb-1 text-[10px] font-black text-white/60 uppercase tracking-widest border-t border-white/5 mt-3\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ReconnectModal.razor.css",
+    "selector": "#components-reconnect-modal button",
+    "letterSpacing": "0.05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Layout\\ToastContainer.razor",
+    "line": 55,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[10px] font-black uppercase tracking-widest text-white/70 mb-0.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Assistant.razor",
+    "line": 22,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"font-bold text-white text-base tracking-tight\">Trợ Lý AI NexusKeys</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Assistant.razor",
+    "line": 31,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"text-[11px] font-black uppercase tracking-wider text-white/50 mb-2\">Gợi ý câu hỏi</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\ForgotPassword.razor",
+    "line": 26,
+    "tracking": [
+      "tracking-tighter"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl font-black text-white tracking-tighter\">NEXUS<span class=\"text-[#0078F2]\">KEYS</span></span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\ForgotPassword.razor",
+    "line": 30,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-xl sm:text-2xl font-bold text-center text-white tracking-tight mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Login.razor",
+    "line": 19,
+    "tracking": [
+      "tracking-tighter"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl font-black text-white tracking-tighter\">NEXUS<span class=\"text-[#0078F2]\">KEYS</span></span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Login.razor",
+    "line": 23,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-xl sm:text-2xl font-bold text-center text-white tracking-tight mb-6\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Login.razor",
+    "line": 99,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xs font-bold uppercase tracking-wider text-white mb-0.5\">Đã từng mua game bản quyền?</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Login.razor",
+    "line": 130,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xs font-bold text-center uppercase tracking-wider text-white mb-2.5\">Phương thức đăng nhập khác</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Login.razor",
+    "line": 172,
+    "tracking": [
+      "tracking-tighter"
+    ],
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"w-5 h-5 rounded bg-[#e3000b] text-[#ffe600] font-black text-[9px] flex items-center justify-center mb-1 gro"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Register.razor",
+    "line": 27,
+    "tracking": [
+      "tracking-tighter"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl font-black text-white tracking-tighter\">NEXUS<span class=\"text-[#0078F2]\">KEYS</span></span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\Register.razor",
+    "line": 31,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-xl sm:text-2xl font-bold text-center text-white tracking-tight mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\ResetPassword.razor",
+    "line": 26,
+    "tracking": [
+      "tracking-tighter"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl font-black text-white tracking-tighter\">NEXUS<span class=\"text-[#0078F2]\">KEYS</span></span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Auth\\ResetPassword.razor",
+    "line": 30,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-xl sm:text-2xl font-bold text-center text-white tracking-tight mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Careers.razor",
+    "line": 13,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#40"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Careers.razor",
+    "line": 18,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Careers.razor",
+    "line": 27,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"#positions\" class=\"egs-auth-btn-primary inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#0078f2] hove"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Careers.razor",
+    "line": 37,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl font-bold text-white mb-6 tracking-tight\">Môi Trường Làm Việc Tại NexusKeys</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Careers.razor",
+    "line": 75,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl font-bold text-white tracking-tight\">Vị Trí Đang Mở Tuyển</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Careers.razor",
+    "line": 85,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-white/5 text-white/70\">@job.Team</spa"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 22,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-[#0078f2] block tracking-wider\">Bước 1</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 36,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-white/40 block tracking-wider\">Bước 2</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 50,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-white/40 block tracking-wider\">Bước 3</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 58,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-2xl font-black text-white tracking-tight\">Giỏ Hàng Của Tôi</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 108,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"() => _showClearCartModal = true\" class=\"px-4 py-2 rounded-lg text-red-400 hover:text-re"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 109,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/products\" class=\"px-4 py-2 rounded-lg text-[#0078f2] hover:text-[#4da6ff] hover:bg-[#0078f2]/10 text-xs font-b"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 117,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-lg font-bold text-white tracking-tight\">Tóm Tắt Đơn Hàng</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 161,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" disabled class=\"w-full h-12 rounded-xl bg-[#202024] text-white/40 border border-white/10 text-xs f"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 167,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/checkout\" class=\"w-full h-12 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] active:scale-[0.98] text-white text-xs"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 214,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "class=\"px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-bold uppercase tracking-wid"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 245,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"creator-tag-input\" class=\"block text-xs font-semibold text-white/70 uppercase tracking-wider mb-2\">Creator T"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 246,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<input id=\"creator-tag-input\" type=\"text\" @bind=\"_creatorTagInput\" @bind:event=\"oninput\" placeholder=\"Ví dụ: NEXUS2026, "
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Cart\\Cart.razor",
+    "line": 254,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"ApplyCreatorTag\" disabled=\"@(string.IsNullOrWhiteSpace(_creatorTagInput))\" class=\"px-5 p"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 30,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-emerald-400 block tracking-wider group-hover:underline\">Bướ"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 44,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-[#0078f2] block tracking-wider\">Bước 2</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 58,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-white/40 block tracking-wider\">Bước 3</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 67,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-2xl sm:text-3xl font-black text-white tracking-tight\">Thanh Toán Đơn Hàng</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 78,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/cart\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white text-xs font-bold uppercase track"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 186,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"coupon-code\" class=\"text-xs font-bold uppercase tracking-wider text-white/60 mb-2 block\">Mã giảm giá</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 188,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<input id=\"coupon-code\" type=\"text\" @bind=\"CheckoutVM.CouponCodeInput\" placeholder=\"Nhập mã...\" class=\"flex-1 bg-[#20202"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 189,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button @onclick=\"CheckoutVM.ApplyCouponAsync\" disabled=\"@CheckoutVM.IsProcessing\" class=\"px-5 py-2.5 rounded-xl bg-[#00"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\Checkout.razor",
+    "line": 230,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button @onclick=\"ProcessPayment\" disabled=\"@CheckoutVM.IsProcessing\" class=\"w-full py-4 rounded-xl bg-[#0078f2] hover:b"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 17,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-emerald-400 block tracking-wider\">Bước 1 ✓</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 31,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-emerald-400 block tracking-wider\">Bước 2 ✓</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 45,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] sm:text-xs uppercase font-bold text-emerald-400 block tracking-wider\">Bước 3 ✓</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 68,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/orders\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-xs uppercase tra"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 69,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/support\" class=\"px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-bo"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 115,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/profile/library\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-xs uppe"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Checkout\\CheckoutSuccess.razor",
+    "line": 119,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/products\" class=\"px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-b"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 15,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#40"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 20,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 29,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"ToggleApply\" class=\"egs-auth-btn-primary inline-flex items-center gap-2 px-8 py-3.5 roun"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 38,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-5xl font-black text-[#40a9ff] tracking-tight mb-1\">5%+</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 39,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-white uppercase tracking-widest mb-3\">Hoa Hồng Doanh Thu</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 52,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/50 uppercase font-bold tracking-wider block mb-2\">Cộng đồng</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 63,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/50 uppercase font-bold tracking-wider block mb-2\">Cộng đồng</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Creator.razor",
+    "line": 73,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/50 uppercase font-bold tracking-wider block mb-2\">Cộng đồng</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 20,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs sm:text-sm font-black tracking-wide text-white uppercase whitespace-nowrap\">Cổng Phân Phối</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 21,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#40a9ff] bor"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 88,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0078f2]/20 border border-[#0078f2]/40 text-[#40"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 93,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 106,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"@adminPortalUrl\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 113,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/login\" class=\"px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-black text-sm tracking-wide"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 153,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-black uppercase tracking-wider text-white/40 block\">TỶ LỆ CHIA SẺ DOANH THU</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 174,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<div class=\"bg-white/10 h-full rounded-full flex items-center justify-center text-[9px] font-bold text-white/40\" style=\""
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 197,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<div class=\"bg-red-500/30 h-full rounded-full flex items-center justify-center text-[9px] font-bold text-red-300\" style="
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 227,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-widest text-[#0078f2]\">MÔ HÌNH TOÀN DIỆN CHO CẢ HAI LĨNH VỰC</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 228,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-4xl font-black text-white tracking-tight\">Hệ Sinh Thái Phân Phối Trò Chơi & Ứng Dụng PC</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 244,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black text-[#0078f2] uppercase tracking-wider block\">Game Studios & Indies</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 245,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"text-xl sm:text-2xl font-black text-white tracking-tight\">Phân Phối Trò Chơi (Games)</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 301,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black text-purple-400 uppercase tracking-wider block\">Software Creators & Tools</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 302,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"text-xl sm:text-2xl font-black text-white tracking-tight\">Phân Phối Ứng Dụng (Apps)</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 359,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#0078f2]/15 text-[#0078f2] text-[11px] font-bl"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 362,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-3xl font-black text-white tracking-tight\">Tính Khoản Tiền Bạn Giữ Lại Được Trên NexusKeys</h"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 427,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-wider text-white/60 block mb-2\">Ước tính tổng doanh số bán (Gross Sal"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 468,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2 py-0.5 rounded-full @(isSpecialSchemeEnabled ? \"bg-emerald-600 text-white\" : \"bg-[#0078f2] text-white\""
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 472,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl lg:text-2xl font-black @(isSpecialSchemeEnabled ? \"text-emerald-400\" : \"text-[#0078f2]\") block trac"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 484,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2 py-0.5 rounded-full bg-white/10 text-white/60 text-[10px] font-black uppercase tracking-wider\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 488,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl lg:text-2xl font-black text-white/80 block tracking-tight whitespace-nowrap\">@steamRevenue.ToString"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 498,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 502,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xl lg:text-2xl font-black text-emerald-400 block tracking-tight whitespace-nowrap\">+@bonusSavings.ToSt"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 517,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-widest text-[#0078f2]\">LỢI ÍCH KHÁC BIỆT</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 518,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-4xl font-black text-white tracking-tight\">4 Đặc Quyền Tiên Quyết Cho Nhà Phát Triển</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 587,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-widest text-[#0078f2]\">HỆ THỐNG CÔNG CỤ TỰ PHÁT HÀNH</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 588,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-3xl font-black text-white tracking-tight mt-1\">Bộ Công Cụ & Dịch Vụ Công Nghệ Toàn Diện</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 667,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-widest text-[#0078f2]\">LỘ TRÌNH RÕ RÀNG</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 668,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-3xl font-black text-white tracking-tight mt-1\">Quy Trình 4 Bước Đưa Sản Phẩm Lên Cửa Hàng</h"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 713,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-widest text-[#0078f2]\">SO SÁNH MINH BẠCH</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 714,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl sm:text-2xl font-black text-white tracking-tight mt-1\">NexusKeys Store vs Nền Tảng Truyền Thống</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 723,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"egs-dist-table-row bg-[#202026] text-xs font-black text-white uppercase tracking-wider\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 785,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black uppercase tracking-widest text-[#0078f2]\">GIẢI ĐÁP THẮC MẮC</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 786,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-3xl font-black text-white tracking-tight\">Câu Hỏi Thường Gặp Về Tự Xuất Bản</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 883,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-3 py-1 rounded-full bg-[#0078f2]/20 text-[#40a9ff] text-xs font-black uppercase tracking-wider border bo"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 887,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-3xl sm:text-4xl font-black text-white tracking-tight\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 899,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"@adminPortalUrl\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Distribution.razor",
+    "line": 906,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/login\" class=\"px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-black text-sm tracking-wide"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Download.razor",
+    "line": 13,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#40a9"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Download.razor",
+    "line": 18,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Download.razor",
+    "line": 28,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"SimulateDownload\" class=\"egs-auth-btn-primary flex items-center gap-3 px-8 py-4 rounded-"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Download.razor",
+    "line": 61,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl font-bold text-white mb-6 tracking-tight\">Tại Sao Nên Dùng NexusKeys Launcher?</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Error.razor",
+    "line": 13,
+    "tracking": [
+      "tracking-[0.25em]"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs font-black uppercase tracking-[0.25em] text-red-400 mb-2\">Hệ Thống Gặp Sự Cố</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Error.razor",
+    "line": 14,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 id=\"error-title\" class=\"text-2xl sm:text-3xl font-black text-white mb-3 tracking-tight\">Đã Xảy Ra Lỗi Xử Lý</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Error.razor",
+    "line": 25,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\".\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white text-xs font-bold tracking-wide trans"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Home.razor",
+    "line": 24,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-md\">@CurrentSlide.Title</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Home.razor",
+    "line": 199,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs uppercase tracking-widest font-extrabold text-[#0078f2] mb-1\">Hiện có trên Store</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsDetail.razor",
+    "line": 33,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-2xl font-bold text-white mb-2 tracking-tight\">Không tìm thấy bài viết</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsDetail.razor",
+    "line": 35,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/news\" class=\"px-6 py-2.5 text-xs font-bold text-white bg-[#0078F2] rounded-lg hover:bg-[#0066cc] uppercase tra"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsDetail.razor",
+    "line": 56,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2.5 py-0.5 rounded text-[11px] font-black uppercase tracking-wider bg-[#0078f2] text-white\">Tin tức chín"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsDetail.razor",
+    "line": 61,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-6 tracking-tight\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsDetail.razor",
+    "line": 104,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-white/50 uppercase tracking-wider\">Chủ đề:</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsDetail.razor",
+    "line": 110,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/news\" class=\"px-5 py-2.5 rounded-xl bg-[#202024] hover:bg-white/15 text-white text-xs font-bold uppercase trac"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsList.razor",
+    "line": 14,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight mb-6 sm:mb-8\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsList.razor",
+    "line": 75,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\News\\NewsList.razor",
+    "line": 113,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[10px] sm:text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\NotFound.razor",
+    "line": 13,
+    "tracking": [
+      "tracking-[0.25em]"
+    ],
+    "text9": null,
+    "snippet": "<p class=\"text-xs font-black uppercase tracking-[0.25em] text-[#0078f2] mb-2\">LỖI 404</p>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\NotFound.razor",
+    "line": 14,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 id=\"not-found-title\" class=\"text-2xl sm:text-3xl font-black text-white mb-3 tracking-tight\">Không Tìm Thấy Trang</h1"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\NotFound.razor",
+    "line": 19,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white text-xs font-bold tracking-wide trans"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 53,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-2xl font-black text-white flex flex-wrap items-center gap-3 tracking-tight\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 55,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider @badgeClass\">@statusText<"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 68,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black upperc"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 85,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"font-bold text-white text-sm uppercase tracking-wider\">Sản phẩm đã mua</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 131,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] text-white/40 uppercase font-bold tracking-wider mb-1\">Sản phẩm</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 136,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] text-white/40 uppercase font-bold tracking-wider mb-1\">Mã kích hoạt</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 138,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<input type=\"text\" value=\"@key.KeyCode\" aria-label=\"License Key của @key.ProductName\" readonly class=\"w-full md:w-auto f"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 185,
+    "tracking": [
+      "tracking-wide"
+    ],
+    "text9": null,
+    "snippet": "<h3 id=\"invoice-modal-title\" class=\"text-lg font-black text-white tracking-wide uppercase\">HÓA ĐƠN ĐIỆN TỬ (e-INVOICE)</"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderDetail.razor",
+    "line": 269,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"() => _showInvoiceModal = false\" class=\"px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 35,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl sm:text-2xl font-black text-white mb-2 tracking-tight\">Bạn chưa có đơn hàng nào</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 37,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/products\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font-black"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 67,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] text-white/50 uppercase font-bold tracking-wider\">Mã đơn hàng</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 72,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] text-white/50 uppercase font-bold tracking-wider\">Ngày đặt</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 79,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-[11px] text-white/50 uppercase font-bold tracking-wider\">Tổng tiền</div>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 82,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/orders/@order.Id\" class=\"px-4 py-2 rounded-xl bg-[#202024] hover:bg-white/15 text-white text-xs font-bold uppe"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 103,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider @badgeClass\">@statusText<"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Orders\\OrderList.razor",
+    "line": 109,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black upperc"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 48,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-2xl font-bold text-white mb-2 tracking-tight\">Không tìm thấy sản phẩm</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 50,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/products\" class=\"min-h-[44px] px-6 py-2.5 text-xs font-bold text-white bg-[#0078F2] rounded-lg hover:bg-[#0066"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 72,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mb-3\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 173,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-bold text-white/70 uppercase tracking-wider block\">Thể loại</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 182,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-bold text-white/70 uppercase tracking-wider block\">Tính năng</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 186,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-bold text-white/70 uppercase tracking-wider block\">Hỗ trợ tay cầm</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 190,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-bold text-white/70 uppercase tracking-wider block\">Lưu trữ đám mây</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 207,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black text-[#0078f2] uppercase tracking-wider block mb-1\">Đồ Họa Chuẩn 4K</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 211,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black text-[#0078f2] uppercase tracking-wider block mb-1\">Chế Độ Chơi Đa Dạng</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 215,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-black text-[#0078f2] uppercase tracking-wider block mb-1\">Hỗ Trợ Tay Cầm</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 265,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"SubmitReview\" disabled=\"@(string.IsNullOrWhiteSpace(newReviewContent) || newReviewIsPosi"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 348,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-black text-[#0078f2] uppercase tracking-wider\">Phiên bản chuẩn</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 364,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"AddToCart\" class=\"px-5 py-2.5 min-h-[44px] rounded-lg bg-[#202024] hover:bg-white/15 tex"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 373,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-black text-amber-400 uppercase tracking-wider\">Phiên bản đặc biệt</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 382,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"AddToCart\" class=\"px-5 py-2.5 min-h-[44px] rounded-lg bg-[#0078f2] hover:bg-[#0068d6] te"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 400,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"text-xs font-black text-white/70 uppercase tracking-wider mb-2\">Cấu hình tối thiểu</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 424,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"text-xs font-black text-[#0078f2] uppercase tracking-wider mb-2\">Cấu hình khuyến nghị</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 463,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2.5 py-1 rounded bg-[#202024] text-white/90 font-bold text-[11px] uppercase tracking-wider border border"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 485,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-3xl font-black text-white tracking-tight\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 494,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-3xl font-black text-white tracking-tight\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 508,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button disabled class=\"w-full h-12 rounded-lg bg-red-600/30 text-white/70 font-bold uppercase tracking-wider text-xs cu"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 516,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "class=\"w-full h-12 rounded-lg bg-[#0078f2] hover:bg-[#0060c4] text-white text-xs font-black uppercase tracking-widest tr"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 522,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "class=\"w-full h-12 rounded-lg bg-[#202024] hover:bg-[#2a2a30] text-white text-xs font-bold uppercase tracking-wider tran"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 533,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "class=\"w-full h-12 rounded-lg @(isInWishlist ? \"bg-white/15 border-white/30 text-white\" : \"bg-[#202024] hover:bg-[#2a2a3"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 605,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-3\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 620,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/cart\" class=\"w-full py-3 min-h-[44px] rounded-xl bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-black"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 623,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"() => _showAddedToCartModal = false\" class=\"w-full py-2.5 min-h-[44px] rounded-xl bg-tra"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductDetail.razor",
+    "line": 681,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"ConfirmAgeGate\" class=\"w-full py-3 min-h-[44px] rounded-xl bg-[#0078f2] text-white text-"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 15,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight\">Kho Game & Nội Dung Mở Rộng</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 19,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/70 uppercase tracking-wider font-bold\">Sắp xếp:</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 48,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/70 uppercase tracking-wider mr-1 font-bold flex items-center gap-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 113,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"@(() => ViewModel.LoadAsync(ViewModel.CurrentPage))\" class=\"min-h-[44px] px-6 py-2.5 tex"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 124,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button @onclick=\"ResetAll\" class=\"min-h-[44px] px-6 py-2.5 text-xs font-bold text-white bg-[#0078F2] rounded-lg hover:b"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 190,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h3 class=\"text-sm font-black text-white uppercase tracking-wider\">Bộ lọc</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 208,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-white/90 uppercase tracking-wider group-hover:text-white transition-colors flex item"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 264,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-white/90 uppercase tracking-wider group-hover:text-white transition-colors flex item"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Products\\ProductList.razor",
+    "line": 321,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-white/90 uppercase tracking-wider flex items-center gap-2 mb-2.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 15,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-2xl sm:text-3xl font-black text-white uppercase tracking-tight\">Kho Game &amp; Bản Quyền</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 16,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] border "
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 45,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/products\" class=\"inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-whit"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 87,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 110,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick='@(() => CopyToClipboard(keyItem.KeyCode))' class=\"font-mono text-left text-white hover:t"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 117,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"font-mono text-white/50 tracking-widest font-bold text-base sm:text-lg select-none\">••••-••••-••••-••••</sp"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 127,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-m"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 142,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"px-4 py-2 rounded-lg bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercas"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 195,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-black uppercase tracking-widest text-[#0078f2] block mb-1\">Bản quyền chính thức</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 203,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-bold uppercase tracking-wider text-white/60 block mb-1\">Mã kích hoạt sản phẩm (Product Key"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 204,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"font-mono text-xl sm:text-2xl font-black text-white tracking-widest my-2 select-all\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 207,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"@(() => CopyToClipboard(_selectedKeyData.Key))\" class=\"mt-2 px-5 py-2 rounded-lg text-xs"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Library.razor",
+    "line": 223,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<h4 class=\"text-xs font-black uppercase tracking-wider text-white/70\">Hướng dẫn kích hoạt bản quyền:</h4>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 19,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/60 uppercase tracking-widest font-bold\">Đang tải hồ sơ...</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 27,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-2xl sm:text-3xl font-black text-white uppercase tracking-tight\">Cài Đặt Tài Khoản</h1>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 36,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[11px] font-black uppercase tracking-wider text-white/60 block mb-1\">Ví NexusPay</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 45,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/profile/wallet\" class=\"px-4 py-2 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppe"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 60,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 bord"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 106,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"profile-username\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 115,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"profile-email\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 127,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"profile-full-name\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 134,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"profile-phone\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 142,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"submit\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercas"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 188,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"current-password\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 198,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"new-password\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 205,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"confirm-password\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 213,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"submit\" class=\"px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white text"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Profile.razor",
+    "line": 245,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"GoToAdminPanel\" class=\"px-5 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 17,
+    "tracking": [
+      "tracking-widest"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs text-white/60 uppercase tracking-widest font-bold\">Đang tải ví...</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 32,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] b"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 37,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold text-white/60 uppercase tracking-wider block mb-1\">Số Dư Khả Dụng NexusPay</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 38,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"text-4xl sm:text-5xl font-black text-white tracking-tight drop-shadow-sm flex items-baseline gap-2\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 45,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" @onclick=\"ShowTopUpModal\" class=\"px-6 py-3.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 60,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-white/5 text-white/60 border borde"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 70,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<thead class=\"bg-[#202024]/40 border-b border-white/10 text-white/60 text-[11px] font-black uppercase tracking-wider\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 92,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"ml-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 bor"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 150,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h3 id=\"wallet-topup-title\" class=\"font-black text-xl text-white tracking-tight uppercase\">Nạp Ví NexusPay</h3>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 156,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label class=\"text-xs font-bold uppercase tracking-wider text-white/70 block\">Mệnh giá phổ biến</label>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 170,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"custom-wallet-amount\" class=\"text-xs font-bold uppercase tracking-wider text-white/70 block mb-1.5\">Hoặc số "
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 181,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-xs font-bold uppercase tracking-wider text-white/70 block mb-2\">Cổng thanh toán tự động</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 186,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"text-[9px] text-emerald-400 font-bold uppercase\">Khuyên dùng</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 191,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"text-[9px] text-white/60 font-bold uppercase\">Quét mã</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 196,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "<span class=\"text-[9px] text-white/60 font-bold uppercase\">Nội địa & QT</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Profile\\Wallet.razor",
+    "line": 206,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"px-6 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font-b"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 17,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 22,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h1 class=\"text-3xl sm:text-5xl font-black text-white uppercase tracking-tight leading-tight mb-4\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 49,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl sm:text-2xl font-black text-white uppercase tracking-tight\">Chủ Đề Trợ Giúp Phổ Biến</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 108,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<div class=\"mt-4 pt-3 border-t border-white/5 text-xs font-black text-[#0078f2] uppercase tracking-wider flex items-cent"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 179,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-50"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 193,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"button\" class=\"w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold upperca"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 202,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"support-topic\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 216,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"support-email\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 224,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"support-order\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 233,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<label for=\"support-content\" class=\"block text-xs font-bold uppercase tracking-wider text-white/70 mb-1.5\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Support.razor",
+    "line": 246,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<button type=\"submit\" class=\"w-full py-3.5 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Wishlist\\Wishlist.razor",
+    "line": 30,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h2 class=\"text-xl sm:text-2xl font-black text-white mb-2 tracking-tight\">Danh sách yêu thích trống</h2>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Pages\\Wishlist\\Wishlist.razor",
+    "line": 32,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<a href=\"/products\" class=\"px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font-black"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Shared\\BrandLogo.razor",
+    "line": 61,
+    "tracking": null,
+    "text9": [
+      "text-[9px]"
+    ],
+    "snippet": "private string SubtitleSizeClass => Size is \"lg\" or \"xl\" ? \"text-[11px]\" : \"text-[9px]\";"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Shared\\Modal.razor",
+    "line": 25,
+    "tracking": [
+      "tracking-tight"
+    ],
+    "text9": null,
+    "snippet": "<h3 id=\"@_titleId\" class=\"text-xl sm:text-2xl font-black text-white tracking-tight leading-tight\">"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Shared\\Modal.razor",
+    "line": 65,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "class=\"px-6 py-2.5 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs sm:text-sm font-bold uppercase tracking"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Shared\\ProductCard.razor",
+    "line": 23,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"px-3 py-1 bg-red-600/90 text-white text-xs font-bold rounded-lg uppercase tracking-wider shadow-lg\">Hết hàn"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\Components\\Shared\\ProductImage.razor",
+    "line": 16,
+    "tracking": [
+      "tracking-wider"
+    ],
+    "text9": null,
+    "snippet": "<span class=\"text-[10px] font-medium uppercase tracking-wider text-white/60\">Ảnh đang cập nhật</span>"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": "/* Typography spacing & diacritics optimization for Vietnamese */\nh1, h2, h3, h4...",
+    "letterSpacing": "-0.015em !important",
+    "lineHeight": "1.25 !important"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-hero-badge",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-discover-badge",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-mini-tag",
+    "letterSpacing": "0.04em",
+    "lineHeight": "1"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-mini-title",
+    "letterSpacing": "-0.01em",
+    "lineHeight": "1.35"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-section-title",
+    "letterSpacing": "-0.01em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-vault-banner",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-card-tag",
+    "letterSpacing": "normal !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-list-item-name",
+    "letterSpacing": "-0.01em",
+    "lineHeight": "1.35"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": ".egs-footer-col h4",
+    "letterSpacing": "0.05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\epic-games.css",
+    "selector": "/* StoreApp Menu Link Styles */\n.nav-link-storeapp",
+    "letterSpacing": "0.05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-hero-badge",
+    "letterSpacing": "0.15em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-btn-primary",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-vault-badge-free",
+    "letterSpacing": "0.1em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-vault-badge-mystery",
+    "letterSpacing": "0.1em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-top-list-header h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ":where(h1, h2, h3, h4, h5, h6)",
+    "letterSpacing": "-.045em",
+    "lineHeight": "1.12"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": "h1[tabindex=\"-1\"]:focus",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-brand-wordmark",
+    "letterSpacing": "-.075em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-brand-subtitle",
+    "letterSpacing": ".01em",
+    "lineHeight": "1.25"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-nav-link",
+    "letterSpacing": "-.02em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".btn",
+    "letterSpacing": "-.015em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-kicker",
+    "letterSpacing": ".02em",
+    "lineHeight": "1.4"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-page-header h1",
+    "letterSpacing": "-.05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-home h2,\n.nui-home h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-home-hero-copy h2",
+    "letterSpacing": "-.075em",
+    "lineHeight": ".92"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-home-hero-price strong",
+    "letterSpacing": "-.045em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-section-heading h2",
+    "letterSpacing": "-.065em",
+    "lineHeight": ".98"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-countdown strong",
+    "letterSpacing": ".04em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-recent-header h3",
+    "letterSpacing": "-.02em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-process-grid h3",
+    "letterSpacing": "-.03em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-news-grid h3",
+    "letterSpacing": "-.035em",
+    "lineHeight": "1.28"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-newsletter-section h2",
+    "letterSpacing": "-.065em",
+    "lineHeight": ".98"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-product-meta",
+    "letterSpacing": "0",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-product-title",
+    "letterSpacing": "-.025em",
+    "lineHeight": "1.35"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-product-price",
+    "letterSpacing": "-.02em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-auth-form-card h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-main thead th",
+    "letterSpacing": ".02em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-home-hero-copy h2",
+    "letterSpacing": null,
+    "lineHeight": ".93"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-section-heading h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-process-grid h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-newsletter-section h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-product-detail h1",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-cart-item h3",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-home-hero-copy h2",
+    "letterSpacing": "-.045em",
+    "lineHeight": "1.1"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-section-heading h2",
+    "letterSpacing": "-.04em",
+    "lineHeight": "1.15"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".nui-section-heading h2",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-free-banner-now",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-free-banner-soon",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": "/* Buttons */\n.egs-btn-primary",
+    "letterSpacing": "0.06em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-btn-secondary",
+    "letterSpacing": "0.06em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-btn-blue",
+    "letterSpacing": "0.06em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-section-title",
+    "letterSpacing": "-0.01em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-section-link",
+    "letterSpacing": "0.06em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-auth-btn-primary",
+    "letterSpacing": "0.08em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-auth-btn-social",
+    "letterSpacing": "0.05em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": "/* Authentic Epic Games Store Buttons */\n.egs-epic-btn-primary",
+    "letterSpacing": "0.05em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-vault-banner-now",
+    "letterSpacing": "0.08em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-vault-banner-soon",
+    "letterSpacing": "0.08em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-article-body h2",
+    "letterSpacing": "-0.02em",
+    "lineHeight": "1.3"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-article-body h3",
+    "letterSpacing": "-0.01em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".modal-box h3,\n.modal-box .modal-title",
+    "letterSpacing": "-0.02em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": "/* Modal Buttons */\n.modal-action .btn-primary,\n.modal-box .btn-primary",
+    "letterSpacing": "0.05em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-vault-banner-now,\n.egs-free-banner-now",
+    "letterSpacing": "0.08em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-vault-banner-soon,\n.egs-free-banner-soon",
+    "letterSpacing": "0.08em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": "/* 7. Buttons */\n.egs-epic-btn-primary",
+    "letterSpacing": "0.06em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\nexus-ui.css",
+    "selector": ".egs-epic-btn-secondary",
+    "letterSpacing": "0.06em !important",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": "h1,h2,h3,h4,h5,h6",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": "button,input,optgroup,select,textarea",
+    "letterSpacing": "inherit",
+    "lineHeight": "inherit"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": "blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": "h1,h2,h3,h4,h5,h6",
+    "letterSpacing": "-.045em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": "h1[tabindex=\"-1\"]:focus",
+    "letterSpacing": null,
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".btn",
+    "letterSpacing": "-.01em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[-0\\.055em\\]",
+    "letterSpacing": "-.055em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[0\\.18em\\]",
+    "letterSpacing": ".18em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[0\\.22em\\]",
+    "letterSpacing": ".22em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[0\\.24em\\]",
+    "letterSpacing": ".24em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[0\\.25em\\]",
+    "letterSpacing": ".25em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[0\\.2em\\]",
+    "letterSpacing": ".2em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-\\[0\\.3em\\]",
+    "letterSpacing": ".3em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-tight",
+    "letterSpacing": "-.025em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-wider",
+    "letterSpacing": ".05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\css\\site.css",
+    "selector": ".tracking-widest",
+    "letterSpacing": ".1em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-hero-badge",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-discover-badge",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-mini-tag",
+    "letterSpacing": "0.04em",
+    "lineHeight": "1"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-mini-title",
+    "letterSpacing": "-0.01em",
+    "lineHeight": "1.35"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-section-title",
+    "letterSpacing": "-0.01em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-vault-banner",
+    "letterSpacing": "0.08em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-card-tag",
+    "letterSpacing": "normal",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-list-item-name",
+    "letterSpacing": "-0.01em",
+    "lineHeight": "1.35"
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-footer-col h4",
+    "letterSpacing": "0.05em",
+    "lineHeight": null
+  },
+  {
+    "file": "src\\NexusKeys.Storefront\\wwwroot\\design\\atlas.css",
+    "selector": ".egs-auth-btn-primary",
+    "letterSpacing": "0.025em",
+    "lineHeight": null
+  }
+]

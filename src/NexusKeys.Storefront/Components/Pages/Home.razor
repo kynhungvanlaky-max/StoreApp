@@ -1,0 +1,732 @@
+@page "/"
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject Frontend.Services.ToastService ToastService
+@inject Frontend.ViewModels.WishlistViewModel WishlistViewModel
+@implements IDisposable
+
+<PageTitle>NexusKeys | Cửa Hàng Game Bản Quyền Chính Hãng</PageTitle>
+
+<div class="egs-wrap">
+    <div class="egs-content">
+
+
+        @* ================================================================= *@
+        @* SECTION 1: HERO SPOTLIGHT (Stage & Animated Rail)                 *@
+        @* ================================================================= *@
+        <section aria-label="Tiêu điểm nổi bật">
+            <div class="egs-hero-grid">
+                @* Hero Stage with Animated Slide Transition, Verified Official Cover Art & Overlay *@
+                <a href="@CurrentSlide.Link" class="egs-hero-stage egs-card-hover egs-shimmer-card" aria-label="@CurrentSlide.Title">
+                    <img @key="_heroIndex" src="@CurrentSlide.Image" alt="@CurrentSlide.Title" class="egs-hero-bg egs-hero-stage-animated" />
+                    <div class="egs-hero-overlay">
+                        <span class="egs-hero-badge">@CurrentSlide.Badge</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight drop-shadow-md">@CurrentSlide.Title</h2>
+                        <p class="egs-hero-desc">@CurrentSlide.Description</p>
+                        <span class="egs-hero-price">@CurrentSlide.Price</span>
+                        <div class="egs-hero-actions">
+                            <span class="egs-hero-btn-buy">Khám phá ngay</span>
+                            <button type="button" class="egs-hero-btn-icon @(_wishlistedTitles.Contains(CurrentSlide.Title) ? "text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick="() => ToggleWishlist(CurrentSlide.Title)"
+                                    title="@(_wishlistedTitles.Contains(CurrentSlide.Title) ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg width="18" height="18" fill="@(_wishlistedTitles.Contains(CurrentSlide.Title) ? "currentColor" : "none")" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    @if (_wishlistedTitles.Contains(CurrentSlide.Title))
+                                    {
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/>
+                                    }
+                                    else
+                                    {
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    }
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+
+                @* Hero Rail with Authentic Dynamic Visuals & Animated Progress Bar *@
+                <div class="egs-hero-rail-wrap">
+                    <div class="egs-hero-rail">
+                        @for (int i = 0; i < _slides.Length; i++)
+                        {
+                            var idx = i;
+                            var slide = _slides[idx];
+                            var isActive = _heroIndex == idx;
+                            <button type="button"
+                                    class="egs-rail-item @(isActive ? "active" : "")"
+                                    @onclick="() => SetHeroSlide(idx)"
+                                    @onmouseenter="PauseAutoSlide"
+                                    @onmouseleave="ResumeAutoSlide">
+                                <img src="@slide.Thumb" alt="@slide.Title" class="egs-rail-thumb" />
+                                <span class="egs-rail-title">@slide.Title</span>
+                                @if (isActive)
+                                {
+                                    <div @key="@($"timer-{_heroIndex}")" class="egs-rail-timer"></div>
+                                }
+                            </button>
+                        }
+                    </div>
+
+                    @* Rail Carousel Controls *@
+                    <div class="egs-rail-arrows">
+                        <button type="button" class="egs-circle-btn" @onclick="PrevHeroSlide" aria-label="Slide trước">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button type="button" class="egs-circle-btn" @onclick="NextHeroSlide" aria-label="Slide tiếp theo">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 2: DISCOVER SOMETHING NEW & 4 MINI CARDS                   *@
+        @* ================================================================= *@
+        <section aria-label="Khám phá tựa game mới">
+            <div class="egs-section-header mb-4">
+                <div class="egs-section-title-wrap">
+                    <a href="/products" class="egs-section-title hover:text-white flex items-center gap-2">
+                        <span>Khám phá tựa game mới</span>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="egs-discover-row">
+                <a href="/products" class="egs-discover-banner egs-card-hover egs-shimmer-card">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1174180/library_hero.jpg" alt="Red Dead Redemption 2" />
+                    <div class="egs-discover-overlay">
+                        <span class="egs-discover-badge">Tâm điểm nổi bật</span>
+                        <h3 class="egs-discover-title">Red Dead Redemption 2</h3>
+                        <p class="egs-discover-desc">Trải nghiệm tuyệt phẩm miền Tây hoang dã với hơn 175 giải thưởng Game của Năm danh giá.</p>
+                        <div class="pt-1">
+                            <span class="egs-discover-btn">Khám phá ngay</span>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="egs-mini-grid">
+                    @* Mini 1: Chop Chop Together (From User Screenshot) *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/3065360/header.jpg" alt="Chop Chop Together" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Chop Chop Together") ? "is-active text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick='() => ToggleWishlist("Chop Chop Together")'
+                                    title="@(_wishlistedTitles.Contains("Chop Chop Together") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Chop Chop Together") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Game cơ bản</span>
+                            <span class="egs-mini-title">Chop Chop Together</span>
+                            <span class="egs-mini-price">136.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 2: Control Ultimate Edition *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/870780/library_600x900.jpg" alt="Control Ultimate Edition" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Control Ultimate Edition") ? "is-active text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick='() => ToggleWishlist("Control Ultimate Edition")'
+                                    title="@(_wishlistedTitles.Contains("Control Ultimate Edition") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Control Ultimate Edition") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Bản đặc biệt</span>
+                            <span class="egs-mini-title">Control Ultimate Edition</span>
+                            <span class="egs-mini-price">599.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 3: Dave The Diver *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/1868140/library_600x900.jpg" alt="Dave The Diver" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Dave The Diver") ? "is-active text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick='() => ToggleWishlist("Dave The Diver")'
+                                    title="@(_wishlistedTitles.Contains("Dave The Diver") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Dave The Diver") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Game cơ bản</span>
+                            <span class="egs-mini-title">Dave The Diver</span>
+                            <span class="egs-mini-price">260.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 4: Hades II *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/1145350/library_600x900.jpg" alt="Hades II" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Hades II") ? "is-active text-[#0078f2]" : "")"
+                                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                    @onclick='() => ToggleWishlist("Hades II")'
+                                    title="@(_wishlistedTitles.Contains("Hades II") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                    aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Hades II") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Truy cập sớm</span>
+                            <span class="egs-mini-title">Hades II</span>
+                            <span class="egs-mini-price">385.000 <u>đ</u></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 3: SPOTLIGHT FULL BANNER (Helldivers 2)                    *@
+        @* ================================================================= *@
+        <section aria-label="Banner nổi bật">
+            <div class="egs-full-banner-wrap">
+                <a href="/products" class="egs-full-banner egs-card-hover egs-shimmer-card">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/553850/library_hero.jpg" alt="HELLDIVERS™ 2" />
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent p-6 sm:p-10 flex flex-col justify-center max-w-xl">
+                        <span class="text-xs uppercase tracking-widest font-extrabold text-[#0078f2] mb-1">Hiện có trên Store</span>
+                        <h3 class="text-2xl sm:text-4xl font-black text-white leading-tight mb-2">HELLDIVERS™ 2</h3>
+                        <p class="text-xs sm:text-sm text-white/80 line-clamp-2 mb-4">Gia nhập Lực lượng Helldivers và chiến đấu vì Tự Do trên khắp thiên hà rực lửa trong tựa game bắn súng góc nhìn thứ ba kịch tính.</p>
+                        <div class="flex items-center gap-3">
+                            <span class="egs-hero-btn-buy">Chơi ngay • 790.000 đ</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 4: FEATURED DISCOUNTS                                     *@
+        @* ================================================================= *@
+        <section aria-label="Ưu đãi giảm giá nổi bật">
+            <div class="egs-section-header" style="margin-bottom: 16px;">
+                <a href="/products" class="egs-section-title-wrap">
+                    <h2 class="egs-section-title">
+                        Ưu Đãi Giảm Giá Nổi Bật
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </h2>
+                </a>
+
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="egs-circle-btn" @onclick='() => ScrollTrack("discounts-track", -380)' aria-label="Ưu đãi trước">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button type="button" class="egs-circle-btn" @onclick='() => ScrollTrack("discounts-track", 380)' aria-label="Ưu đãi tiếp theo">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="egs-discounts-grid" id="discounts-track" style="scroll-behavior: smooth;">
+                @* Discount 1: The Witcher 3 *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg" alt="The Witcher 3: Wild Hunt" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("The Witcher 3: Wild Hunt") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("The Witcher 3: Wild Hunt")'
+                                title="@(_wishlistedTitles.Contains("The Witcher 3: Wild Hunt") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("The Witcher 3: Wild Hunt") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">The Witcher 3: Wild Hunt</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-75%</span>
+                        <span class="egs-old-price">660.000 đ*</span>
+                        <span class="egs-new-price">165.000 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 2: Cyberpunk 2077 *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg" alt="Cyberpunk 2077" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Cyberpunk 2077") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Cyberpunk 2077")'
+                                title="@(_wishlistedTitles.Contains("Cyberpunk 2077") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Cyberpunk 2077") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Cyberpunk 2077</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-50%</span>
+                        <span class="egs-old-price">990.000 đ*</span>
+                        <span class="egs-new-price">495.000 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 3: Resident Evil 4 Remake *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/2050650/library_600x900.jpg" alt="Resident Evil 4 Remake" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Resident Evil 4 Remake") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Resident Evil 4 Remake")'
+                                title="@(_wishlistedTitles.Contains("Resident Evil 4 Remake") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Resident Evil 4 Remake") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Resident Evil 4 Remake</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-50%</span>
+                        <span class="egs-old-price">960.000 đ*</span>
+                        <span class="egs-new-price">480.000 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 4: Outward Definitive Edition *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/794260/library_600x900.jpg" alt="Outward Definitive Edition" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Outward Definitive Edition") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Outward Definitive Edition")'
+                                title="@(_wishlistedTitles.Contains("Outward Definitive Edition") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Outward Definitive Edition") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag text-amber-300">Phiên bản đặc biệt</span>
+                    <h3 class="egs-card-name">Outward Definitive Edition</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-85%</span>
+                        <span class="egs-old-price">666.000 đ*</span>
+                        <span class="egs-new-price">99.900 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 5: Medieval Dynasty (Exact Match with User Screenshot) *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1129580/library_600x900.jpg" alt="Medieval Dynasty" />
+                        <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Medieval Dynasty") ? "is-active text-[#0078f2]" : "")"
+                                @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                @onclick='() => ToggleWishlist("Medieval Dynasty")'
+                                title="@(_wishlistedTitles.Contains("Medieval Dynasty") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Medieval Dynasty") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Medieval Dynasty</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-50%</span>
+                        <span class="egs-old-price">490.000 đ*</span>
+                        <span class="egs-new-price">245.000 đ</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 6: TOP 3 LISTS                                            *@
+        @* ================================================================= *@
+        <section aria-label="Bảng xếp hạng game">
+            <div class="egs-lists-row">
+                @* Column 1: Coming Soon *@
+                <div class="egs-list-col">
+                    <a href="/products" class="egs-list-col-header">
+                        <h2 class="egs-list-col-title">
+                            Sắp ra mắt
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </h2>
+                    </a>
+
+                    <div class="egs-list-col-items">
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2246340/library_600x900.jpg" alt="Monster Hunter Wilds" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Monster Hunter Wilds") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Monster Hunter Wilds")'
+                                        title="@(_wishlistedTitles.Contains("Monster Hunter Wilds") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Monster Hunter Wilds") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Monster Hunter Wilds</span>
+                                <span class="egs-list-item-price">1.299.000 đ</span>
+                            </div>
+                        </a>
+
+                        @* Graveyard Keeper 2 (Exact Match from User Screenshot Image 1) *@
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/599140/library_600x900.jpg" alt="Graveyard Keeper 2" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Graveyard Keeper 2") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Graveyard Keeper 2")'
+                                        title="@(_wishlistedTitles.Contains("Graveyard Keeper 2") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Graveyard Keeper 2") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Graveyard Keeper 2</span>
+                                <span class="egs-list-item-price">261.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1845910/library_600x900.jpg" alt="Dragon Age: The Veilguard" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Dragon Age: The Veilguard") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Dragon Age: The Veilguard")'
+                                        title="@(_wishlistedTitles.Contains("Dragon Age: The Veilguard") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Dragon Age: The Veilguard") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Dragon Age: The Veilguard</span>
+                                <span class="egs-list-item-price">1.190.000 đ</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                @* Column 2: Top Upcoming Wishlisted *@
+                <div class="egs-list-col">
+                    <a href="/products" class="egs-list-col-header">
+                        <h2 class="egs-list-col-title">
+                            Được ước nhiều nhất
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </h2>
+                    </a>
+
+                    <div class="egs-list-col-items">
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg" alt="Black Myth: Wukong" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Black Myth: Wukong") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Black Myth: Wukong")'
+                                        title="@(_wishlistedTitles.Contains("Black Myth: Wukong") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Black Myth: Wukong") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Black Myth: Wukong</span>
+                                <span class="egs-list-item-price">1.299.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2124490/library_600x900.jpg" alt="Silent Hill 2" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Silent Hill 2") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Silent Hill 2")'
+                                        title="@(_wishlistedTitles.Contains("Silent Hill 2") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Silent Hill 2") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Silent Hill 2</span>
+                                <span class="egs-list-item-price">1.420.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/990080/library_600x900.jpg" alt="Hogwarts Legacy" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Hogwarts Legacy") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Hogwarts Legacy")'
+                                        title="@(_wishlistedTitles.Contains("Hogwarts Legacy") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Hogwarts Legacy") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Hogwarts Legacy</span>
+                                <span class="egs-list-item-price">990.000 đ</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                @* Column 3: Top New Releases *@
+                <div class="egs-list-col">
+                    <a href="/products" class="egs-list-col-header">
+                        <h2 class="egs-list-col-title">
+                            Mới phát hành hot
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </h2>
+                    </a>
+
+                    <div class="egs-list-col-items">
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2669320/library_600x900.jpg" alt="EA SPORTS FC 25" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("EA SPORTS FC™ 25") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("EA SPORTS FC™ 25")'
+                                        title="@(_wishlistedTitles.Contains("EA SPORTS FC™ 25") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("EA SPORTS FC™ 25") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">EA SPORTS FC™ 25</span>
+                                <span class="egs-list-item-price">1.299.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2322010/library_600x900.jpg" alt="God of War Ragnarök" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("God of War Ragnarök") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("God of War Ragnarök")'
+                                        title="@(_wishlistedTitles.Contains("God of War Ragnarök") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("God of War Ragnarök") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">God of War Ragnarök</span>
+                                <span class="egs-list-item-price">1.490.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1086940/library_600x900.jpg" alt="Baldur's Gate 3" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Baldurs Gate 3") ? "is-active text-[#0078f2]" : "")"
+                                        @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                        @onclick='() => ToggleWishlist("Baldurs Gate 3")'
+                                        title="@(_wishlistedTitles.Contains("Baldurs Gate 3") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Baldurs Gate 3") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Baldur's Gate 3</span>
+                                <span class="egs-list-item-price">990.000 đ</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 7: DUO BANNERS (Baldur's Gate 3 & Black Myth: Wukong)     *@
+        @* ================================================================= *@
+        <section aria-label="Tựa game đề cử song hành">
+            <div class="egs-duo-grid">
+                @* Left: Baldur's Gate 3 *@
+                <div class="egs-duo-card egs-shimmer-card">
+                    <div class="egs-duo-poster">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1086940/capsule_616x353.jpg" alt="Baldur's Gate 3" />
+                    </div>
+                    <h3 class="egs-duo-title">BALDUR'S GATE 3</h3>
+                    <p class="egs-duo-desc">
+                        Tuyệt tác RPG của thập kỷ - Khám phá thế giới Forgotten Realms với hàng trăm giờ cốt truyện sâu sắc và quyết định then chốt.
+                    </p>
+                    <a href="/products" class="egs-duo-btn">Mua ngay • 990.000 đ</a>
+                </div>
+
+                @* Right: Black Myth: Wukong *@
+                <div class="egs-duo-card egs-shimmer-card">
+                    <div class="egs-duo-poster">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_616x353.jpg" alt="Black Myth: Wukong" />
+                    </div>
+                    <h3 class="egs-duo-title">BLACK MYTH: WUKONG</h3>
+                    <p class="egs-duo-desc">
+                        Trở thành Thiên Mệnh Nhân, dấn thân vào hành trình khám phá những huyền tích bí ẩn và đối đầu với vô số yêu ma chốn thần thoại.
+                    </p>
+                    <a href="/products" class="egs-duo-btn">Mua ngay • 1.299.000 đ</a>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 8: TRENDING                                               *@
+        @* ================================================================= *@
+        <section aria-label="Game thịnh hành">
+            <div class="egs-section-header" style="margin-bottom: 16px;">
+                <h2 class="egs-section-title">Xu Hướng Nổi Bật</h2>
+                <a href="/products" class="egs-outline-btn">Xem tất cả</a>
+            </div>
+
+            <div class="egs-trending-grid">
+                <a href="/products" class="egs-trending-card egs-card-hover">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_616x353.jpg" alt="Forza Horizon 5" />
+                </a>
+                <a href="/products" class="egs-trending-card egs-card-hover">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_616x353.jpg" alt="Red Dead Redemption 2" />
+                </a>
+                <a href="/products" class="egs-trending-card egs-card-hover">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_616x353.jpg" alt="Ghost of Tsushima DIRECTOR'S CUT" />
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+@code {
+    private record HeroSlide(string Image, string Thumb, string Badge, string Title, string Description, string Price, string Link);
+
+    private readonly HeroSlide[] _slides = new[]
+    {
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg",
+            "BÁN CHẠY NHẤT",
+            "Black Myth: Wukong",
+            "Hóa thân thành Thiên Mệnh Nhân, dấn thân vào hành trình Tây Du kỳ ảo đầy thử thách và hiểm nguy.",
+            "1.299.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg",
+            "SIÊU PHẨM NHẬP VAI",
+            "Cyberpunk 2077: Ultimate Edition",
+            "Trở thành lính đánh thuê cyberpunk V giữa thành phố Night City rực rỡ nhưng đầy hiểm họa chết chóc.",
+            "990.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_600x900.jpg",
+            "GAME CỦA NĂM",
+            "Elden Ring: Shadow of the Erdtree",
+            "Bước vào Vùng Đất Bóng Tối, khám phá những bí mật chưa từng được kể cùng Thánh Kiếm Miquella.",
+            "1.099.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/2215430/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/2215430/library_600x900.jpg",
+            "TUYỆT TÁC HÀNH ĐỘNG",
+            "Ghost of Tsushima DIRECTOR'S CUT",
+            "Theo chân samurai Jin Sakai trên con đường bảo vệ quê hương đảo Tsushima khỏi quân xâm lược.",
+            "1.399.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg",
+            "ƯU ĐÃI ĐẶC BIỆT -75%",
+            "The Witcher 3: Wild Hunt",
+            "Săn lùng Đứa Trẻ Lời Nguyền trong thế giới mở kỳ ảo tàn khốc, chiến đấu với quái vật cổ xưa.",
+            "165.000 đ",
+            "/products")
+    };
+
+    private int _heroIndex = 0;
+    private HeroSlide CurrentSlide => _slides[_heroIndex];
+    private System.Threading.Timer? _autoSlideTimer;
+    private bool _isPaused = false;
+    private readonly HashSet<string> _wishlistedTitles = new(StringComparer.OrdinalIgnoreCase);
+
+    private void ToggleWishlist(string title)
+    {
+        if (_wishlistedTitles.Contains(title))
+        {
+            _wishlistedTitles.Remove(title);
+            ToastService.ShowInfo($"Đã xóa \"{title}\" khỏi danh sách yêu thích.");
+        }
+        else
+        {
+            _wishlistedTitles.Add(title);
+            ToastService.ShowSuccess($"Đã thêm \"{title}\" vào danh sách yêu thích!");
+        }
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        _autoSlideTimer = new System.Threading.Timer(_ =>
+        {
+            if (_isPaused) return;
+            InvokeAsync(() =>
+            {
+                _heroIndex = (_heroIndex + 1) % _slides.Length;
+                StateHasChanged();
+            });
+        }, null, 5000, 5000);
+    }
+
+    private void SetHeroSlide(int index)
+    {
+        if (index >= 0 && index < _slides.Length)
+        {
+            _heroIndex = index;
+            ResetTimer();
+        }
+    }
+
+    private void NextHeroSlide()
+    {
+        _heroIndex = (_heroIndex + 1) % _slides.Length;
+        ResetTimer();
+    }
+
+    private void PrevHeroSlide()
+    {
+        _heroIndex = (_heroIndex - 1 + _slides.Length) % _slides.Length;
+        ResetTimer();
+    }
+
+    private void PauseAutoSlide()
+    {
+        _isPaused = true;
+    }
+
+    private void ResumeAutoSlide()
+    {
+        _isPaused = false;
+        ResetTimer();
+    }
+
+    private void ResetTimer()
+    {
+        _autoSlideTimer?.Change(5000, 5000);
+    }
+
+    private async Task ScrollTrack(string elementId, int delta)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", $"document.getElementById('{elementId}')?.scrollBy({{ left: {delta}, behavior: 'smooth' }})");
+        }
+        catch
+        {
+            // fallback
+        }
+    }
+
+    public void Dispose()
+    {
+        _autoSlideTimer?.Dispose();
+    }
+}

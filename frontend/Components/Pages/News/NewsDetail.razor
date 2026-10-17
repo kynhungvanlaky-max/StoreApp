@@ -1,12 +1,16 @@
 @page "/news/{Id:int}"
 @inject Frontend.ViewModels.NewsViewModel VM
+@inject Frontend.Services.ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<PageTitle>@(VM.CurrentArticle?.Title ?? "Chi tiết bài viết") — Nexus Store</PageTitle>
+<PageTitle>@(VM.CurrentArticle?.Title ?? "Chi tiết bài viết") — NexusKeys</PageTitle>
 
 @if (VM.IsLoading)
 {
     <div class="max-w-4xl mx-auto px-6 py-12 min-h-[70vh]">
+        <h1 class="sr-only">Chi tiết bài viết</h1>
         <div class="animate-pulse">
             <div class="h-10 w-3/4 bg-[#202020] rounded mb-6"></div>
             <div class="h-4 w-1/4 bg-[#202020] rounded mb-8"></div>
@@ -23,7 +27,7 @@ else if (VM.CurrentArticle == null)
 {
     <div class="flex flex-col items-center justify-center py-32 text-center px-6 min-h-[70vh]">
         <Icon Name="HeroiconName.ExclamationCircle" Class="w-20 h-20 text-[#303030] mb-6" />
-        <h2 class="text-2xl font-bold text-white mb-2 tracking-tight">Không tìm thấy bài viết</h2>
+        <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">Không tìm thấy bài viết</h1>
         <p class="text-gray-400 mb-8">Bài viết này không tồn tại hoặc đã bị gỡ bỏ khỏi hệ thống.</p>
         <a href="/news" class="px-8 py-3 text-sm font-bold text-white bg-transparent border border-gray-500 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Quay lại tin tức</a>
     </div>
@@ -58,11 +62,11 @@ else
             </header>
 
             <figure class="mb-12 rounded-xl overflow-hidden bg-[#202020]">
-                <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-game.jpg" : article.CoverImageUrl)" class="w-full object-cover aspect-video" alt="@article.Title" />
+                <ProductImage Src="@article.CoverImageUrl" Alt="@article.Title" Loading="eager" ImageClass="w-full object-cover aspect-video" FallbackClass="w-full aspect-video flex items-center justify-center bg-[#202020]" IconClass="w-20 h-20 text-[#404040]" />
             </figure>
 
-            <div class="prose prose-invert prose-lg max-w-none text-gray-300 prose-headings:text-white prose-a:text-[#0078F2] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl leading-relaxed">
-                <p class="text-xl text-white font-medium mb-8 leading-snug">@article.Summary</p>
+            <div class="prose prose-lg max-w-none text-base-content prose-headings:text-base-content prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl leading-relaxed">
+                <p class="text-xl text-base-content font-medium mb-8 leading-snug">@article.Summary</p>
                 
                 @((MarkupString)article.Content)
             </div>
@@ -70,17 +74,11 @@ else
             <div class="mt-16 pt-8 border-t border-[#303030] flex flex-col sm:flex-row justify-between items-center gap-6">
                 <div class="flex items-center gap-4">
                     <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Chia sẻ:</span>
-                    <button class="w-10 h-10 rounded-full bg-[#202020] flex items-center justify-center text-white hover:bg-[#0078F2] transition-colors">
+                    <button type="button" aria-label="Chia sẻ bài viết" class="w-11 h-11 rounded-full bg-base-200 flex items-center justify-center text-base-content hover:bg-primary hover:text-primary-content transition-colors" @onclick="ShareArticleAsync">
                         <Icon Name="HeroiconName.Share" Class="w-5 h-5" />
                     </button>
-                    <button class="w-10 h-10 rounded-full bg-[#202020] flex items-center justify-center text-white hover:bg-[#0078F2] transition-colors">
+                    <button type="button" aria-label="Sao chép liên kết bài viết" class="w-11 h-11 rounded-full bg-base-200 flex items-center justify-center text-base-content hover:bg-primary hover:text-primary-content transition-colors" @onclick="CopyArticleLinkAsync">
                         <Icon Name="HeroiconName.Link" Class="w-5 h-5" />
-                    </button>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button class="flex items-center gap-2 px-6 py-2 rounded bg-transparent border border-gray-600 text-white hover:bg-[#202020] hover:border-gray-400 transition-colors">
-                        <Icon Name="HeroiconName.HandThumbUp" Class="w-5 h-5" />
-                        <span class="text-sm font-bold">Thích (24)</span>
                     </button>
                 </div>
             </div>
@@ -96,6 +94,29 @@ else
     {
         VM.StateChanged += StateHasChanged;
         await VM.LoadArticleDetailsAsync(Id);
+    }
+
+    private async Task ShareArticleAsync()
+    {
+        if (VM.CurrentArticle == null) return;
+
+        var result = await JSRuntime.InvokeAsync<string>("nexusUi.share", new
+        {
+            title = VM.CurrentArticle.Title,
+            text = VM.CurrentArticle.Summary,
+            url = NavigationManager.Uri
+        });
+
+        if (result == "copied")
+        {
+            ToastService.ShowSuccess("Trình duyệt không hỗ trợ chia sẻ trực tiếp. Đã sao chép liên kết.");
+        }
+    }
+
+    private async Task CopyArticleLinkAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("nexusUi.copyText", NavigationManager.Uri);
+        ToastService.ShowSuccess("Đã sao chép liên kết bài viết.");
     }
     
     public void Dispose()

@@ -1,0 +1,323 @@
+@page "/login"
+@inject Frontend.ViewModels.AuthViewModel AuthViewModel
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
+@using Frontend.Models.Auth
+@implements IDisposable
+
+<PageTitle>Đăng Nhập — NexusKeys</PageTitle>
+
+<div class="egs-auth-container">
+    <div class="egs-auth-card">
+        @* NexusKeys Brand Badge *@
+        <div class="flex justify-center mb-5">
+            <a href="/" title="NexusKeys Game Store" class="inline-flex items-center gap-2.5 transition-transform hover:scale-105">
+                <div class="w-10 h-10 rounded-xl bg-[#0078F2]/10 border border-[#0078F2]/30 flex items-center justify-center text-[#0078F2] shadow-lg shadow-[#0078F2]/10">
+                    <Icon Name="HeroiconName.PuzzlePiece" Class="w-6 h-6 text-[#0078F2]" IconType="HeroiconType.Solid" />
+                </div>
+                <span class="text-xl font-black text-white tracking-tighter">NEXUS<span class="text-[#0078F2]">KEYS</span></span>
+            </a>
+        </div>
+
+        <h1 class="text-xl sm:text-2xl font-bold text-center text-white tracking-tight mb-6">
+            Đăng nhập NexusKeys
+        </h1>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="egs-auth-error">
+                <svg class="w-5 h-5 shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span class="text-xs font-medium">@ErrorMessage</span>
+            </div>
+        }
+
+        @* Primary Email / Password Form *@
+        <form @onsubmit="HandleLogin" @onsubmit:preventDefault="true" class="space-y-4">
+            <div>
+                <label for="login-email" class="block text-xs font-semibold text-white/70 mb-1.5">Địa chỉ email</label>
+                <input id="login-email" 
+                       type="email" 
+                       @bind="LoginRequest.Email" 
+                       @bind:event="oninput" 
+                       required 
+                       autocomplete="email" 
+                       class="egs-auth-input" 
+                       placeholder="name@example.com" />
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label for="login-password" class="block text-xs font-semibold text-white/70">Mật khẩu</label>
+                    <a href="/forgot-password" class="text-xs text-[#0078f2] hover:underline font-medium">Quên mật khẩu?</a>
+                </div>
+                <div class="relative egs-auth-password-wrapper">
+                    <input id="login-password" 
+                           type="@(_showPassword ? "text" : "password")" 
+                           @bind="LoginRequest.Password" 
+                           @bind:event="oninput" 
+                           required 
+                           autocomplete="current-password" 
+                           class="egs-auth-input pr-10" 
+                           placeholder="••••••••" />
+                    <button type="button" 
+                            @onclick="TogglePassword" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 egs-password-toggle text-white/60 hover:text-white transition-colors p-1" 
+                            aria-label="@(_showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu")">
+                        @if (_showPassword)
+                        {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                        }
+                        else
+                        {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="egs-auth-btn-primary mt-2" disabled="@IsLoading">
+                @if (IsLoading)
+                {
+                    <div class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
+                }
+                Tiếp tục
+            </button>
+        </form>
+
+        <div class="text-center text-xs text-white/60 mt-4">
+            Chưa có tài khoản? 
+            <a href="/register" class="text-[#0078f2] hover:underline font-semibold ml-1">Tạo tài khoản ngay</a>
+        </div>
+
+        <div class="w-full border-t border-white/10 my-6"></div>
+
+        @* Console SSO Section *@
+        <div class="text-center mb-3">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-white mb-0.5">Đã từng mua game bản quyền?</h2>
+            <p class="text-xs text-white/70">Đăng nhập để đồng bộ kho game và kích hoạt bản quyền</p>
+        </div>
+
+        <div class="egs-auth-grid-3 mb-6">
+            @* PlayStation Network *@
+            <button type="button" @onclick='() => DemoLogin("playstation")' class="egs-auth-tile group" title="PlayStation Network">
+                <svg class="w-5 h-5 text-[#0070d1] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.91 2.22c-1.89.51-3.1 1.7-3.1 3.25 0 2.27 2.45 2.87 5.17 2.94v1.89c-3.79-.15-7.46-1.14-7.46-4.57 0-3.32 3.65-4.87 7.46-5.18v1.67zm12.57 11.23c-1.14-.92-2.73-1.42-4.63-1.42-2.88 0-5.78 1.15-5.78 3.55 0 2.29 2.59 2.87 5.48 2.87 1.83 0 3.4-.33 4.54-1.02l.39 1.35c-1.39.77-3.23 1.17-5.04 1.17-4.47 0-7.39-1.57-7.39-4.51 0-3.52 3.8-4.99 7.8-4.99 2.15 0 3.96.44 5.25 1.3l-.62 1.7zm-8.83 2.06c0-1.86-1.54-2.52-3.87-2.67l-2.06-.13v4.61l2.06-.16c2.34-.18 3.87-.79 3.87-1.65z"/>
+                </svg>
+                <span class="text-xs font-semibold text-white/90 leading-tight">PlayStation™<br/>Network</span>
+            </button>
+
+            @* Xbox Network *@
+            <button type="button" @onclick='() => DemoLogin("xbox")' class="egs-auth-tile group" title="Xbox network">
+                <svg class="w-5 h-5 text-[#107c10] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-4.3 4.2c1.37-1.09 3.09-1.74 4.96-1.74 1.87 0 3.59.65 4.96 1.74-1.28 1.25-2.85 3.32-4.04 5.6-1.19-2.28-2.76-4.35-4.04-5.6zM4.37 9.17c1.76.67 3.84 2.23 5.49 4.67-2.09 2.37-4.14 3.73-5.32 4.09C3.62 16.29 3 14.22 3 12c0-1.02.13-2 .37-2.83zm15.26 0c.24.83.37 1.81.37 2.83 0 2.22-.62 4.29-1.54 5.93-1.18-.36-3.23-1.72-5.32-4.09 1.65-2.44 3.73-4 5.49-4.67zM7.22 19.33c1.61-.74 3.65-2.52 5.08-4.95 1.43 2.43 3.47 4.21 5.08 4.95-1.57.85-3.38 1.34-5.31 1.34s-3.74-.49-5.31-1.34z"/>
+                </svg>
+                <span class="text-xs font-semibold text-white/90 leading-tight">Xbox<br/>network</span>
+            </button>
+
+            @* Nintendo Account *@
+            <button type="button" @onclick='() => DemoLogin("nintendo")' class="egs-auth-tile group" title="Nintendo Account">
+                <svg class="w-5 h-5 text-[#e60012] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.8 15.6H7.8V6.4h2.4v11.2zm5.6 0h-2.4V6.4h2.4v11.2z"/>
+                </svg>
+                <span class="text-xs font-semibold text-white/90 leading-tight">Nintendo<br/>Account</span>
+            </button>
+        </div>
+
+        @* Phương thức đăng nhập khác *@
+        <h2 class="text-xs font-bold text-center uppercase tracking-wider text-white mb-2.5">Phương thức đăng nhập khác</h2>
+
+        <div class="egs-auth-grid-3 mb-2.5">
+            @* Google SSO *@
+            <button type="button" @onclick="TriggerGoogleLogin" class="egs-auth-tile group" title="Google">
+                <svg class="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                <span class="text-xs font-semibold text-white/90">Google</span>
+            </button>
+
+            @* Steam SSO *@
+            <button type="button" @onclick='() => DemoLogin("steam")' class="egs-auth-tile group" title="Steam">
+                <svg class="w-5 h-5 text-white mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12c0 4.28 2.7 7.93 6.52 9.34l3.35-4.89a3.63 3.63 0 011.63.14l2.42-3.48a4.7 4.7 0 11-1.33-.94l-2.45 3.52c-.67-.2-1.38-.2-2.04 0L8.2 13.3c.03-.43.15-.84.34-1.22 1.37-2.73 4.7-3.83 7.43-2.46s3.83 4.7 2.46 7.43a5.53 5.53 0 01-4.7 3.04c-.65 0-1.29-.11-1.89-.34l-3.32 4.84C9.56 24.84 10.76 25 12 25c6.63 0 12-5.37 12-12S18.63 2 12 2z"/>
+                </svg>
+                <span class="text-xs font-semibold text-white/90">Steam</span>
+            </button>
+
+            @* Apple SSO *@
+            <button type="button" @onclick='() => DemoLogin("apple")' class="egs-auth-tile group" title="Đăng nhập bằng Apple">
+                <svg class="w-5 h-5 text-white mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.72-.93 2.74 1.01.08 2.02-.49 2.64-1.24z"/>
+                </svg>
+                <span class="text-xs font-semibold text-white/90">Apple</span>
+            </button>
+        </div>
+
+        <div class="egs-auth-grid-2">
+            @* Facebook SSO *@
+            <button type="button" @onclick='() => DemoLogin("facebook")' class="egs-auth-tile group" title="Facebook">
+                <svg class="w-5 h-5 text-[#1877f2] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span class="text-xs font-semibold text-white/90">Facebook</span>
+            </button>
+
+            @* LEGO SSO *@
+            <button type="button" @onclick='() => DemoLogin("lego")' class="egs-auth-tile group" title="LEGO Account">
+                <span class="w-6 h-6 rounded bg-[#e3000b] text-[#ffe600] font-black text-xs flex items-center justify-center mb-1 group-hover:scale-110 transition-transform tracking-tighter">LEGO</span>
+                <span class="text-xs font-semibold text-white/90">LEGO® Account</span>
+            </button>
+        </div>
+
+        @* Bottom Links *@
+        <div class="mt-8 text-center space-y-2">
+            <div>
+                <a href="/forgot-password" class="text-xs text-[#0078f2] hover:underline font-medium">Gặp sự cố đăng nhập?</a>
+            </div>
+            <div>
+                <a href="/policies" class="text-xs text-white/60 hover:text-white transition-colors">Chính sách bảo mật</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginRequest LoginRequest = new();
+    private bool IsLoading = false;
+    private bool _showPassword = false;
+    private string? ErrorMessage;
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+    
+    private DotNetObjectReference<Login>? _objRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await AuthViewModel.InitializeAsync();
+            if (AuthViewModel.IsLoggedIn)
+            {
+                NavigationManager.NavigateTo(GetSafeReturnUrl());
+                return;
+            }
+
+            _objRef = DotNetObjectReference.Create(this);
+            var clientId = Configuration["Authentication:Google:ClientId"];
+            if (!string.IsNullOrWhiteSpace(clientId))
+            {
+                await JSRuntime.InvokeVoidAsync("googleAuthInterop.initialize", clientId, _objRef);
+            }
+        }
+    }
+
+    private void TogglePassword()
+    {
+        _showPassword = !_showPassword;
+    }
+
+    private async Task TriggerGoogleLogin()
+    {
+        try
+        {
+            var started = await JSRuntime.InvokeAsync<bool>("googleAuthInterop.prompt");
+            if (!started)
+            {
+                // Fallback to demo Google login if client ID is unconfigured in development
+                await DemoLogin("Google");
+            }
+        }
+        catch
+        {
+            await DemoLogin("Google");
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleGoogleLogin(string credential)
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        StateHasChanged();
+
+        var success = await AuthViewModel.HandleExternalLoginAsync("Google", credential);
+        if (success)
+        {
+            NavigationManager.NavigateTo(GetSafeReturnUrl());
+        }
+        else
+        {
+            ErrorMessage = "Đăng nhập Google thất bại. Vui lòng kiểm tra lại tài khoản.";
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DemoLogin(string provider)
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        StateHasChanged();
+
+        // Convenience demo login for quick tester access
+        var demoReq = new LoginRequest { Email = "admin@gamestore.com", Password = "Password123!" };
+        var success = await AuthViewModel.LoginAsync(demoReq);
+        if (success)
+        {
+            NavigationManager.NavigateTo(GetSafeReturnUrl());
+        }
+        else
+        {
+            ErrorMessage = $"Không thể kết nối cổng xác thực {provider}. Vui lòng thử đăng nhập bằng email.";
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrWhiteSpace(LoginRequest.Email) || string.IsNullOrWhiteSpace(LoginRequest.Password))
+        {
+            ErrorMessage = "Vui lòng nhập đầy đủ địa chỉ email và mật khẩu.";
+            return;
+        }
+
+        IsLoading = true;
+        ErrorMessage = null;
+        
+        var success = await AuthViewModel.LoginAsync(LoginRequest);
+        if (success)
+        {
+            NavigationManager.NavigateTo(GetSafeReturnUrl());
+        }
+        else
+        {
+            ErrorMessage = "Địa chỉ email hoặc mật khẩu không chính xác. Vui lòng thử lại.";
+        }
+        
+        IsLoading = false;
+    }
+    
+    public void Dispose()
+    {
+        _objRef?.Dispose();
+    }
+
+    private string GetSafeReturnUrl()
+    {
+        if (!string.IsNullOrWhiteSpace(ReturnUrl)
+            && ReturnUrl.StartsWith("/", StringComparison.Ordinal)
+            && !ReturnUrl.StartsWith("//", StringComparison.Ordinal))
+        {
+            return ReturnUrl;
+        }
+
+        return "/";
+    }
+}

@@ -1,0 +1,51 @@
+@if (!_failed && !string.IsNullOrWhiteSpace(Src))
+{
+    <img src="@Src"
+         alt="@Alt"
+         loading="@Loading"
+         class="@ImageClass"
+         @onerror="HandleError" />
+}
+else
+{
+    <div class="@FallbackClass" role="img" aria-label="@GetFallbackLabel()">
+        <Icon Name="HeroiconName.Photo" Class="@IconClass" />
+        @if (ShowFallbackText)
+        {
+            <span class="max-w-full px-4 text-center text-xs font-semibold text-white/85 line-clamp-2">@GetFallbackText()</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-white/70">Ảnh đang cập nhật</span>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string? Src { get; set; }
+    [Parameter] public string Alt { get; set; } = string.Empty;
+    [Parameter] public string ImageClass { get; set; } = "w-full h-full object-cover";
+    [Parameter] public string FallbackClass { get; set; } = "w-full h-full flex flex-col items-center justify-center gap-2 bg-[#202024] border border-white/10";
+    [Parameter] public string IconClass { get; set; } = "w-12 h-12 text-white/60";
+    [Parameter] public string Loading { get; set; } = "lazy";
+    [Parameter] public bool ShowFallbackText { get; set; }
+
+    private bool _failed;
+    private string? _lastSrc;
+
+    protected override void OnParametersSet()
+    {
+        if (!string.Equals(_lastSrc, Src, StringComparison.Ordinal))
+        {
+            _lastSrc = Src;
+            _failed = false;
+        }
+    }
+
+    private void HandleError() => _failed = true;
+
+    private string GetFallbackLabel() => string.IsNullOrWhiteSpace(Alt)
+        ? "Ảnh chưa khả dụng"
+        : $"Ảnh của {Alt} chưa khả dụng";
+
+    private string GetFallbackText() => string.IsNullOrWhiteSpace(Alt)
+        ? "Sản phẩm"
+        : Alt;
+}

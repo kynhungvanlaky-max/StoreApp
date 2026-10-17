@@ -1,0 +1,574 @@
+# Design Specification: API Endpoint Refactoring and Hardening (Milestone 2)
+
+**Author:** `explorer_m1_2`  
+**Date:** 2026-10-16  
+**Module:** `NexusKeys.Api` (`src/NexusKeys.Api`)  
+**Targets:** `AuthEndpoints.cs`, `UserEndpoints.cs`, `Program.cs`  
+**Scope:** Endpoint refactoring, `ITokenService` integration, `POST /api/v1/auth/logout` addition, Register validation hardening, RFC 7807 compliance, and `RestRouteContractTests` compatibility.
+
+---
+
+## 1. Executive Summary
+
+This specification provides the complete technical design for refactoring and hardening authentication and user identity endpoints in `NexusKeys.Api` to satisfy Requirements R1, R2, and R3.
+All proposed designs strictly adhere to:
+1. **Clean Architecture separation**: Business logic and token operations are delegated to `ITokenService`, eliminating duplicated token creation, rotation, and revocation code from Minimal API endpoints.
+2. **RFC 7807 ProblemDetails compliance**: Validation and auth failures produce `application/problem+json` formatted responses via `V1ProblemDetailsFilter`.
+3. **Route Contract & Test Preservation**: 100% preservation of `RestRouteContractTests.cs`, `AuthAndUserApiTests.cs`, and `ImprovementRegressionTests.cs` without modifying a single line in `tests/`.
+4. **DI Test Host Fallback**: Endpoints use resilient resolution (`sp.GetService<ITokenService>() ?? new TokenService(config, db)`) ensuring that in-memory integration test fixtures (`ApiTestHost.cs`), which cannot be modified, run without dependency injection failures.
+
+---
+
+## 2. Code Inspection & Current State Analysis
+
+### 2.1 `AuthEndpoints.cs` (`src/NexusKeys.Api/Endpoints/Identity/AuthEndpoints.cs`)
+- **Current Lines:** 484 lines.
+- **Current Responsibilities in Minimal API Lambdas:**
+  - `POST /register`: Direct User entity creation with BCrypt hash; lacks username duplicate check; lacks input whitespace trimming.
+  - `POST /login`: Directly invokes private helper `GenerateJwtToken(user, config)` and `GenerateRefreshToken()`; inserts `RefreshToken` entity directly.
+  - `POST /refresh`: Contains ~50 lines of database queries, manual token rotation, and `DbUpdateConcurrencyException` handling.
+  - `POST /reset-password`: Manually executes `db.RefreshTokens.RemoveRange(userTokens)`.
+  - `POST /external-login`: Directly invokes private helper `GenerateJwtToken(user, config)` and `GenerateRefreshToken()`.
+  - Private static methods: `GenerateJwtToken` issues standard claims (`sub`, `email`, `role`, `jti`, `name`) but lacks explicit `ClaimTypes.NameIdentifier` (`nameid`).
+  - **Missing Endpoint:** No server-side session termination endpoint (`POST /api/v1/auth/logout`).
+
+### 2.2 `UserEndpoints.cs` (`src/NexusKeys.Api/Endpoints/Identity/UserEndpoints.cs`)
+- **Current Lines:** 231 lines.
+- **Password Changes Handling (`POST /me/password-changes` on V1):**
+  - Manually queries and removes tokens:
+    ```csharp
+    var userTokens = await db.RefreshTokens.Where(t => t.UserId == user.Id).ToListAsync();
+    if (userTokens.Any())
+    {
+        db.RefreshTokens.RemoveRange(userTokens);
+    }
+    await db.SaveChangesAsync();
+    ```
+  - Returns `204 NoContent` on V1 and `200 OK` on legacy.
+
+### 2.3 Test Suite & DI Observations (`ApiTestHost.cs` & `RestRouteContractTests.cs`)
+- In `tests/GameStore.API.ProductKeyTests/ApiTestHost.cs:50-66`, services registered in `builder.Services` include:
+  `GameStoreDbContext`, `HttpClient`, `VnPayService`, `MoMoService`, `IEmailService`, `V1ProblemDetailsFilter`, `ProblemDetails`, `SignalR`, and `Authentication`.
+- Neither `ApiTestHost.cs` nor `RestRouteContractTests.cs` calls `builder.Services.AddScoped<ITokenService, TokenService>()`.
+- **Critical Architectural Rule**: Because tests in `tests/` MUST NEVER BE MODIFIED, endpoints must NOT fail if `ITokenService` is missing from the test host container. Resilient resolution (`ResolveTokenService`) guarantees complete test pass rates.
+
+---
+
+## 3. Dependency Injection & Service Integration Architecture
+
+### 3.1 Service Contracts (`NexusKeys.Domain` & `NexusKeys.Infrastructure`)
+
+Defined in Domain (`namespace GameStore.API.Interfaces`):
+```csharp
+namespace GameStore.API.Interfaces;
+
+public class TokenResult
+{
+    public string Token { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
+}
+
+public interface ITokenService
+{
+    string GenerateAccessToken(User user);
+    RefreshToken GenerateRefreshToken(int userId);
+    Task<(bool Success, TokenResult? Result, string? Error, bool IsLocked)> RefreshTokenAsync(string token, CancellationToken ct = default);
+    Task RevokeUserTokensAsync(int userId, CancellationToken ct = default);
+    Task<bool> RevokeTokenAsync(string token, CancellationToken ct = default);
+}
+```
+
+### 3.2 Standardized Claims in `GenerateAccessToken`
+Access tokens generated by `TokenService` contain:
+- `JwtRegisteredClaimNames.Sub`: `user.Id.ToString()`
+- `ClaimTypes.NameIdentifier`: `user.Id.ToString()` (Explicit `nameid` claim)
+- `JwtRegisteredClaimNames.Email`: `user.Email`
+- `ClaimTypes.Name`: `user.Username`
+- `ClaimTypes.Role`: `user.Role?.RoleName ?? "Customer"`
+- `JwtRegisteredClaimNames.Jti`: `Guid.NewGuid().ToString()`
+- Lifetime: 30 minutes (`DateTime.UtcNow.AddMinutes(30)`)
+- ClockSkew: `TimeSpan.Zero` (already configured in `Program.cs`)
+
+### 3.3 Resilient Service Resolution Pattern
+In `AuthEndpoints.cs` and `UserEndpoints.cs`:
+```csharp
+private static ITokenService ResolveTokenService(IServiceProvider sp, GameStoreDbContext db, IConfiguration config) =>
+    sp.GetService<ITokenService>() ?? new TokenService(config, db);
+```
+- In **Production** (`Program.cs`): `builder.Services.AddScoped<ITokenService, TokenService>();` ensures standard DI injection.
+- In **Integration Tests** (`ApiTestHost.cs`): When `sp.GetService<ITokenService>()` evaluates to `null`, it seamlessly falls back to `new TokenService(config, db)`, executing the exact same domain and database logic with zero configuration overhead and zero risk of `InvalidOperationException`.
+
+---
+
+## 4. Detailed Endpoint Designs
+
+### 4.1 Endpoint: `POST /api/v1/auth/register` (Validation Hardening)
+
+#### Objectives
+1. Trim whitespace on `Username`, `Email`, and `SecretCode`.
+2. Validate `Username.Length >= 3` and case-insensitive uniqueness in database.
+3. Validate `Email` contains `@` and `.`, and case-insensitive uniqueness in database.
+4. Validate `Password.Length >= 6`.
+5. Block privilege escalation attempt (`secretCode == "NEXUSADMIN"`) with `403 Forbidden`.
+6. Return `201 Created` with `Location` header (`/api/v1/users/{id}`) and `{ user.Id, message = "Đăng ký thành công!" }`.
+7. Ensure all error responses format to `application/problem+json` via `V1ProblemDetailsFilter`.
+
+#### Implementation Code
+```csharp
+// REGISTER
+group.MapPost("/register", async (RegisterRequest req, GameStoreDbContext db, CancellationToken ct) =>
+{
+    var username = req.Username?.Trim() ?? string.Empty;
+    var email = req.Email?.Trim() ?? string.Empty;
+    var password = req.Password ?? string.Empty;
+    var secretCode = req.SecretCode?.Trim() ?? string.Empty;
+
+    // Input validation
+    if (string.IsNullOrWhiteSpace(username) || username.Length < 3)
+        return Results.BadRequest(new { message = "Tên người dùng phải có ít nhất 3 ký tự." });
+
+    if (string.IsNullOrWhiteSpace(email) || !email.Contains("@") || !email.Contains("."))
+        return Results.BadRequest(new { message = "Email không hợp lệ." });
+
+    if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+        return Results.BadRequest(new { message = "Mật khẩu phải có ít nhất 6 ký tự." });
+
+    // Duplicate check: username
+    if (await db.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower(), ct))
+        return Results.BadRequest(new { message = "Tên người dùng đã được sử dụng." });
+
+    // Duplicate check: email
+    if (await db.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower(), ct))
+        return Results.BadRequest(new { message = "Email đã được sử dụng." });
+
+    // Prevent privilege escalation
+    if (secretCode == "NEXUSADMIN")
+    {
+        return Results.Forbid();
+    }
+
+    var role = await db.Set<Role>().FirstOrDefaultAsync(r => r.RoleName == "Customer", ct);
+    if (role == null) return Results.StatusCode(StatusCodes.Status500InternalServerError);
+
+    var user = new User
+    {
+        Username = username,
+        Email = email,
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+        RoleId = role.Id,
+        WalletBalance = 0,
+        CreatedAt = DateTime.UtcNow
+    };
+
+    db.Users.Add(user);
+    await db.SaveChangesAsync(ct);
+
+    return Results.Created(
+        $"{EndpointRouteConventions.PublicPrefix(apiPrefix)}/users/{user.Id}",
+        new { user.Id, message = "Đăng ký thành công!" });
+});
+```
+
+---
+
+### 4.2 Endpoint: `POST /api/v1/auth/login` (TokenService Integration)
+
+#### Objectives
+1. Authenticate user credentials via BCrypt.
+2. Reject locked accounts with `400 Bad Request` ProblemDetails containing `isLocked: true` (verified by `AuthAndUserApiTests.Login_LockedUser_ReturnsBadRequest`).
+3. Reject invalid credentials with `401 Unauthorized` ProblemDetails.
+4. Issue 30-minute JWT token and 7-day RefreshToken using `ITokenService`.
+5. Persist refresh token in database.
+6. Return `200 OK` with `AuthResponse`.
+
+#### Implementation Code
+```csharp
+// LOGIN
+group.MapPost("/login", async (
+    LoginRequest req,
+    GameStoreDbContext db,
+    IConfiguration config,
+    IServiceProvider sp,
+    CancellationToken ct) =>
+{
+    var email = req.Email?.Trim() ?? string.Empty;
+    var user = await db.Users.Include(u => u.Role)
+        .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower(), ct);
+
+    if (user == null)
+    {
+        return Results.Problem(
+            detail: "Email hoặc mật khẩu không chính xác.",
+            statusCode: StatusCodes.Status401Unauthorized,
+            title: "Đăng nhập thất bại",
+            extensions: new Dictionary<string, object?>
+            {
+                ["message"] = "Email hoặc mật khẩu không chính xác."
+            });
+    }
+
+    if (user.IsLocked)
+    {
+        return Results.Problem(
+            detail: "Tài khoản của bạn đã bị khoá. Vui lòng liên hệ hỗ trợ.",
+            statusCode: StatusCodes.Status400BadRequest,
+            title: "Tài khoản bị khoá",
+            extensions: new Dictionary<string, object?>
+            {
+                ["message"] = "Tài khoản của bạn đã bị khoá. Vui lòng liên hệ hỗ trợ.",
+                ["isLocked"] = true
+            });
+    }
+
+    try
+    {
+        if (!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
+        {
+            return Results.Problem(
+                detail: "Email hoặc mật khẩu không chính xác.",
+                statusCode: StatusCodes.Status401Unauthorized,
+                title: "Đăng nhập thất bại",
+                extensions: new Dictionary<string, object?>
+                {
+                    ["message"] = "Email hoặc mật khẩu không chính xác."
+                });
+        }
+    }
+    catch (BCrypt.Net.SaltParseException)
+    {
+        return Results.Problem(
+            detail: "Email hoặc mật khẩu không chính xác.",
+            statusCode: StatusCodes.Status401Unauthorized,
+            title: "Đăng nhập thất bại",
+            extensions: new Dictionary<string, object?>
+            {
+                ["message"] = "Email hoặc mật khẩu không chính xác."
+            });
+    }
+
+    var tokenService = ResolveTokenService(sp, db, config);
+    var token = tokenService.GenerateAccessToken(user);
+    var rt = tokenService.GenerateRefreshToken(user.Id);
+
+    db.Set<RefreshToken>().Add(rt);
+    await db.SaveChangesAsync(ct);
+
+    return Results.Ok(new AuthResponse
+    {
+        Token = token,
+        RefreshToken = rt.Token,
+        Username = user.Username,
+        Email = user.Email,
+        Role = user.Role.RoleName
+    });
+});
+```
+
+---
+
+### 4.3 Endpoint: `POST /api/v1/auth/refresh` (Token Rotation Integration)
+
+#### Objectives
+1. Delegate token lookup, expiry verification, locked account check, concurrency handling, and rotation to `tokenService.RefreshTokenAsync`.
+2. Reject locked users with `401 Unauthorized` (verified by `ImprovementRegressionTests.RefreshToken_LockedUser_IsRejected`).
+3. Reject expired or nonexistent tokens with `401 Unauthorized`.
+4. Return rotated tokens in `AuthResponse` with `200 OK` (verified by `AuthAndUserApiTests.Refresh_ValidToken_RotatesRefreshToken`).
+
+#### Implementation Code
+```csharp
+// REFRESH TOKEN
+group.MapPost("/refresh", async (
+    RefreshRequest req,
+    GameStoreDbContext db,
+    IConfiguration config,
+    IServiceProvider sp,
+    CancellationToken ct) =>
+{
+    if (string.IsNullOrWhiteSpace(req.RefreshToken))
+        return Results.Unauthorized();
+
+    var tokenService = ResolveTokenService(sp, db, config);
+    var (success, result, error, isLocked) = await tokenService.RefreshTokenAsync(req.RefreshToken, ct);
+
+    if (!success || result == null)
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(new AuthResponse
+    {
+        Token = result.Token,
+        RefreshToken = result.RefreshToken,
+        Username = result.Username,
+        Email = result.Email,
+        Role = result.Role
+    });
+});
+```
+
+---
+
+### 4.4 Endpoint: `POST /api/v1/auth/logout` (NEW ENDPOINT - Session Revocation)
+
+#### Objectives
+1. Provide explicit API route `POST /api/v1/auth/logout` (and legacy `POST /api/auth/logout`).
+2. Accept optional `LogoutRequest` body containing `refreshToken` OR identify authenticated caller via `ClaimsPrincipal user`.
+3. If `req?.RefreshToken` is provided: revoke that specific session token via `tokenService.RevokeTokenAsync`.
+4. If caller is authenticated (via Bearer token) and no specific token was revoked: revoke all active refresh tokens for the user via `tokenService.RevokeUserTokensAsync`.
+5. If neither token nor authenticated user is provided: return `400 Bad Request` ProblemDetails.
+6. Return `204 NoContent` on V1 (or `200 OK` with message on legacy).
+7. Ensure operation is idempotent according to RFC 7009 (revoking an already expired or revoked token still succeeds).
+
+#### Request Model
+```csharp
+public class LogoutRequest
+{
+    public string? RefreshToken { get; set; }
+}
+```
+
+#### Implementation Code
+```csharp
+// LOGOUT
+group.MapPost("/logout", async (
+    LogoutRequest? req,
+    ClaimsPrincipal user,
+    GameStoreDbContext db,
+    IConfiguration config,
+    IServiceProvider sp,
+    CancellationToken ct) =>
+{
+    var tokenService = ResolveTokenService(sp, db, config);
+    var tokenRevoked = false;
+
+    // 1. If explicit refresh token provided in body, revoke it
+    if (!string.IsNullOrWhiteSpace(req?.RefreshToken))
+    {
+        await tokenService.RevokeTokenAsync(req.RefreshToken, ct);
+        tokenRevoked = true;
+    }
+
+    // 2. If caller is authenticated and no refresh token was revoked, revoke all tokens for user
+    var userId = user.GetUserId();
+    if (userId.HasValue && !tokenRevoked)
+    {
+        await tokenService.RevokeUserTokensAsync(userId.Value, ct);
+        tokenRevoked = true;
+    }
+
+    // 3. If neither refresh token nor authenticated user provided
+    if (!tokenRevoked)
+    {
+        return Results.BadRequest(new { message = "Cần cung cấp refresh token hoặc xác thực người dùng để đăng xuất." });
+    }
+
+    return EndpointRouteConventions.IsV1(apiPrefix)
+        ? Results.NoContent()
+        : Results.Ok(new { message = "Đăng xuất thành công." });
+});
+```
+
+---
+
+### 4.5 Endpoint: `POST /api/v1/auth/reset-password` (Token Revocation Integration)
+
+#### Objectives
+1. Verify reset token validity and expiry.
+2. Update user's password hash.
+3. Mark reset token as used (`resetToken.IsUsed = true`).
+4. Revoke all active refresh tokens for the user via `tokenService.RevokeUserTokensAsync` (verified by `ImprovementRegressionTests.ResetPassword_RevokesExistingRefreshTokens`).
+5. Return `200 OK` with success message.
+
+#### Implementation Code
+```csharp
+// RESET PASSWORD
+group.MapPost("/reset-password", async (
+    ResetPasswordRequest req,
+    GameStoreDbContext db,
+    IConfiguration config,
+    IServiceProvider sp,
+    CancellationToken ct) =>
+{
+    var resetToken = await db.Set<PasswordResetToken>()
+        .Include(rt => rt.User)
+        .FirstOrDefaultAsync(rt => rt.Token == req.Token && !rt.IsUsed && rt.ExpiresAt > DateTime.UtcNow, ct);
+
+    if (resetToken == null)
+        return Results.BadRequest(new { message = "Token không hợp lệ hoặc đã hết hạn." });
+
+    if (string.IsNullOrWhiteSpace(req.NewPassword) || req.NewPassword.Length < 6)
+        return Results.BadRequest(new { message = "Mật khẩu phải có ít nhất 6 ký tự." });
+
+    // Update password
+    resetToken.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
+    resetToken.IsUsed = true;
+
+    // Revoke all existing refresh tokens via ITokenService
+    var tokenService = ResolveTokenService(sp, db, config);
+    await tokenService.RevokeUserTokensAsync(resetToken.UserId, ct);
+
+    await db.SaveChangesAsync(ct);
+
+    return Results.Ok(new { message = "Mật khẩu đã được thay đổi thành công." });
+});
+```
+
+---
+
+### 4.6 Endpoint: `POST /api/v1/auth/external-login` (TokenService Integration)
+
+#### Objectives
+1. Validate Google / external provider token.
+2. Create user if new, or update GoogleId if linked.
+3. Reject locked users with `400 Bad Request` ProblemDetails.
+4. Issue access token and refresh token via `ITokenService`.
+5. Persist refresh token in database.
+6. Return `200 OK` with `AuthResponse`.
+
+#### Implementation Code Snippet (Token issuance segment)
+```csharp
+var tokenService = ResolveTokenService(sp, db, config);
+var token = tokenService.GenerateAccessToken(user);
+var rt = tokenService.GenerateRefreshToken(user.Id);
+
+db.Set<RefreshToken>().Add(rt);
+await db.SaveChangesAsync(ct);
+
+return Results.Ok(new AuthResponse
+{
+    Token = token,
+    RefreshToken = rt.Token,
+    Username = user.Username,
+    Email = user.Email,
+    Role = user.Role.RoleName
+});
+```
+
+---
+
+### 4.7 Endpoint: `POST /api/v1/users/me/password-changes` in `UserEndpoints.cs`
+
+#### Objectives
+1. Require authorization (`.RequireAuthorization()`).
+2. Verify old password using BCrypt.
+3. Update password hash.
+4. Revoke all active refresh tokens for the user via `tokenService.RevokeUserTokensAsync(user.Id)` (verified by `ImprovementRegressionTests.ChangePassword_RevokesExistingRefreshTokens`).
+5. Return `204 NoContent` on V1 (or `200 OK` on legacy).
+
+#### Implementation Code
+```csharp
+group.MapPost(isV1 ? "/me/password-changes" : "/change-password", async (
+    ChangePasswordDto dto,
+    GameStoreDbContext db,
+    ClaimsPrincipal userClaim,
+    IConfiguration config,
+    IServiceProvider sp,
+    CancellationToken ct) =>
+{
+    var userId = userClaim.GetUserId();
+    if (userId == null) return Results.Unauthorized();
+
+    var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId.Value, ct);
+    if (user == null) return Results.NotFound();
+
+    if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
+        return Results.BadRequest("Mật khẩu mới phải có ít nhất 6 ký tự.");
+
+    try
+    {
+        if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash))
+            return Results.BadRequest("Mật khẩu cũ không chính xác.");
+    }
+    catch (BCrypt.Net.SaltParseException)
+    {
+        return Results.BadRequest("Mật khẩu cũ không chính xác.");
+    }
+
+    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+    // Revoke all user refresh tokens via ITokenService
+    var tokenService = sp.GetService<ITokenService>() ?? new TokenService(config, db);
+    await tokenService.RevokeUserTokensAsync(user.Id, ct);
+
+    await db.SaveChangesAsync(ct);
+
+    return isV1
+        ? Results.NoContent()
+        : Results.Ok(new { message = "Đổi mật khẩu thành công!" });
+}).RequireAuthorization();
+```
+
+---
+
+## 5. Compliance with `RestRouteContractTests`
+
+### 5.1 Route Inventory Analysis
+In `tests/GameStore.API.ProductKeyTests/RestRouteContractTests.cs`:
+- Line 90: `Assert.Contains(routes, route => route.Method == "POST" && route.Route == "/api/v1/auth/register");` -> **Satisfied**.
+- Line 91: `Assert.Contains(routes, route => route.Method == "POST" && route.Route == "/api/v1/auth/login");` -> **Satisfied**.
+- Line 100: `Assert.Contains(routes, route => route.Method == "POST" && route.Route == "/api/v1/users/me/password-changes");` -> **Satisfied**.
+- Line 89: `Assert.Contains(routes, route => route.Method == "PATCH" && route.Route == "/api/v1/users/{id:int}");` -> **Satisfied**.
+- Line 114: `Assert.DoesNotContain(routes, route => route.Route.StartsWith("/api/v1") && route.Route.Contains("toggle-lock"));` -> **Satisfied** (mapped only when `!isV1`).
+- Line 117: `Assert.DoesNotContain(routes, route => route.Route == "/api/v1/auth/change-password");` -> **Satisfied** (mapped only when `!isV1`).
+
+### 5.2 Addition of `/api/v1/auth/logout`
+- The new endpoint adds `POST /api/v1/auth/logout` (and legacy `POST /api/auth/logout`).
+- It does not violate any `DoesNotContain` rule in `RestRouteContractTests.cs`.
+- It adheres to canonical REST resource naming conventions.
+
+---
+
+## 6. RFC 7807 ProblemDetails Verification
+
+### 6.1 `V1ProblemDetailsFilter` Mechanism
+`V1ProblemDetailsFilter` is attached to `app.MapGroup("/api/v1")`:
+```csharp
+var v1 = app.MapGroup(v1Prefix)
+    .AddEndpointFilter<V1ProblemDetailsFilter>();
+```
+Whenever an endpoint returns `Results.BadRequest(new { message = "..." })` or `Results.BadRequest("...")`:
+1. `result` has `statusCode == 400`.
+2. `V1ProblemDetailsFilter` checks `ExtractDetail(valueResult.Value)`.
+3. If value is an object with a `message` property or a string, the message string is extracted.
+4. Returns `Results.Problem(statusCode: 400, title: "Bad Request", detail: detail)` with `Content-Type: application/problem+json`.
+
+### 6.2 Test Assertions Validated
+- `Register_InvalidInput_ReturnsProblemDetails`:
+  - Asserts `Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);`
+  - Asserts `Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);`
+- `Login_LockedUser_ReturnsBadRequest`:
+  - Asserts `Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);`
+  - Asserts `Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);`
+
+Both assertions are fully satisfied by this design.
+
+---
+
+## 7. Registration in `Program.cs`
+
+In `src/NexusKeys.Api/Program.cs`:
+Add the service registration under `// Add services to the container`:
+```csharp
+builder.Services.AddScoped<ITokenService, TokenService>();
+```
+With imports:
+```csharp
+using GameStore.API.Interfaces;
+```
+
+---
+
+## 8. Summary Table of Endpoint Changes
+
+| Endpoint Route | Method | Previous Logic | Refactored Logic | Status / Impact |
+|---|---|---|---|---|
+| `/api/v1/auth/register` | `POST` | Basic length check, no username duplicate check, no input trimming | Trim inputs, check duplicate username & email case-insensitive, reject `NEXUSADMIN` with 403, return 201 with Location | Hardened, RFC 7807 compliant |
+| `/api/v1/auth/login` | `POST` | Internal private helper `GenerateJwtToken` | Resolve `ITokenService`, call `GenerateAccessToken` + `GenerateRefreshToken`, persist token, 400 for locked | Encapsulated, standard claims (`nameid`) |
+| `/api/v1/auth/refresh` | `POST` | 50 lines of DB queries, rotation, and concurrency handling in endpoint | One-line call to `tokenService.RefreshTokenAsync`, returns 401 on locked/expired | Clean Minimal API delegate |
+| `/api/v1/auth/logout` | `POST` | Did not exist | Accepts `refreshToken` or authenticated user, revokes session, returns 204 NoContent | **New Endpoint**, completes session lifecycle |
+| `/api/v1/auth/reset-password` | `POST` | Manual `db.RefreshTokens.RemoveRange` | Call `tokenService.RevokeUserTokensAsync(resetToken.UserId)` | Clean service encapsulation |
+| `/api/v1/auth/external-login` | `POST` | Internal private helper `GenerateJwtToken` | Resolve `ITokenService`, call `GenerateAccessToken` + `GenerateRefreshToken` | Clean service encapsulation |
+| `/api/v1/users/me/password-changes` | `POST` | Manual `db.RefreshTokens.RemoveRange` | Call `tokenService.RevokeUserTokensAsync(user.Id)` | Clean service encapsulation |

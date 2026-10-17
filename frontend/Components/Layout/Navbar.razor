@@ -1,185 +1,578 @@
 @inject Frontend.ViewModels.AuthViewModel AuthViewModel
 @inject Frontend.ViewModels.CartViewModel CartViewModel
+@inject Frontend.ViewModels.WishlistViewModel WishlistViewModel
 @inject Frontend.ViewModels.ProfileViewModel ProfileViewModel
 @inject Frontend.Services.ProductService ProductService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject IConfiguration Configuration
+@inject Frontend.Services.ToastService ToastService
+@using Microsoft.AspNetCore.Components.Routing
 @implements IDisposable
 
-<div class="h-20 bg-[#121212] sticky top-0 z-40 flex items-center justify-between px-6 border-b border-[#303030] shadow-md">
-    <div class="flex items-center gap-8 h-full">
-        @* Logo *@
-        <a href="/" class="text-2xl font-black text-white tracking-tighter flex items-center gap-2">
-            <Icon Name="HeroiconName.PuzzlePiece" Class="w-8 h-8 text-[#0078F2]" IconType="HeroiconType.Solid" />
-            NEXUS<span class="text-[#0078F2]">KEYS</span>
-        </a>
+<header class="h-[56px] bg-[#121212] sticky top-0 z-40 border-b border-white/10 text-white w-full select-none shadow-lg shadow-black/20">
+    <div class="mx-auto w-full max-w-[1440px] 2xl:max-w-[1600px] px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-4">
+        @* Left: Epic Shield Logo, Ecosystem Menu & Global Navigation Links *@
+        <div class="flex items-center gap-4 lg:gap-6 h-full min-w-0">
+            @* Epic Games Ecosystem Switcher Popover *@
+            <div class="relative shrink-0">
+                <button type="button" @onclick="ToggleEcosystemMenu" class="flex items-center gap-1.5 shrink-0 group py-1.5 px-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Epic Games Ecosystem" aria-expanded="@_showEcosystemMenu">
+                    <img src="images/epic/epic_logo.png" alt="Epic Games" class="w-8 h-8 object-contain drop-shadow" />
+                    <svg class="w-3.5 h-3.5 text-white/50 group-hover:text-white transition-transform duration-200 @(_showEcosystemMenu ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
 
-        @* Mobile Sidebar Toggle *@
-        <button class="btn btn-ghost btn-circle lg:hidden text-white" @onclick="ToggleMobileMenu">
-            <Icon Name="HeroiconName.Bars3" Class="w-6 h-6" />
-        </button>
-
-        @* Desktop Navigation *@
-        <nav class="hidden lg:flex h-full items-center gap-1">
-            <a href="/" class="h-full px-4 flex items-center border-b-4 border-transparent hover:border-[#0078F2] text-gray-300 hover:text-white transition-colors text-sm font-bold tracking-wider uppercase">
-                Trang Chủ
-            </a>
-            <a href="/products" class="h-full px-4 flex items-center border-b-4 border-transparent hover:border-[#0078F2] text-gray-300 hover:text-white transition-colors text-sm font-bold tracking-wider uppercase">
-                Cửa Hàng
-            </a>
-            <a href="/news" class="h-full px-4 flex items-center border-b-4 border-transparent hover:border-[#0078F2] text-gray-300 hover:text-white transition-colors text-sm font-bold tracking-wider uppercase">
-                Tin Tức
-            </a>
-            <a href="/support" class="h-full px-4 flex items-center border-b-4 border-transparent hover:border-[#0078F2] text-gray-300 hover:text-white transition-colors text-sm font-bold tracking-wider uppercase">
-                Hỗ Trợ
-            </a>
-        </nav>
-    </div>
-    
-    <div class="flex items-center gap-4">
-        @* Search Bar *@
-        <div class="hidden md:flex relative w-64 lg:w-80 transition-all duration-300 focus-within:w-80 lg:focus-within:w-96 group z-50">
-            <Icon Name="HeroiconName.MagnifyingGlass" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0078F2] transition-colors" />
-            <input type="text" @bind="SearchQuery" @bind:event="oninput" @onkeydown="HandleSearch" @onfocus="HandleFocus" @onblur="HandleBlur" placeholder="Tìm kiếm" class="w-full bg-[#202020] text-white text-sm rounded-full pl-12 pr-4 py-2.5 outline-none focus:bg-[#303030] transition-colors placeholder:text-gray-500 border border-transparent focus:border-[#303030]" autocomplete="off" />
-            
-            @if (_showDropdown)
-            {
-                <div class="absolute top-full left-0 w-full lg:w-96 mt-2 bg-[#1a1a1a] border border-[#333] rounded-2xl shadow-2xl overflow-hidden z-50">
-                    <div class="p-4 border-b border-[#333]/50">
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Kết quả hàng đầu</span>
-                    </div>
-                    
-                    @if (_isSearching)
-                    {
-                        <div class="p-8 flex justify-center items-center">
-                            <span class="loading loading-spinner loading-md text-[#0078F2]"></span>
-                        </div>
-                    }
-                    else if (_searchResults.Any())
-                    {
-                        <div class="flex flex-col py-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                            @foreach (var product in _searchResults)
-                            {
-                                <a href="/product/@product.Id" class="flex items-center gap-4 px-4 py-3 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)">
-                                    <div class="w-12 h-16 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
-                                        @if (!string.IsNullOrEmpty(product.ImageUrl))
-                                        {
-                                            <img src="@product.ImageUrl" class="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-110" alt="@product.Name" />
-                                        }
-                                        else
-                                        {
-                                            <div class="w-full h-full flex items-center justify-center text-gray-500"><Icon Name="HeroiconName.Photo" Class="w-6 h-6" /></div>
-                                        }
-                                    </div>
-                                    <div class="flex flex-col overflow-hidden">
-                                        <span class="text-[11px] text-gray-400 font-medium mb-0.5">Trò chơi cơ bản</span>
-                                        <span class="text-sm font-bold text-gray-200 truncate group-hover/item:text-white transition-colors">
-                                            @HighlightSearchText(product.Name, _searchQuery)
-                                        </span>
-                                    </div>
-                                </a>
-                            }
-                        </div>
-                        <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-left px-5 py-4 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-sm font-bold text-gray-300 hover:text-white transition-colors" @onmousedown="NavigateToSearch">
-                            Xem tất cả kết quả &rarr;
-                        </a>
-                    }
-                    else
-                    {
-                        <div class="p-6 text-center">
-                            <span class="text-sm text-gray-400">Không tìm thấy kết quả nào</span>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-
-        <div class="flex items-center gap-1">
-            <a href="/wishlist" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#202020] text-gray-400 hover:text-white transition-colors" title="Danh sách mong ước">
-                <Icon Name="HeroiconName.Heart" Class="w-5 h-5" />
-            </a>
-
-            <a href="/cart" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#202020] text-gray-400 hover:text-white transition-colors relative" title="Giỏ hàng">
-                <Icon Name="HeroiconName.ShoppingCart" Class="w-5 h-5" />
-                @if (CartViewModel.TotalItems > 0)
+                @if (_showEcosystemMenu)
                 {
-                    <span class="absolute -top-1 -right-1 w-4 h-4 text-[10px] font-bold bg-[#0078F2] text-white rounded-full flex items-center justify-center">@CartViewModel.TotalItems</span>
+                    <div class="fixed inset-0 z-40 bg-transparent" @onclick="() => _showEcosystemMenu = false"></div>
+                    <div class="egs-ecosystem-panel absolute left-0 top-12 z-50">
+                        @* Header *@
+                        <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+                            <div class="flex items-center gap-2">
+                                <img src="images/epic/epic_logo.png" alt="Epic Games" class="w-5 h-5 object-contain" />
+                                <span class="text-xs font-black uppercase tracking-wider text-white whitespace-nowrap">Hệ sinh thái Epic Games</span>
+                            </div>
+                            <span class="text-xs font-bold text-[#0078f2] px-2.5 py-0.5 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 uppercase tracking-wider whitespace-nowrap">Ecosystem</span>
+                        </div>
+
+                        @* 2-column Grid of Cards *@
+                        <div class="egs-ecosystem-grid">
+                            @* 1. Epic Games Store *@
+                            <a href="/" @onclick="() => _showEcosystemMenu = false" class="egs-ecosystem-card group">
+                                <div class="egs-ecosystem-icon bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.614A2.993 2.993 0 009 9.35c.616 0 1.2-.186 1.69-.512a3 3 0 003.62 0c.49.326 1.074.512 1.69.512a2.993 2.993 0 002.81-1.964A3.001 3.001 0 0021.25 9.35m-18.5 0l1.39-4.862A2.25 2.25 0 016.298 3h11.404a2.25 2.25 0 012.158 1.488L21.25 9.35"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs font-bold text-white group-hover:text-[#0078f2] transition-colors block whitespace-nowrap">Epic Games Store</span>
+                                    <span class="text-[11px] text-white/50 block whitespace-nowrap mt-0.5">Cửa hàng game bản quyền</span>
+                                </div>
+                            </a>
+
+                            @* 2. Unreal Engine *@
+                            <a href="https://unrealengine.com" target="_blank" rel="noopener noreferrer" class="egs-ecosystem-card group">
+                                <div class="egs-ecosystem-icon bg-purple-500/15 border border-purple-500/30 text-purple-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs font-bold text-white group-hover:text-purple-400 transition-colors block whitespace-nowrap">Unreal Engine</span>
+                                    <span class="text-[11px] text-white/50 block whitespace-nowrap mt-0.5">Công cụ 3D tân tiến</span>
+                                </div>
+                            </a>
+
+                            @* 3. Fortnite *@
+                            <a href="https://fortnite.com" target="_blank" rel="noopener noreferrer" class="egs-ecosystem-card group">
+                                <div class="egs-ecosystem-icon bg-yellow-500/15 border border-yellow-500/30 text-yellow-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs font-bold text-white group-hover:text-yellow-400 transition-colors block whitespace-nowrap">Fortnite</span>
+                                    <span class="text-[11px] text-white/50 block whitespace-nowrap mt-0.5">Game sinh tồn thế giới</span>
+                                </div>
+                            </a>
+
+                            @* 4. Fab Marketplace *@
+                            <a href="https://fab.com" target="_blank" rel="noopener noreferrer" class="egs-ecosystem-card group">
+                                <div class="egs-ecosystem-icon bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors block whitespace-nowrap">Fab Marketplace</span>
+                                    <span class="text-[11px] text-white/50 block whitespace-nowrap mt-0.5">Chợ tài nguyên 3D</span>
+                                </div>
+                            </a>
+
+                            @* 5. Rocket League *@
+                            <a href="https://rocketleague.com" target="_blank" rel="noopener noreferrer" class="egs-ecosystem-card group">
+                                <div class="egs-ecosystem-icon bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m0 0l3.04-3.04a1.5 1.5 0 012.122 0l1.157 1.157a1.5 1.5 0 010 2.122l-3.04 3.04z"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs font-bold text-white group-hover:text-cyan-400 transition-colors block whitespace-nowrap">Rocket League</span>
+                                    <span class="text-[11px] text-white/50 block whitespace-nowrap mt-0.5">Bóng đá xe bay</span>
+                                </div>
+                            </a>
+
+                            @* 6. Dev Portal *@
+                            <a href="/distribution" @onclick="() => _showEcosystemMenu = false" class="egs-ecosystem-card group">
+                                <div class="egs-ecosystem-icon bg-pink-500/15 border border-pink-500/30 text-pink-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs font-bold text-white group-hover:text-pink-400 transition-colors block whitespace-nowrap">Dev Portal</span>
+                                    <span class="text-[11px] text-white/50 block whitespace-nowrap mt-0.5">Phát hành game 88/12</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        @* Footer *@
+                        <div class="border-t border-white/10 mt-3 pt-3 flex items-center justify-between">
+                            <span class="text-[11px] text-white/40">Mạng lưới giải trí & công nghệ toàn cầu</span>
+                            <a href="https://www.epicgames.com" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-[#0078f2] hover:text-white flex items-center gap-1 transition-colors">
+                                <span>epicgames.com</span>
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="h-4 w-[1px] bg-white/10 hidden lg:block"></div>
+
+            @* Desktop Global Navigation Links matching real Epic Games Store *@
+            <nav class="hidden lg:flex h-full items-center gap-1 xl:gap-2" aria-label="Global Navigation">
+                <a href="/" class="h-full px-3 flex items-center text-xs font-bold uppercase tracking-wider transition-colors relative @(IsStoreActive ? "text-white" : "text-white/70 hover:text-white")">
+                    CỬA HÀNG
+                    @if (IsStoreActive)
+                    {
+                        <span class="absolute bottom-0 left-2 right-2 h-[3px] bg-[#0078f2] shadow-[0_0_8px_#0078f2] rounded-t-full"></span>
+                    }
+                </a>
+                <a href="/news" class="h-full px-3 flex items-center text-xs font-bold uppercase tracking-wider transition-colors relative @(IsCurrentPath("/news") ? "text-white" : "text-white/70 hover:text-white")">
+                    TIN TỨC
+                    @if (IsCurrentPath("/news"))
+                    {
+                        <span class="absolute bottom-0 left-2 right-2 h-[3px] bg-[#0078f2] shadow-[0_0_8px_#0078f2] rounded-t-full"></span>
+                    }
+                </a>
+                <a href="/support" class="h-full px-3 flex items-center text-xs font-bold uppercase tracking-wider transition-colors relative @(IsCurrentPath("/support") ? "text-white" : "text-white/70 hover:text-white")">
+                    HỖ TRỢ
+                    @if (IsCurrentPath("/support"))
+                    {
+                        <span class="absolute bottom-0 left-2 right-2 h-[3px] bg-[#0078f2] shadow-[0_0_8px_#0078f2] rounded-t-full"></span>
+                    }
+                </a>
+                <a href="/distribution" class="h-full px-3 flex items-center text-xs font-bold uppercase tracking-wider transition-colors relative @(IsCurrentPath("/distribution") ? "text-white" : "text-white/70 hover:text-white")">
+                    PHÁT HÀNH
+                    @if (IsCurrentPath("/distribution"))
+                    {
+                        <span class="absolute bottom-0 left-2 right-2 h-[3px] bg-[#0078f2] shadow-[0_0_8px_#0078f2] rounded-t-full"></span>
+                    }
+                </a>
+                <a href="/assistant" class="h-full px-3 flex items-center text-xs font-bold uppercase tracking-wider transition-colors relative group @(IsCurrentPath("/assistant") ? "text-white" : "text-white/70 hover:text-white")">
+                    TRỢ LÝ AI
+                    <span class="ml-1.5 px-1.5 py-0.5 text-xs font-black uppercase tracking-wider rounded bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white shadow-sm shadow-indigo-500/30 group-hover:shadow-indigo-500/50 transition-shadow">AI</span>
+                    @if (IsCurrentPath("/assistant"))
+                    {
+                        <span class="absolute bottom-0 left-2 right-2 h-[3px] bg-[#0078f2] shadow-[0_0_8px_#0078f2] rounded-t-full"></span>
+                    }
+                </a>
+            </nav>
+        </div>
+        
+        @* Right: Quick Access Icons (Wishlist, Cart), Language, User Account Dropdown, Download Button, Mobile Hamburger *@
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0 h-full">
+            @* Wishlist Quick Access Icon *@
+            <a href="/wishlist" class="relative flex items-center justify-center w-8 h-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors group" title="Danh sách yêu thích" aria-label="Danh sách yêu thích">
+                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                </svg>
+                @if (WishlistViewModel.Items.Count > 0)
+                {
+                    <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center shadow-md shadow-[#0078f2]/50 animate-in zoom-in-75">
+                        @(WishlistViewModel.Items.Count > 99 ? "99+" : WishlistViewModel.Items.Count.ToString())
+                    </span>
                 }
             </a>
-            
-            <div class="dropdown dropdown-end ml-2">
-                <div tabindex="0" role="button" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#202020] text-gray-400 hover:text-white transition-colors cursor-pointer border border-transparent hover:border-[#303030]">
-                    <Icon Name="HeroiconName.User" Class="w-5 h-5" />
-                </div>
-                <ul tabindex="0" class="mt-4 z-[1] p-3 shadow-2xl menu menu-sm dropdown-content bg-[#1a1a1a]/95 backdrop-blur-md rounded-2xl w-64 border border-[#333]">
+
+            @* Cart Quick Access Icon *@
+            <a href="/cart" class="relative flex items-center justify-center w-8 h-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors group" title="Giỏ hàng" aria-label="Giỏ hàng">
+                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                </svg>
+                @if (CartViewModel.TotalItems > 0)
+                {
+                    <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center shadow-md shadow-[#0078f2]/50 animate-in zoom-in-75">
+                        @(CartViewModel.TotalItems > 99 ? "99+" : CartViewModel.TotalItems.ToString())
+                    </span>
+                }
+            </a>
+
+            @* Language Globe Icon *@
+            <button type="button" @onclick="() => _showLanguageModal = true" class="flex items-center justify-center w-8 h-8 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10" title="Chọn ngôn ngữ & khu vực" aria-label="Chọn ngôn ngữ">
+                <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>
+            </button>
+
+            @* Account Flyout Dropdown *@
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" aria-label="Mở menu tài khoản" class="h-9 px-3 flex items-center gap-2.5 rounded-lg bg-[#202024] hover:bg-[#28282d] border border-white/10 text-white transition-all cursor-pointer group">
                     @if (AuthViewModel.IsLoggedIn)
                     {
-                        <li class="mb-3 px-2">
-                            <div class="flex items-center gap-3 bg-[#252525] p-3 rounded-xl border border-[#333] hover:border-[#444] transition-colors cursor-default">
-                                <div class="w-10 h-10 rounded-full bg-[#303030] flex items-center justify-center text-gray-400 shrink-0">
-                                    <Icon Name="HeroiconName.User" Class="w-6 h-6" />
-                                </div>
-                                <div class="overflow-hidden">
-                                    <p class="font-bold text-white text-sm truncate w-full" title="@AuthViewModel.Username">@AuthViewModel.Username</p>
-                                    <p class="text-xs font-medium text-[#0078F2]">@(ProfileViewModel.Profile?.WalletBalance.ToString("N0") ?? "0") đ</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li><a href="/profile" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.UserCircle" Class="w-5 h-5 mr-2" /> Tài khoản của tôi</a></li>
-                        <li><a href="/orders" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.DocumentText" Class="w-5 h-5 mr-2" /> Lịch sử đơn hàng</a></li>
-                        <li><a href="/profile/library" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.Key" Class="w-5 h-5 mr-2" /> Quản lý License Key</a></li>
-                        <li><a href="/profile/wallet" class="hover:bg-[#0078F2]/10 text-gray-300 hover:text-[#0078F2] rounded-xl py-2.5 font-medium transition-colors"><Icon Name="HeroiconName.Banknotes" Class="w-5 h-5 mr-2" /> Nạp tiền ví Nexus</a></li>
-                        @if (AuthViewModel.Role == "Administrator")
-                        {
-                            <li class="mt-2 pt-2 border-t border-[#333]">
-                                <button @onclick="GoToAdminPanel" class="hover:bg-purple-500/10 text-purple-400 hover:text-purple-300 rounded-xl py-2.5 font-bold transition-colors text-left w-full">
-                                    <Icon Name="HeroiconName.ShieldCheck" Class="w-5 h-5 mr-2" /> Giao diện Quản Trị
-                                </button>
-                            </li>
-                        }
-                        <li class="mt-2 pt-2 border-t border-[#333]">
-                            <button @onclick="HandleLogout" class="hover:bg-error/10 text-error hover:text-error rounded-xl py-2.5 text-left w-full font-bold transition-colors"><Icon Name="HeroiconName.ArrowRightOnRectangle" Class="w-5 h-5 mr-2" /> Đăng xuất</button>
-                        </li>
+                        var initial = !string.IsNullOrWhiteSpace(AuthViewModel.Username) ? AuthViewModel.Username.Substring(0, 1).ToUpper() : "U";
+                        var shortName = !string.IsNullOrWhiteSpace(ProfileViewModel.Profile?.FullName) ? ProfileViewModel.Profile.FullName : AuthViewModel.Username;
+                        <div class="relative flex items-center justify-center">
+                            <span class="w-5 h-5 rounded-md bg-[#0078f2] text-white text-xs font-black flex items-center justify-center shadow">@initial</span>
+                            <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#202024]" style="background-color: #10b981;"></span>
+                        </div>
+                        <span class="text-xs font-bold max-w-[80px] sm:max-w-[120px] truncate hidden sm:inline">@shortName</span>
+                        <svg class="w-3.5 h-3.5 text-white/50 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     }
                     else
                     {
-                        <li class="px-2 mb-3">
-                            <div class="flex items-center gap-3 bg-[#252525] p-3 rounded-xl border border-[#333] cursor-default">
-                                <div class="w-10 h-10 rounded-full bg-[#303030] flex items-center justify-center text-gray-400 shrink-0">
-                                    <Icon Name="HeroiconName.User" Class="w-6 h-6" />
+                        <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                        </svg>
+                        <span class="text-xs font-bold text-white uppercase tracking-wider">Đăng nhập</span>
+                    }
+                </div>
+                    
+                <div tabindex="0" class="dropdown-content egs-flyout-menu z-50 mt-2 p-2.5 sm:p-3 bg-[#18181c] rounded-xl w-76 sm:w-80 border border-white/10 text-white shadow-2xl shadow-black/95" style="transform-origin: top right;">
+                    @if (AuthViewModel.IsLoggedIn)
+                    {
+                        var isDev = string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase);
+                        var displayName = !string.IsNullOrWhiteSpace(ProfileViewModel.Profile?.FullName) ? ProfileViewModel.Profile.FullName : (!string.IsNullOrWhiteSpace(AuthViewModel.Username) ? AuthViewModel.Username : "Người chơi Nexus");
+                        var email = !string.IsNullOrWhiteSpace(ProfileViewModel.Profile?.Email) ? ProfileViewModel.Profile.Email : (!string.IsNullOrWhiteSpace(AuthViewModel.Username) ? $"{AuthViewModel.Username.ToLower()}@nexuskeys.com" : "player@nexuskeys.com");
+                        var balance = ProfileViewModel.Profile?.WalletBalance.ToString("N0") ?? "0";
+
+                        <div class="p-3 bg-[#202024] rounded-xl border border-white/10 mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="relative shrink-0">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0078f2] to-[#005bb5] text-white font-black text-sm flex items-center justify-center border border-white/20 shadow-md">
+                                        @(!string.IsNullOrWhiteSpace(displayName) ? displayName.Substring(0, 1).ToUpper() : "U")
+                                    </div>
+                                    <span class="egs-status-dot"></span>
                                 </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm">Khách</p>
-                                    <p class="text-xs text-gray-400">Vui lòng đăng nhập</p>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-sm font-bold text-white truncate block">@displayName</span>
+                                        @if (IsStaffOrAdmin)
+                                        {
+                                            <span class="px-1.5 py-0.5 rounded text-xs font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] border border-[#0078f2]/40 shrink-0">
+                                                @(IsAdmin ? "Admin" : (isDev ? "Dev" : "Staff"))
+                                            </span>
+                                        }
+                                    </div>
+                                    <span class="text-xs text-white/50 truncate block mt-0.5">@email</span>
                                 </div>
                             </div>
-                        </li>
-                        <li><a href="/login" class="bg-[#0078F2] hover:bg-[#0066cc] text-white font-bold rounded-xl py-2.5 mb-2 justify-center transition-colors shadow-lg shadow-[#0078F2]/20"><Icon Name="HeroiconName.ArrowRightEndOnRectangle" Class="w-5 h-5 mr-1" /> Đăng nhập</a></li>
-                        <li><a href="/register" class="hover:bg-[#303030] text-gray-300 hover:text-white rounded-xl py-2.5 justify-center font-medium border border-[#333] transition-colors"><Icon Name="HeroiconName.UserPlus" Class="w-5 h-5 mr-1" /> Đăng ký tài khoản mới</a></li>
+
+                            @* NexusPay Wallet Mini Pill *@
+                            <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
+                                <div class="min-w-0">
+                                    <span class="text-xs font-bold text-white/40 uppercase tracking-wider block">Ví NexusPay</span>
+                                    <span class="text-sm font-black text-white tracking-wide whitespace-nowrap">@balance ₫</span>
+                                </div>
+                                <a href="/profile/wallet" class="shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] active:scale-95 text-white text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-[#0078f2]/30" onclick="if(document.activeElement) document.activeElement.blur();">
+                                    + Nạp tiền
+                                </a>
+                            </div>
+                        </div>
+
+                        @* Categorized Menu items *@
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-bold uppercase tracking-wider text-white/40 block px-3 py-1">Thư viện & Đơn hàng</span>
+                            <a href="/profile/library" class="egs-account-item" onclick="if(document.activeElement) document.activeElement.blur();">
+                                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+                                <span>Kho game & Key bản quyền</span>
+                            </a>
+                            <a href="/orders" class="egs-account-item" onclick="if(document.activeElement) document.activeElement.blur();">
+                                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                                <span>Lịch sử đơn hàng</span>
+                            </a>
+                            <a href="/wishlist" class="egs-account-item flex items-center justify-between" onclick="if(document.activeElement) document.activeElement.blur();">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                                    <span>Danh sách yêu thích</span>
+                                </div>
+                                @if (WishlistViewModel.Items.Count > 0)
+                                {
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#0078f2]/20 text-[#0078f2] border border-[#0078f2]/30">@WishlistViewModel.Items.Count</span>
+                                }
+                            </a>
+                            <a href="/profile/wallet" class="egs-account-item" onclick="if(document.activeElement) document.activeElement.blur();">
+                                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6H2.25m0 0v1.5m0 0H3m-1.5 0H2.25m1.5 0h16.5m-16.5 0a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25h16.5a2.25 2.25 0 002.25-2.25V9.75a2.25 2.25 0 00-2.25-2.25H3.75z"/></svg>
+                                <span>Ví & Nạp tiền NexusPay</span>
+                            </a>
+                        </div>
+
+                        <div class="space-y-0.5 pt-1.5 mt-1.5 border-t border-white/10">
+                            <span class="text-xs font-bold uppercase tracking-wider text-white/40 block px-3 py-1">Cài đặt & Tài khoản</span>
+                            <a href="/profile" class="egs-account-item" onclick="if(document.activeElement) document.activeElement.blur();">
+                                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Cài đặt tài khoản</span>
+                            </a>
+                            @if (IsStaffOrAdmin)
+                            {
+                                <button type="button" @onclick="GoToAdminPanel" disabled="@_isOpeningAdmin" class="egs-account-item text-[#0078f2] hover:bg-[#0078f2]/10">
+                                    <svg class="w-4 h-4 text-[#0078f2]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                                    <span>@(IsAdmin ? "Trang Quản trị Hệ thống" : (isDev ? "Developer Studio" : "Bảng Quản lý Nghiệp vụ"))</span>
+                                </button>
+                            }
+                        </div>
+
+                        <div class="pt-1.5 mt-1.5 border-t border-white/10">
+                            <button type="button" @onclick="HandleLogout" class="egs-account-item text-red-400 hover:bg-red-500/10 hover:text-red-300">
+                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                                <span>Đăng xuất</span>
+                            </button>
+                        </div>
                     }
-                </ul>
+                    else
+                    {
+                        <div class="text-center p-3">
+                            <div class="w-11 h-11 rounded-full bg-white/5 border border-white/10 text-white/70 flex items-center justify-center mx-auto mb-2.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                            </div>
+                            <h3 class="text-sm font-bold text-white mb-1">Tài khoản NexusKeys</h3>
+                            <p class="text-xs text-white/50 mb-4 leading-relaxed">Đăng nhập để xem kho key, nạp ví và nhận thông báo ưu đãi độc quyền.</p>
+                            
+                            <div class="space-y-2">
+                                <a href="/login" class="w-full h-10 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center transition-all shadow-md shadow-[#0078f2]/30 active:scale-95" onclick="if(document.activeElement) document.activeElement.blur();">
+                                    Đăng nhập
+                                </a>
+                                <a href="/register" class="w-full h-10 rounded-lg bg-[#202024] hover:bg-[#28282d] border border-white/10 text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center transition-colors active:scale-95" onclick="if(document.activeElement) document.activeElement.blur();">
+                                    Đăng ký tài khoản
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
             </div>
+
+
+
+            @* Mobile Hamburger Toggle *@
+            <button type="button" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 lg:hidden text-white/80 shrink-0 transition-colors" @onclick="ToggleMobileMenu" aria-label="Open menu" aria-expanded="@IsMobileMenuOpen.ToString().ToLowerInvariant()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+            </button>
         </div>
     </div>
-    
-    @* Mobile Menu *@
-    @if (IsMobileMenuOpen)
-    {
-        <div class="absolute top-20 left-0 w-full bg-[#121212] border-b border-[#303030] flex flex-col p-4 shadow-lg lg:hidden">
-            <a href="/" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Trang Chủ</a>
-            <a href="/products" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Cửa Hàng</a>
-            <a href="/news" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Tin Tức</a>
-            <a href="/support" @onclick="ToggleMobileMenu" class="py-3 px-4 text-white font-bold hover:bg-[#202020] rounded-lg">Hỗ Trợ</a>
-            
-            <div class="mt-4 relative w-full">
-                <Icon Name="HeroiconName.MagnifyingGlass" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" @bind="SearchQuery" @bind:event="oninput" @onkeydown="HandleSearch" placeholder="Tìm kiếm game..." class="w-full bg-[#202020] text-white text-sm rounded-full pl-12 pr-4 py-3 outline-none focus:bg-[#303030]" />
+</header>
+
+@* Mobile Drawer Navigation *@
+@if (IsMobileMenuOpen)
+{
+    var isDev = string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase);
+    <div class="fixed inset-0 z-[100] h-full min-h-screen w-full flex justify-end lg:hidden">
+        @* Backdrop *@
+        <div class="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity" @onclick="ToggleMobileMenu"></div>
+
+        @* Sliding Drawer Panel *@
+        <div class="relative w-80 max-w-[85vw] h-full min-h-screen border-l border-white/10 flex flex-col justify-between shadow-2xl egs-drawer-in overflow-y-auto p-5 z-[101]" style="background-color: #141418;">
+                <div class="space-y-4">
+                    @* Drawer Top Bar *@
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div class="flex items-center gap-2">
+                            <img src="images/epic/epic_logo.png" alt="Epic Games" class="w-7 h-7 object-contain" />
+                            <span class="font-black text-sm tracking-wide text-white uppercase">NexusKeys</span>
+                        </div>
+                        <button type="button" @onclick="ToggleMobileMenu" class="w-8 h-8 rounded-lg text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors" aria-label="Đóng menu">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    @* User Status Snippet *@
+                    @if (AuthViewModel.IsLoggedIn)
+                    {
+                        var displayName = !string.IsNullOrWhiteSpace(ProfileViewModel.Profile?.FullName) ? ProfileViewModel.Profile.FullName : AuthViewModel.Username;
+                        var balance = ProfileViewModel.Profile?.WalletBalance.ToString("N0") ?? "0";
+                        <div class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center shrink-0">
+                                    @(!string.IsNullOrWhiteSpace(displayName) ? displayName.Substring(0, 1).ToUpper() : "U")
+                                </div>
+                                <div class="truncate">
+                                    <h4 class="text-xs font-bold text-white truncate">@displayName</h4>
+                                    <span class="text-xs text-white/50 block">Ví: @balance ₫</span>
+                                </div>
+                            </div>
+                            <a href="/profile/wallet" @onclick="ToggleMobileMenu" class="px-2 py-1 rounded bg-[#0078f2] text-white text-xs font-bold uppercase shrink-0">
+                                + Nạp
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="/login" @onclick="ToggleMobileMenu" class="py-2 px-3 rounded-xl bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold text-center uppercase tracking-wide">
+                                Đăng nhập
+                            </a>
+                            <a href="/register" @onclick="ToggleMobileMenu" class="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold text-center uppercase tracking-wide">
+                                Đăng ký
+                            </a>
+                        </div>
+                    }
+
+                    @* Mobile Search *@
+                    <div class="relative w-full">
+                        <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input id="storefront-mobile-search" name="mobileSearch" type="text" @bind="SearchQuery" @bind:event="oninput" @onkeydown="HandleSearch" placeholder="Tìm kiếm trong cửa hàng..." aria-label="Tìm kiếm trong cửa hàng" class="w-full bg-[#202024] text-white text-xs rounded-xl pl-10 pr-3 py-2.5 outline-none focus:bg-[#28282d] border border-white/10 focus:border-[#0078f2] placeholder:text-white/40 transition-colors" />
+                    </div>
+
+                    @* Quick Counters Row *@
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="/cart" @onclick="ToggleMobileMenu" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-xs">
+                            <span class="text-white/80 font-semibold flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                                Giỏ hàng
+                            </span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white">@CartViewModel.TotalItems</span>
+                        </a>
+                        <a href="/wishlist" @onclick="ToggleMobileMenu" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-xs">
+                            <span class="text-white/80 font-semibold flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                                Yêu thích
+                            </span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white">@WishlistViewModel.Items.Count</span>
+                        </a>
+                    </div>
+
+                    @* Navigation Links *@
+                    <div class="space-y-1">
+                        <span class="text-xs font-black uppercase tracking-wider text-white/40 block px-2">Điều hướng</span>
+                        <a href="/" @onclick="ToggleMobileMenu" class="py-2.5 px-3 text-sm font-semibold rounded-xl flex items-center gap-2.5 @(IsStoreActive ? "bg-[#0078f2]/15 text-[#0078f2] font-bold" : "text-white/80 hover:bg-white/5")">
+                            <span class="w-1.5 h-1.5 rounded-full @(IsStoreActive ? "bg-[#0078f2]" : "bg-transparent")"></span>
+                            <span>Cửa hàng (Khám phá)</span>
+                        </a>
+                        <a href="/products" @onclick="ToggleMobileMenu" class="py-2.5 px-3 text-sm font-semibold rounded-xl flex items-center gap-2.5 @(IsCurrentPath("/products") ? "bg-[#0078f2]/15 text-[#0078f2] font-bold" : "text-white/80 hover:bg-white/5")">
+                            <span class="w-1.5 h-1.5 rounded-full @(IsCurrentPath("/products") ? "bg-[#0078f2]" : "bg-transparent")"></span>
+                            <span>Duyệt tìm sản phẩm</span>
+                        </a>
+                        <a href="/news" @onclick="ToggleMobileMenu" class="py-2.5 px-3 text-sm font-semibold rounded-xl flex items-center gap-2.5 @(IsCurrentPath("/news") ? "bg-[#0078f2]/15 text-[#0078f2] font-bold" : "text-white/80 hover:bg-white/5")">
+                            <span class="w-1.5 h-1.5 rounded-full @(IsCurrentPath("/news") ? "bg-[#0078f2]" : "bg-transparent")"></span>
+                            <span>Tin tức game</span>
+                        </a>
+                        <a href="/assistant" @onclick="ToggleMobileMenu" class="py-2.5 px-3 text-sm font-semibold rounded-xl flex items-center justify-between @(IsCurrentPath("/assistant") ? "bg-[#0078f2]/15 text-[#0078f2] font-bold" : "text-white/80 hover:bg-white/5")">
+                            <span class="flex items-center gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full @(IsCurrentPath("/assistant") ? "bg-[#0078f2]" : "bg-transparent")"></span>
+                                <span>Trợ lý AI Nexus</span>
+                            </span>
+                            <span class="px-1.5 py-0.5 text-xs font-black uppercase tracking-wider rounded bg-gradient-to-r from-blue-500 to-indigo-500 text-white">AI</span>
+                        </a>
+                        <a href="/support" @onclick="ToggleMobileMenu" class="py-2.5 px-3 text-sm font-semibold rounded-xl flex items-center gap-2.5 @(IsCurrentPath("/support") ? "bg-[#0078f2]/15 text-[#0078f2] font-bold" : "text-white/80 hover:bg-white/5")">
+                            <span class="w-1.5 h-1.5 rounded-full @(IsCurrentPath("/support") ? "bg-[#0078f2]" : "bg-transparent")"></span>
+                            <span>Trung tâm hỗ trợ</span>
+                        </a>
+                        <a href="/distribution" @onclick="ToggleMobileMenu" class="py-2.5 px-3 text-sm font-semibold rounded-xl flex items-center gap-2.5 @(IsCurrentPath("/distribution") ? "bg-[#0078f2]/15 text-[#0078f2] font-bold" : "text-white/80 hover:bg-white/5")">
+                            <span class="w-1.5 h-1.5 rounded-full @(IsCurrentPath("/distribution") ? "bg-[#0078f2]" : "bg-transparent")"></span>
+                            <span>Phát hành game</span>
+                        </a>
+
+                        @if (IsStaffOrAdmin)
+                        {
+                            <button type="button" @onclick="GoToAdminPanel" disabled="@_isOpeningAdmin" class="w-full py-2.5 px-3 text-left text-sm text-[#0078f2] font-bold hover:bg-[#0078f2]/10 rounded-xl flex items-center gap-2.5 transition-colors">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2]"></span>
+                                <span>@(IsAdmin ? "Giao diện Quản Trị Hệ Thống" : (isDev ? "Developer Studio" : "Bảng Quản Lý Nghiệp Vụ"))</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                @* Drawer Footer *@
+                <div class="pt-4 mt-4 border-t border-white/10 space-y-2">
+                    <button type="button" @onclick="() => { ToggleMobileMenu(); _showLanguageModal = true; }" class="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-semibold flex items-center justify-between transition-colors">
+                        <span class="flex items-center gap-2">
+                            <span>@(_languageList.FirstOrDefault(l => l.Code == _selectedLanguage)?.Flag ?? "🇻🇳")</span>
+                            <span>@(_languageList.FirstOrDefault(l => l.Code == _selectedLanguage)?.Name ?? "Tiếng Việt")</span>
+                        </span>
+                        <span class="text-xs text-white/40">Đổi</span>
+                    </button>
+
+
+
+                    @if (AuthViewModel.IsLoggedIn)
+                    {
+                        <button type="button" @onclick="HandleLogout" class="w-full py-2 px-3 rounded-xl text-red-400 hover:bg-red-500/10 text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                            <span>Đăng xuất</span>
+                        </button>
+                    }
+                </div>
             </div>
         </div>
     }
-</div>
+
+@* Language & Region Selector Modal *@
+@if (_showLanguageModal)
+{
+    <div class="egs-modal-backdrop" @onclick="() => _showLanguageModal = false" role="dialog" aria-modal="true" aria-labelledby="lang-modal-title">
+        <div class="egs-modal-card max-w-md p-6 sm:p-8" @onclick:stopPropagation="true">
+            <button type="button" 
+                    class="absolute top-5 right-5 w-8 h-8 rounded-lg text-white/50 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors"
+                    aria-label="Đóng hộp thoại"
+                    @onclick="() => _showLanguageModal = false">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#0078f2] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0078f2]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="lang-modal-title" class="font-black text-xl text-white tracking-tight">Ngôn ngữ & Khu vực</h3>
+                    <p class="text-xs text-white/60">Chọn ngôn ngữ hiển thị và loại tiền tệ thanh toán</p>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-6 max-h-72 overflow-y-auto pr-1">
+                @foreach (var lang in _languageList)
+                {
+                    var isSelected = _selectedLanguage == lang.Code;
+                    <button type="button" @onclick="() => _selectedLanguage = lang.Code"
+                            class="w-full p-3 rounded-xl border flex items-center justify-between transition-all @(isSelected ? "bg-[#0078f2]/15 border-[#0078f2] text-white" : "bg-[#202024] border-white/10 text-white/70 hover:bg-[#28282d] hover:text-white")">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">@lang.Flag</span>
+                            <div class="text-left">
+                                <span class="text-xs font-bold block">@lang.Name</span>
+                                <span class="text-xs text-white/50">@lang.Region</span>
+                            </div>
+                        </div>
+                        @if (isSelected)
+                        {
+                            <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white flex items-center justify-center text-xs font-black">✓</span>
+                        }
+                    </button>
+                }
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                <button type="button" class="px-5 py-2.5 rounded-xl border border-white/15 text-white/70 hover:text-white hover:bg-white/10 text-xs sm:text-sm font-semibold transition-colors" @onclick="() => _showLanguageModal = false">
+                    Hủy bỏ
+                </button>
+                <button type="button" class="px-6 py-2.5 rounded-xl bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 active:scale-95" @onclick="SaveLanguagePreferences">
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    private bool _showEcosystemMenu = false;
+    private bool _showLanguageModal = false;
+    private string _selectedLanguage = "vi-VN";
+
+    private class LanguageOption
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Region { get; set; } = "";
+        public string Flag { get; set; } = "";
+    }
+
+    private readonly List<LanguageOption> _languageList = new()
+    {
+        new LanguageOption { Code = "vi-VN", Name = "Tiếng Việt", Region = "Việt Nam (₫ VND)", Flag = "🇻🇳" },
+        new LanguageOption { Code = "en-US", Name = "English", Region = "United States ($ USD)", Flag = "🇺🇸" },
+        new LanguageOption { Code = "ja-JP", Name = "日本語", Region = "Japan (¥ JPY)", Flag = "🇯🇵" },
+        new LanguageOption { Code = "ko-KR", Name = "한국어", Region = "Korea (₩ KRW)", Flag = "🇰🇷" },
+        new LanguageOption { Code = "de-DE", Name = "Deutsch", Region = "Deutschland (€ EUR)", Flag = "🇩🇪" },
+        new LanguageOption { Code = "fr-FR", Name = "Français", Region = "France (€ EUR)", Flag = "🇫🇷" },
+        new LanguageOption { Code = "es-ES", Name = "Español", Region = "España (€ EUR)", Flag = "🇪🇸" },
+        new LanguageOption { Code = "pt-BR", Name = "Português", Region = "Brasil (R$ BRL)", Flag = "🇧🇷" },
+    };
+
+    private void ToggleEcosystemMenu() => _showEcosystemMenu = !_showEcosystemMenu;
+
+    private void SaveLanguagePreferences()
+    {
+        _showLanguageModal = false;
+        var lang = _languageList.FirstOrDefault(l => l.Code == _selectedLanguage)?.Name ?? "Tiếng Việt";
+        ToastService.ShowSuccess($"Đã đổi ngôn ngữ và khu vực sang {lang} thành công!");
+    }
+
     private string _searchQuery = "";
     private string SearchQuery
     {
@@ -195,32 +588,61 @@
     }
 
     private bool IsMobileMenuOpen = false;
-    private bool _showDropdown = false;
-    private bool _isSearching = false;
-    private List<Frontend.Models.Product.ProductDto> _searchResults = new();
+    private bool _isOpeningAdmin;
     private CancellationTokenSource? _searchCts;
+
+    private bool IsStaffOrAdmin => AuthViewModel.IsLoggedIn && (
+        string.Equals(AuthViewModel.Role, "Administrator", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(AuthViewModel.Role, "Staff", StringComparison.OrdinalIgnoreCase));
+
+    private bool IsAdmin => AuthViewModel.IsLoggedIn && string.Equals(AuthViewModel.Role, "Administrator", StringComparison.OrdinalIgnoreCase);
 
     protected override void OnInitialized()
     {
         AuthViewModel.StateChanged += StateHasChanged;
         CartViewModel.StateChanged += StateHasChanged;
+        WishlistViewModel.StateChanged += StateHasChanged;
         ProfileViewModel.StateChanged += StateHasChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
     }
 
     protected override async Task OnInitializedAsync()
     {
         if (AuthViewModel.IsLoggedIn)
         {
-            await ProfileViewModel.LoadProfileAsync();
+            await Task.WhenAll(
+                ProfileViewModel.LoadProfileAsync(),
+                WishlistViewModel.LoadWishlistAsync()
+            );
         }
+    }
+
+    private string CurrentPath => "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].Trim('/');
+
+    private bool IsCurrentPath(string path, bool exact = false)
+    {
+        var current = CurrentPath == "//" ? "/" : CurrentPath;
+        if (exact || path == "/")
+        {
+            return string.Equals(current, path, StringComparison.OrdinalIgnoreCase);
+        }
+        return current.Equals(path, StringComparison.OrdinalIgnoreCase) || current.StartsWith(path + "/", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool IsStoreActive => IsCurrentPath("/", exact: true) || IsCurrentPath("/products");
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        IsMobileMenuOpen = false;
+        _showEcosystemMenu = false;
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleSearchInputAsync()
     {
         if (string.IsNullOrWhiteSpace(_searchQuery) || _searchQuery.Length < 2)
         {
-            _showDropdown = false;
-            _searchResults.Clear();
             return;
         }
 
@@ -231,73 +653,14 @@
         try
         {
             await Task.Delay(300, token); // Debounce
-            
-            if (!token.IsCancellationRequested)
-            {
-                _isSearching = true;
-                _showDropdown = true;
-                await InvokeAsync(StateHasChanged);
-
-                var result = await ProductService.GetProductsAsync(page: 1, pageSize: 4, search: _searchQuery);
-                
-                if (!token.IsCancellationRequested)
-                {
-                    _searchResults = result?.Items ?? new List<Frontend.Models.Product.ProductDto>();
-                    _isSearching = false;
-                    await InvokeAsync(StateHasChanged);
-                }
-            }
         }
         catch (TaskCanceledException) { }
-    }
-
-    private void HandleFocus()
-    {
-        if (!string.IsNullOrWhiteSpace(_searchQuery) && _searchQuery.Length >= 2)
-        {
-            _showDropdown = true;
-        }
-    }
-
-    private async Task HandleBlur()
-    {
-        // Give time for mousedown on results to trigger before hiding dropdown
-        await Task.Delay(200);
-        _showDropdown = false;
-        StateHasChanged();
-    }
-
-    private void NavigateToProduct(int id)
-    {
-        _showDropdown = false;
-        NavigationManager.NavigateTo($"/product/{id}");
-    }
-
-    private void NavigateToSearch()
-    {
-        _showDropdown = false;
-        NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(_searchQuery)}");
-    }
-
-    private MarkupString HighlightSearchText(string text, string query)
-    {
-        if (string.IsNullOrWhiteSpace(query)) return new MarkupString(System.Net.WebUtility.HtmlEncode(text));
-        
-        var index = text.IndexOf(query, StringComparison.OrdinalIgnoreCase);
-        if (index < 0) return new MarkupString(System.Net.WebUtility.HtmlEncode(text));
-        
-        var before = System.Net.WebUtility.HtmlEncode(text.Substring(0, index));
-        var match = System.Net.WebUtility.HtmlEncode(text.Substring(index, query.Length));
-        var after = System.Net.WebUtility.HtmlEncode(text.Substring(index + query.Length));
-        
-        return new MarkupString($"{before}<span class=\"text-[#0078F2]\">{match}</span>{after}");
     }
 
     private void HandleSearch(KeyboardEventArgs e)
     {
         if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_searchQuery))
         {
-            _showDropdown = false;
             IsMobileMenuOpen = false;
             NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(_searchQuery)}");
         }
@@ -316,10 +679,39 @@
 
     private async Task GoToAdminPanel()
     {
-        var token = await AuthViewModel.GetTokenAsync();
-        if (!string.IsNullOrEmpty(token))
+        if (!IsStaffOrAdmin)
         {
-            await JS.InvokeVoidAsync("open", $"http://localhost:3001/Auth/AutoLogin?token={token}", "_blank");
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        _isOpeningAdmin = true;
+
+        try
+        {
+            var token = await AuthViewModel.GetTokenAsync();
+            if (string.IsNullOrWhiteSpace(token) && await AuthViewModel.TryRefreshAsync())
+            {
+                token = await AuthViewModel.GetTokenAsync();
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                ToastService.ShowError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            var adminUrl = Configuration["AdminPortal:BaseUrl"]?.TrimEnd('/') ?? "http://localhost:3001";
+            await JS.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
+        }
+        catch
+        {
+            ToastService.ShowError("Không thể mở cổng quản trị. Vui lòng thử lại.");
+        }
+        finally
+        {
+            _isOpeningAdmin = false;
         }
     }
 
@@ -327,6 +719,9 @@
     {
         AuthViewModel.StateChanged -= StateHasChanged;
         CartViewModel.StateChanged -= StateHasChanged;
+        WishlistViewModel.StateChanged -= StateHasChanged;
         ProfileViewModel.StateChanged -= StateHasChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+        _searchCts?.Dispose();
     }
 }

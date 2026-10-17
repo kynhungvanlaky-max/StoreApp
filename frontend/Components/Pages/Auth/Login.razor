@@ -2,17 +2,19 @@
 @inject Frontend.ViewModels.AuthViewModel AuthViewModel
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
 @using Frontend.Models.Auth
+@implements IDisposable
 
-<PageTitle>Đăng Nhập — Nexus Store</PageTitle>
+<PageTitle>Đăng Nhập — NexusKeys</PageTitle>
 
 <div class="flex items-center justify-center min-h-[calc(100vh-200px)] py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 bg-[#202020] p-8 rounded-xl border border-[#303030]">
         <div class="text-center">
             <Icon Name="HeroiconName.PuzzlePiece" Class="w-12 h-12 text-white mx-auto mb-4" IconType="HeroiconType.Solid" />
-            <h2 class="mt-2 text-2xl font-bold text-white tracking-tight uppercase">
+            <h1 class="mt-2 text-2xl font-bold text-white tracking-tight uppercase">
                 Đăng Nhập
-            </h2>
+            </h1>
             <p class="mt-2 text-sm text-gray-400">
                 Chưa có tài khoản?
                 <a href="/register" class="font-bold text-white hover:underline uppercase tracking-wider text-xs ml-1">
@@ -20,7 +22,7 @@
                 </a>
             </p>
         </div>
-        <form class="mt-8 space-y-6" @onsubmit="HandleLogin">
+        <form class="mt-8 space-y-6" @onsubmit="HandleLogin" @onsubmit:preventDefault="true">
             @if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 <div class="p-4 bg-error/20 border border-error/50 rounded flex items-center gap-3 text-error text-sm">
@@ -31,22 +33,17 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="sr-only">Tài khoản hoặc Email</label>
-                    <input type="text" @bind="LoginRequest.Email" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Tài khoản hoặc địa chỉ email">
+                    <label for="login-email" class="sr-only">Email</label>
+                    <input id="login-email" type="email" @bind="LoginRequest.Email" @bind:event="oninput" required autocomplete="email" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Địa chỉ email">
                 </div>
                 <div>
-                    <label class="sr-only">Mật khẩu</label>
-                    <input type="password" @bind="LoginRequest.Password" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mật khẩu">
+                    <label for="login-password" class="sr-only">Mật khẩu</label>
+                    <input id="login-password" type="password" @bind="LoginRequest.Password" @bind:event="oninput" required autocomplete="current-password" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mật khẩu">
                 </div>
             </div>
 
             <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-600 bg-[#121212] text-[#0078F2] focus:ring-offset-[#202020]">
-                    <label for="remember-me" class="ml-2 block text-sm text-gray-400">
-                        Ghi nhớ tôi
-                    </label>
-                </div>
+                <span class="text-sm text-gray-500">Phiên đăng nhập được bảo vệ trên thiết bị này</span>
 
                 <div class="text-sm">
                     <a href="/forgot-password" class="font-medium text-gray-400 hover:text-white transition-colors">Quên mật khẩu?</a>
@@ -86,12 +83,12 @@
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
-    public string? ReturnUrl { get; set; }
-
     private LoginRequest LoginRequest = new();
     private bool IsLoading = false;
     private string? ErrorMessage;
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
     
     private DotNetObjectReference<Login>? _objRef;
 
@@ -99,39 +96,29 @@
     {
         if (firstRender)
         {
+            await AuthViewModel.InitializeAsync();
             if (AuthViewModel.IsLoggedIn)
             {
-                await CheckAndRedirectToTarget();
+                NavigationManager.NavigateTo(GetSafeReturnUrl());
                 return;
             }
 
             _objRef = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("googleAuthInterop.initialize", "86985055083-mfhejhujniaiu0k8qki84l8jialv9mc7.apps.googleusercontent.com", _objRef);
-        }
-    }
-
-    private async Task CheckAndRedirectToTarget()
-    {
-        var isReturnToAdmin = string.Equals(ReturnUrl, "/admin", StringComparison.OrdinalIgnoreCase) ||
-                              NavigationManager.Uri.Contains("returnUrl=/admin", StringComparison.OrdinalIgnoreCase);
-
-        if (isReturnToAdmin)
-        {
-            var token = await AuthViewModel.GetTokenAsync();
-            if (!string.IsNullOrEmpty(token))
+            var clientId = Configuration["Authentication:Google:ClientId"];
+            if (!string.IsNullOrWhiteSpace(clientId))
             {
-                NavigationManager.NavigateTo($"http://localhost:3001/Auth/AutoLogin?token={token}", forceLoad: true);
-                return;
+                await JSRuntime.InvokeVoidAsync("googleAuthInterop.initialize", clientId, _objRef);
             }
         }
-
-        NavigationManager.NavigateTo("/");
     }
 
     private async Task TriggerGoogleLogin()
     {
-        // Kích hoạt popup chọn tài khoản của Google
-        await JSRuntime.InvokeVoidAsync("googleAuthInterop.prompt");
+        var started = await JSRuntime.InvokeAsync<bool>("googleAuthInterop.prompt");
+        if (!started)
+        {
+            ErrorMessage = "Đăng nhập Google chưa sẵn sàng. Vui lòng chờ vài giây rồi thử lại.";
+        }
     }
 
     [JSInvokable]
@@ -144,7 +131,7 @@
         var success = await AuthViewModel.HandleExternalLoginAsync("Google", credential);
         if (success)
         {
-            await CheckAndRedirectToTarget();
+            NavigationManager.NavigateTo(GetSafeReturnUrl());
         }
         else
         {
@@ -154,11 +141,13 @@
         }
     }
 
+
+
     private async Task HandleLogin()
     {
         if (string.IsNullOrWhiteSpace(LoginRequest.Email) || string.IsNullOrWhiteSpace(LoginRequest.Password))
         {
-            ErrorMessage = "Vui lòng nhập đầy đủ tài khoản/email và mật khẩu.";
+            ErrorMessage = "Vui lòng nhập đầy đủ email và mật khẩu.";
             return;
         }
 
@@ -168,11 +157,11 @@
         var success = await AuthViewModel.LoginAsync(LoginRequest);
         if (success)
         {
-            await CheckAndRedirectToTarget();
+            NavigationManager.NavigateTo(GetSafeReturnUrl());
         }
         else
         {
-            ErrorMessage = "Tài khoản hoặc mật khẩu không đúng.";
+            ErrorMessage = "Email hoặc mật khẩu không đúng.";
         }
         
         IsLoading = false;
@@ -181,5 +170,17 @@
     public void Dispose()
     {
         _objRef?.Dispose();
+    }
+
+    private string GetSafeReturnUrl()
+    {
+        if (!string.IsNullOrWhiteSpace(ReturnUrl)
+            && ReturnUrl.StartsWith("/", StringComparison.Ordinal)
+            && !ReturnUrl.StartsWith("//", StringComparison.Ordinal))
+        {
+            return ReturnUrl;
+        }
+
+        return "/";
     }
 }

@@ -1,0 +1,91 @@
+@page "/wishlist"
+@inject Frontend.ViewModels.WishlistViewModel VM
+@inject Frontend.ViewModels.CartViewModel CartVM
+@layout Frontend.Components.Layout.ProfileLayout
+@implements IDisposable
+
+<PageTitle>Danh Sách Yêu Thích — NexusKeys</PageTitle>
+<h1 class="sr-only">Danh sách yêu thích</h1>
+
+<div class="w-full">
+            @if (VM.IsLoading && VM.Items.Count == 0)
+            {
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="rounded-xl bg-[#18181c] border border-white/10 p-3 animate-pulse">
+                            <div class="aspect-[3/4] w-full bg-[#202024] rounded-lg mb-3"></div>
+                            <div class="h-3 bg-[#202024] rounded-full w-full mb-2"></div>
+                            <div class="h-3 bg-[#202024] rounded-full w-1/2"></div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (VM.Items.Count == 0)
+            {
+                <div class="bg-[#18181c] rounded-2xl border border-white/10 p-12 text-center shadow-xl">
+                    <div class="w-16 h-16 rounded-2xl bg-[#0078f2]/10 text-[#0078f2] flex items-center justify-center mx-auto mb-4 border border-[#0078f2]/20">
+                        <Icon Name="HeroiconName.Heart" Class="w-8 h-8" />
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mb-2 tracking-tight">Danh sách yêu thích trống</h2>
+                    <p class="text-white/60 mb-6 text-xs sm:text-sm max-w-md mx-auto">Bạn chưa thêm sản phẩm nào vào danh sách. Hãy dạo qua Cửa hàng để tìm tựa game ưng ý nhé!</p>
+                    <a href="/products" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 active:scale-[0.98] inline-flex items-center gap-2">
+                        <Icon Name="HeroiconName.BuildingStorefront" Class="w-5 h-5 mr-1" />
+                        <span>Đến Cửa Hàng</span>
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                    @for (int i = 0; i < VM.Items.Count; i++)
+                    {
+                        var item = VM.Items[i];
+                        <Frontend.Components.Shared.ProductCard 
+                            Product="@(new Frontend.Models.Product.ProductDto {
+                                Id = item.Product.Id,
+                                Name = item.Product.Name,
+                                Type = item.Product.Type ?? string.Empty,
+                                BasePrice = item.Product.BasePrice,
+                                ImageUrl = item.Product.ImageUrl ?? string.Empty,
+                                Categories = item.Product.Categories ?? new()
+                            })"
+                            IsWishlistMode="true"
+                            OnAddToCart="() => AddToCart(item)"
+                            OnRemoveFromWishlist="() => VM.RemoveFromWishlistAsync(item.ProductId)" />
+                    }
+                </div>
+
+            }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        VM.StateChanged += StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await VM.LoadWishlistAsync();
+        }
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+
+    private async Task AddToCart(Frontend.Models.Wishlist.WishlistItem item)
+    {
+        await CartVM.AddToCartAsync(new Frontend.Models.Cart.CartItem
+        {
+            ProductId = item.Product.Id,
+            Name = item.Product.Name,
+            Price = item.Product.BasePrice,
+            ImageUrl = item.Product.ImageUrl ?? string.Empty
+        });
+    }
+}

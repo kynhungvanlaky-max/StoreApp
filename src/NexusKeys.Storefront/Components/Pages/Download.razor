@@ -1,0 +1,150 @@
+@page "/download"
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<PageTitle>Tải NexusKeys Launcher — Ứng Dụng Quản Lý Game Bản Quyền</PageTitle>
+
+<div class="egs-wrap">
+    <div class="egs-content">
+
+        @* HERO DOWNLOAD SECTION *@
+        <section class="relative rounded-2xl overflow-hidden bg-gradient-to-b from-[#1c1c22] to-[#121216] border border-white/10 p-8 md:p-14 mb-12 shadow-2xl">
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#40a9ff] text-xs font-bold uppercase tracking-wider mb-6">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    Bộ Cài Đặt Chính Thức
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
+                    Tải Ứng Dụng NexusKeys Launcher
+                </h1>
+
+                <p class="text-white/70 text-base sm:text-lg mb-8 leading-relaxed">
+                    Trải nghiệm các tựa game PC bản quyền, tự động cập nhật, kết nối bạn bè và khám phá hàng ngàn trò chơi trên ứng dụng NexusKeys Launcher.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    @* Windows Primary Download *@
+                    <button type="button" @onclick="SimulateDownload" class="egs-auth-btn-primary flex items-center gap-3 px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-sm tracking-wide shadow-lg shadow-[#0078f2]/30 cursor-pointer">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.801"/>
+                        </svg>
+                        <span>Tải Cho Windows (PC)</span>
+                    </button>
+
+                    @* macOS Secondary Download *@
+                    <button type="button" @onclick="SimulateDownload" class="egs-auth-tile flex items-center gap-2.5 px-6 py-4 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-semibold text-sm cursor-pointer">
+                        <svg class="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.01-2.85-.9.04-2 .6-2.65 1.35-.58.66-1.09 1.73-1.05 2.76.99.08 2.07-.51 2.69-1.26z"/>
+                        </svg>
+                        <span>Bộ Cài Cho macOS</span>
+                    </button>
+                </div>
+
+                @if (_downloadStarted)
+                {
+                    <div class="inline-flex items-center gap-2 p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold animate-pulse">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Đang tải NexusKeysInstaller-v2.0.exe... Vui lòng kiểm tra thư mục tải xuống của bạn.
+                    </div>
+                }
+            </div>
+
+            @* Background Shield Glow Artwork *@
+            <div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none hidden md:flex items-center justify-center w-80 h-80 rounded-full bg-[#0078f2]/30 blur-2xl">
+                <span class="text-9xl font-black text-[#0078f2]">NK</span>
+            </div>
+        </section>
+
+        @* 3 FEATURE HIGHLIGHTS *@
+        <section class="mb-14">
+            <h2 class="text-xl font-bold text-white mb-6 tracking-tight">Tại Sao Nên Dùng NexusKeys Launcher?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @* Feature 1: Free Games Weekly *@
+                <div class="egs-card-hover egs-shimmer-card rounded-2xl bg-[#1c1c20] border border-white/10 p-6 flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#40a9ff] flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Game Miễn Phí Định Kỳ</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Khám phá kho game hấp dẫn không tốn phí. Nhận game định kỳ và sở hữu vĩnh viễn trong tài khoản NexusKeys của bạn.
+                    </p>
+                </div>
+
+                @* Feature 2: Cloud Saves & Auto Updates *@
+                <div class="egs-card-hover egs-shimmer-card rounded-2xl bg-[#1c1c20] border border-white/10 p-6 flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Đồng Bộ Đám Mây & Cập Nhật Tự Động</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Không bao giờ lo mất tiến trình. Dữ liệu save game, thành tích và các bản vá lỗi luôn được cập nhật tự động nhanh chóng.
+                    </p>
+                </div>
+
+                @* Feature 3: Friends & Cross-Play *@
+                <div class="egs-card-hover egs-shimmer-card rounded-2xl bg-[#1c1c20] border border-white/10 p-6 flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Cộng Đồng & Đa Nền Tảng</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Kết nối cộng đồng game thủ sôi động. Trò chuyện, nhắn tin và mời bạn bè tham gia các tựa game yêu thích mượt mà.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        @* SYSTEM REQUIREMENTS *@
+        <section class="rounded-2xl bg-[#16161a] border border-white/10 p-8 mb-14">
+            <h2 class="text-xl font-bold text-white mb-6">Yêu Cầu Hệ Thống</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                <div>
+                    <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#0078f2]"></span>
+                        Yêu cầu Windows
+                    </h3>
+                    <ul class="space-y-2.5 text-white/70">
+                        <li><strong class="text-white">Hệ điều hành:</strong> Windows 10/11 64-bit</li>
+                        <li><strong class="text-white">Bộ vi xử lý:</strong> 2.0 GHz Dual-Core Intel hoặc AMD</li>
+                        <li><strong class="text-white">RAM:</strong> Tối thiểu 2 GB RAM</li>
+                        <li><strong class="text-white">Đồ họa:</strong> GPU tương thích DirectX 9.0c trở lên</li>
+                        <li><strong class="text-white">Dung lượng:</strong> 1.5 GB ổ đĩa khả dụng</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                        Yêu cầu macOS
+                    </h3>
+                    <ul class="space-y-2.5 text-white/70">
+                        <li><strong class="text-white">Hệ điều hành:</strong> macOS 10.15 (Catalina) trở lên</li>
+                        <li><strong class="text-white">Bộ vi xử lý:</strong> Apple Silicon (M1/M2/M3) hoặc Intel Core 2 Duo</li>
+                        <li><strong class="text-white">RAM:</strong> Tối thiểu 4 GB RAM</li>
+                        <li><strong class="text-white">Đồ họa:</strong> GPU tương thích Metal</li>
+                        <li><strong class="text-white">Dung lượng:</strong> 2 GB ổ đĩa khả dụng</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+
+    private bool _downloadStarted = false;
+
+    private void SimulateDownload()
+    {
+        _downloadStarted = true;
+    }
+}

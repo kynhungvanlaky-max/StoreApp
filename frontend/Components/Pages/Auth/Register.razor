@@ -4,15 +4,15 @@
 @inject NavigationManager NavigationManager
 @using Frontend.Models.Auth
 
-<PageTitle>Đăng Ký — Nexus Store</PageTitle>
+<PageTitle>Đăng Ký — NexusKeys</PageTitle>
 
 <div class="flex items-center justify-center min-h-[calc(100vh-200px)] py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 bg-[#202020] p-8 rounded-xl border border-[#303030]">
         <div class="text-center">
             <Icon Name="HeroiconName.UserPlus" Class="w-12 h-12 text-white mx-auto mb-4" IconType="HeroiconType.Solid" />
-            <h2 class="mt-2 text-2xl font-bold text-white tracking-tight uppercase">
+            <h1 class="mt-2 text-2xl font-bold text-white tracking-tight uppercase">
                 Tạo Tài Khoản
-            </h2>
+            </h1>
             <p class="mt-2 text-sm text-gray-400">
                 Đã có tài khoản?
                 <a href="/login" class="font-bold text-white hover:underline uppercase tracking-wider text-xs ml-1">
@@ -20,7 +20,7 @@
                 </a>
             </p>
         </div>
-        <form class="mt-8 space-y-6" @onsubmit="HandleRegister">
+        <form class="mt-8 space-y-6" @onsubmit="HandleRegister" @onsubmit:preventDefault="true">
             @if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 <div class="p-4 bg-error/20 border border-error/50 rounded flex items-center gap-3 text-error text-sm">
@@ -31,20 +31,20 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="sr-only">Tên hiển thị</label>
-                    <input type="text" @bind="RegisterRequest.Username" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Tên hiển thị của bạn">
+                    <label for="register-username" class="sr-only">Tên hiển thị</label>
+                    <input id="register-username" type="text" @bind="RegisterRequest.Username" @bind:event="oninput" required autocomplete="username" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Tên hiển thị của bạn">
                 </div>
                 <div>
-                    <label class="sr-only">Email</label>
-                    <input type="email" @bind="RegisterRequest.Email" required class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Địa chỉ email">
+                    <label for="register-email" class="sr-only">Email</label>
+                    <input id="register-email" type="email" @bind="RegisterRequest.Email" @bind:event="oninput" required autocomplete="email" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Địa chỉ email">
                 </div>
                 <div>
-                    <label class="sr-only">Mật khẩu</label>
-                    <input type="password" @bind="RegisterRequest.Password" required minlength="6" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mật khẩu (Ít nhất 6 ký tự)">
+                    <label for="register-password" class="sr-only">Mật khẩu</label>
+                    <input id="register-password" type="password" @bind="RegisterRequest.Password" @bind:event="oninput" required minlength="6" autocomplete="new-password" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mật khẩu (Ít nhất 6 ký tự)">
                 </div>
                 <div>
-                    <label class="sr-only">Mã bí mật (Không bắt buộc)</label>
-                    <input type="text" @bind="RegisterRequest.SecretCode" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mã nhận quyền đặc biệt (Không bắt buộc)">
+                    <label for="register-secret" class="sr-only">Mã bí mật (Không bắt buộc)</label>
+                    <input id="register-secret" type="text" @bind="RegisterRequest.SecretCode" @bind:event="oninput" autocomplete="off" class="w-full bg-[#121212] text-white text-sm rounded border border-transparent focus:border-white px-4 py-3 outline-none transition-colors" placeholder="Mã nhận quyền đặc biệt (Không bắt buộc)">
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
             </div>
             
             <div class="text-xs text-gray-500 text-center mt-4 leading-relaxed">
-                Bằng việc đăng ký, bạn đồng ý với <a href="#" class="text-gray-300 hover:text-white underline">Điều khoản Dịch vụ</a> và <a href="#" class="text-gray-300 hover:text-white underline">Chính sách Bảo mật</a> của chúng tôi.
+                Bằng việc đăng ký, bạn đồng ý với <a href="/terms" class="text-gray-300 hover:text-white underline">Điều khoản Dịch vụ</a> và <a href="/privacy" class="text-gray-300 hover:text-white underline">Chính sách Bảo mật</a> của chúng tôi.
             </div>
         </form>
     </div>

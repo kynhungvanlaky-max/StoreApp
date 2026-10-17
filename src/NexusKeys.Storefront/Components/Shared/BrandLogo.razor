@@ -1,0 +1,62 @@
+@namespace Frontend.Components.Shared
+
+<span class="nui-brand inline-flex items-center @GapClass @Class select-none group">
+    <span class="nui-brand-mark @IconContainerClass shrink-0" aria-hidden="true">
+        <svg class="@SvgSizeClass" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 35V13L35 35V13" stroke="currentColor" stroke-width="4.5" stroke-linecap="square" stroke-linejoin="miter" />
+            <circle cx="24" cy="24" r="3.5" fill="currentColor" />
+            <path d="M24 27.5V34" stroke="currentColor" stroke-width="3" stroke-linecap="square" />
+        </svg>
+    </span>
+
+    @if (ShowText)
+    {
+        <span class="min-w-0 flex flex-col leading-none">
+            <span class="nui-brand-wordmark @TextSizeClass">
+                <span>NEXUS</span><span class="@(HideSuffixOnMobile ? "hidden sm:inline" : "")">@Suffix</span>
+            </span>
+            @if (!string.IsNullOrWhiteSpace(Subtitle))
+            {
+                <span class="nui-brand-subtitle @SubtitleSizeClass mt-1">@Subtitle</span>
+            }
+        </span>
+    }
+</span>
+
+@code {
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public string Suffix { get; set; } = "KEYS";
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public bool ShowText { get; set; } = true;
+    [Parameter] public bool HideSuffixOnMobile { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string Theme { get; set; } = "mono";
+
+    private string GapClass => Size is "lg" or "xl" ? "gap-3" : "gap-2.5";
+
+    private string IconContainerClass => Size switch
+    {
+        "sm" => "w-8 h-8",
+        "lg" => "w-12 h-12",
+        "xl" => "w-16 h-16",
+        _ => "w-10 h-10"
+    };
+
+    private string SvgSizeClass => Size switch
+    {
+        "sm" => "w-5 h-5",
+        "lg" => "w-7 h-7",
+        "xl" => "w-10 h-10",
+        _ => "w-6 h-6"
+    };
+
+    private string TextSizeClass => Size switch
+    {
+        "sm" => "text-base",
+        "lg" => "text-2xl",
+        "xl" => "text-3xl",
+        _ => "text-xl"
+    };
+
+    private string SubtitleSizeClass => Size is "lg" or "xl" ? "text-xs font-semibold" : "text-[11px] font-semibold";
+}

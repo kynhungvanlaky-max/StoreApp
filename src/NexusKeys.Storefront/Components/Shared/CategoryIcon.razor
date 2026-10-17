@@ -1,0 +1,161 @@
+@namespace Frontend.Components.Shared
+
+<span class="inline-flex items-center justify-center shrink-0 @Class" aria-hidden="true">
+    @switch (NormalizedName)
+    {
+        case "action" or "hanh-dong" or "hành động":
+            @* Action: Dual Swords & Energy Shield *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <path d="M14 34L22 26M22 26L32 16L34 14L30 14L28 16L18 26M22 26L18 22M26 30L22 26" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M34 34L26 26M26 26L16 16L14 14L18 14L20 16L30 26M26 26L30 22M22 30L26 26" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="24" cy="24" r="2.5" fill="currentColor" />
+            </svg>
+            break;
+
+        case "rpg" or "nhap-vai" or "nhập vai" or "nhập vai (rpg)":
+            @* RPG: D20 Crystal Die *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <polygon points="24,8 36,16 36,32 24,40 12,32 12,16" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                <polygon points="24,14 32,20 32,28 24,34 16,28 16,20" class="fill-base-content/15" stroke="currentColor" stroke-width="1.5" />
+                <polygon points="24,8 24,40" stroke="currentColor" stroke-width="1.5" />
+                <polygon points="12,16 36,32" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2" />
+                <polygon points="12,32 36,16" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2" />
+                <circle cx="24" cy="24" r="2.5" fill="currentColor" />
+            </svg>
+            break;
+
+        case "strategy" or "chien-thuat" or "chiến thuật":
+            @* Strategy: Crown & Castle Tower *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <path d="M14 36H34M16 36V32H32V36M17 32L19 20H29L31 32M15 16V20H33V16M15 16H18V18H21V16H27V18H30V16H33" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M22 24H26V28H22V24Z" class="fill-base-content/20" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            break;
+
+        case "shooter" or "ban-sung" or "bắn súng" or "fps":
+            @* Shooter: Crosshair Reticle *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2" stroke-dasharray="16 5" />
+                <circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2" />
+                <line x1="24" y1="6" x2="24" y2="14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="24" y1="34" x2="24" y2="42" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="6" y1="24" x2="14" y2="24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="34" y1="24" x2="42" y2="24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                <circle cx="24" cy="24" r="2" fill="currentColor" />
+            </svg>
+            break;
+
+        case "racing" or "dua-xe" or "đua xe":
+            @* Racing: Speedometer *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2.2" />
+                <path d="M12 24H20M28 24H36M24 28V36" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                <circle cx="24" cy="24" r="3.5" fill="currentColor" />
+                <line x1="24" y1="24" x2="31" y2="17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            break;
+
+        case "horror" or "kinh-di" or "kinh dị":
+            @* Horror: Cyber Skull *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <path d="M14 20C14 14.4772 18.4772 10 24 10C29.5228 10 34 14.4772 34 20C34 24.5 32 27 30 29V36H18V29C16 27 14 24.5 14 20Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="20" cy="20" r="2.5" fill="currentColor" />
+                <circle cx="28" cy="20" r="2.5" fill="currentColor" />
+                <path d="M21 32V36M24 32V36M27 32V36" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            break;
+
+        case "open-world" or "the-gioi-mo" or "thế giới mở":
+            @* Open World: Globe & Orbital Rings *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="2" />
+                <ellipse cx="24" cy="24" rx="6" ry="13" stroke="currentColor" stroke-width="1.6" />
+                <line x1="11" y1="24" x2="37" y2="24" stroke="currentColor" stroke-width="1.6" />
+                <path d="M14 17C17 19 31 19 34 17" stroke="currentColor" stroke-width="1.4" />
+                <path d="M14 31C17 29 31 29 34 31" stroke="currentColor" stroke-width="1.4" />
+            </svg>
+            break;
+
+        case "adventure" or "phieu-luu" or "phiêu lưu":
+            @* Adventure: Mountains & Peak Flag *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <polygon points="22,12 36,36 8,36" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                <polygon points="30,22 40,36 20,36" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                <polygon points="22,12 17,21 22,23 27,21" class="fill-base-content/20" />
+                <circle cx="34" cy="14" r="2.5" fill="currentColor" />
+            </svg>
+            break;
+
+        case "sports" or "the-thao" or "thể thao":
+            @* Sports: Championship Trophy *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <path d="M16 12H32V22C32 26.4 28.4 30 24 30C19.6 30 16 26.4 16 22V12Z" class="fill-base-content/15" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                <path d="M16 15H10C8.9 15 8 15.9 8 17V19C8 22.3 10.7 25 14 25H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M32 15H38C39.1 15 40 15.9 40 17V19C40 22.3 37.3 25 34 25H32" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M24 30V36M18 36H30" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            break;
+
+        case "puzzle" or "giai-do" or "giải đố":
+            @* Puzzle: Cube Prism *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <polygon points="24,10 37,17.5 37,32.5 24,40 11,32.5 11,17.5" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                <line x1="24" y1="10" x2="24" y2="40" stroke="currentColor" stroke-width="1.8" />
+                <line x1="11" y1="17.5" x2="37" y2="32.5" stroke="currentColor" stroke-width="1.5" />
+                <line x1="11" y1="32.5" x2="37" y2="17.5" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="24" cy="24" r="3" fill="currentColor" />
+            </svg>
+            break;
+
+        case "survival" or "sinh-ton" or "sinh tồn":
+            @* Survival: Campfire & Axes *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <path d="M24 10C24 10 29 17 29 23C29 26.5 26.8 29 24 29C21.2 29 19 26.5 19 23C19 19 24 10 24 10Z" class="fill-base-content/25" stroke="currentColor" stroke-width="1.5" />
+                <line x1="12" y1="36" x2="36" y2="28" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="36" y1="36" x2="12" y2="28" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            break;
+
+        case "simulation" or "mo-phong" or "mô phỏng":
+            @* Simulation: Cyber Flight Controller *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <rect x="12" y="28" width="24" height="10" rx="3" stroke="currentColor" stroke-width="2.2" />
+                <path d="M24 28V16M24 16C26 16 28 14 28 12C28 10 26 8 24 8C22 8 20 10 20 12C20 14 22 16 24 16Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                <circle cx="24" cy="12" r="2" fill="currentColor" />
+                <circle cx="17" cy="33" r="1.5" fill="currentColor" />
+                <circle cx="31" cy="33" r="1.5" fill="currentColor" />
+            </svg>
+            break;
+
+        default:
+            @* Default Gaming Controller *@
+            <svg class="w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" class="fill-base-content/5 stroke-base-content/20" stroke-width="1.5" />
+                <path d="M12 28C10 24 10 18 16 16C20 14.5 28 14.5 32 16C38 18 38 24 36 28C34 32 31 34 29 32L26 28H22L19 32C17 34 14 32 12 28Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                <path d="M16 21H20M18 19V23" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="28" cy="21" r="1.2" fill="currentColor" />
+                <circle cx="31" cy="19" r="1.2" fill="currentColor" />
+                <circle cx="31" cy="23" r="1.2" fill="currentColor" />
+            </svg>
+            break;
+    }
+</span>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+    [Parameter] public string Class { get; set; } = "w-10 h-10";
+
+    private string NormalizedName => Name.Trim().ToLowerInvariant();
+}

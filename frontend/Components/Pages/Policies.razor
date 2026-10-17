@@ -1,0 +1,57 @@
+@page "/terms"
+@page "/privacy"
+@page "/refund-policy"
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Title — NexusKeys</PageTitle>
+
+<main class="mx-auto w-full max-w-4xl px-4 sm:px-6 py-12 sm:py-16">
+    <a href="/" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white mb-8">
+        <Icon Name="HeroiconName.ArrowLeft" Class="w-4 h-4" /> Trang chủ
+    </a>
+    <article class="rounded-xl border border-[#303030] bg-[#1a1a1a] p-6 sm:p-10">
+        <h1 class="text-3xl font-bold text-white mb-3">@Title</h1>
+        <p class="text-sm text-gray-500 mb-8">Cập nhật lần cuối: 14/08/2026</p>
+        @foreach (var section in Sections)
+        {
+            <section class="mb-7 last:mb-0">
+                <h2 class="text-lg font-semibold text-white mb-2">@section.Heading</h2>
+                <p class="text-gray-300 leading-7">@section.Content</p>
+            </section>
+        }
+    </article>
+</main>
+
+@code {
+    private string CurrentPath => new Uri(NavigationManager.Uri).AbsolutePath.ToLowerInvariant();
+
+    private string Title => CurrentPath switch
+    {
+        "/privacy" => "Chính sách bảo mật",
+        "/refund-policy" => "Chính sách hoàn tiền",
+        _ => "Điều khoản dịch vụ"
+    };
+
+    private IReadOnlyList<(string Heading, string Content)> Sections => CurrentPath switch
+    {
+        "/privacy" =>
+        [
+            ("Thông tin được thu thập", "Chúng tôi chỉ thu thập dữ liệu cần thiết để tạo tài khoản, xử lý đơn hàng, hỗ trợ khách hàng và bảo vệ giao dịch."),
+            ("Cách sử dụng dữ liệu", "Dữ liệu được dùng để vận hành dịch vụ, gửi thông báo liên quan đến giao dịch và cải thiện trải nghiệm. NexusKeys không bán thông tin cá nhân."),
+            ("Bảo mật và quyền của bạn", "Thông tin nhạy cảm được truyền qua kết nối bảo mật. Bạn có thể yêu cầu xem, sửa hoặc xóa dữ liệu bằng cách liên hệ bộ phận hỗ trợ.")
+        ],
+        "/refund-policy" =>
+        [
+            ("Điều kiện hoàn tiền", "Yêu cầu hoàn tiền được xem xét khi key chưa được hiển thị hoặc key được xác nhận không hợp lệ do lỗi từ hệ thống hoặc nhà cung cấp."),
+            ("Trường hợp không áp dụng", "Key đã hiển thị, đã kích hoạt, hoặc lỗi phát sinh do nhập sai vùng, nền tảng hay yêu cầu cấu hình sẽ không đủ điều kiện hoàn tiền."),
+            ("Thời gian xử lý", "Hãy gửi mã đơn hàng và bằng chứng lỗi trong vòng 48 giờ. Kết quả được phản hồi qua email sau khi hoàn tất xác minh.")
+        ],
+        _ =>
+        [
+            ("Tài khoản", "Bạn chịu trách nhiệm bảo mật thông tin đăng nhập và cung cấp dữ liệu chính xác khi mua hàng."),
+            ("Sản phẩm số", "Mỗi key có yêu cầu nền tảng, vùng và cấu hình riêng. Vui lòng kiểm tra kỹ thông tin sản phẩm trước khi thanh toán."),
+            ("Thanh toán và giao key", "Đơn hàng chỉ hoàn tất sau khi hệ thống xác nhận thanh toán. Key được lưu trong thư viện tài khoản để bạn chủ động kiểm tra."),
+            ("Sử dụng hợp lệ", "Không được sử dụng dịch vụ cho mục đích gian lận, gây gián đoạn hệ thống hoặc xâm phạm quyền của bên khác.")
+        ]
+    };
+}

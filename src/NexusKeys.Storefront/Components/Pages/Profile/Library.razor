@@ -1,0 +1,344 @@
+@page "/profile/library"
+@inject Frontend.ViewModels.ProfileViewModel VM
+@inject IJSRuntime JSRuntime
+@inject Frontend.Services.ToastService ToastService
+@layout Frontend.Components.Layout.ProfileLayout
+@implements IDisposable
+
+<PageTitle>Kho Game & License Key — NexusKeys</PageTitle>
+
+<div class="space-y-6 w-full">
+    @* Page Header *@
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">Kho Game &amp; Bản Quyền</h1>
+                <span class="px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] border border-[#0078f2]/30">
+                    @VM.Library.Count Key
+                </span>
+            </div>
+            <p class="text-xs sm:text-sm text-white/60 mt-1">Quản lý mã kích hoạt bản quyền chính thức trên Steam, Epic Games, Ubisoft và EA Play.</p>
+        </div>
+    </div>
+
+    @if (VM.IsLoading && VM.Library.Count == 0)
+    {
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="bg-[#18181c] rounded-2xl border border-white/10 p-4 animate-pulse">
+                    <div class="aspect-[16/9] w-full rounded-xl bg-white/5 mb-3"></div>
+                    <div class="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
+                    <div class="h-3 bg-white/5 rounded w-1/2"></div>
+                </div>
+            }
+        </div>
+    }
+    else if (VM.Library.Count == 0)
+    {
+        <div class="bg-[#18181c] rounded-2xl border border-white/10 p-12 text-center shadow-xl">
+            <div class="w-16 h-16 rounded-2xl bg-[#0078f2]/10 border border-[#0078f2]/20 text-[#0078f2] flex items-center justify-center mx-auto mb-4">
+                <Icon Name="HeroiconName.Key" Class="w-8 h-8" />
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Thư viện của bạn đang trống</h2>
+            <p class="text-sm text-white/60 max-w-md mx-auto mb-6">Bạn chưa sở hữu tựa game bản quyền nào. Hãy khám phá kho game AAA và ưu đãi giảm giá độc quyền trên Cửa Hàng!</p>
+            <a href="/products" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-[#0078f2]/30 transition-all active:scale-95">
+                <Icon Name="HeroiconName.BuildingStorefront" Class="w-4 h-4" />
+                <span>Khám Phá Cửa Hàng</span>
+            </a>
+        </div>
+    }
+    else
+    {
+        @* Search Bar *@
+        <div class="bg-[#18181c] p-3 rounded-2xl border border-white/10 flex items-center gap-3">
+            <div class="relative flex-1">
+                <Icon Name="HeroiconName.MagnifyingGlass" Class="w-4 h-4 absolute left-3.5 top-3 text-white/60" />
+                <label for="library-search" class="sr-only">Tìm kiếm game hoặc mã bản quyền</label>
+                <input id="library-search" type="text" @bind="SearchQuery" @bind:event="oninput" placeholder="Tìm kiếm tựa game trong kho của bạn..." class="w-full bg-[#202024] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-white/50 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all" />
+            </div>
+        </div>
+
+        var filteredLibrary = VM.Library
+            .Where(l => string.IsNullOrEmpty(_searchQuery) || l.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+            
+        var groupedLibrary = filteredLibrary.GroupBy(l => l.Id).ToList();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(groupedLibrary.Count / (double)PageSize));
+        if (_currentPage > totalPages) _currentPage = totalPages;
+        var pagedGroups = groupedLibrary.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+
+        <div class="space-y-4">
+            @foreach (var group in pagedGroups)
+            {
+                var firstItem = group.First();
+                var keys = group.ToList();
+                var isExpanded = _expandedGroups.Contains(firstItem.Id);
+
+                <div class="bg-[#18181c] border border-white/10 hover:border-white/20 rounded-2xl overflow-hidden transition-all shadow-lg">
+                    <button type="button" class="flex items-center justify-between gap-4 p-4 sm:p-5 w-full text-left hover:bg-white/[0.02] transition-colors" @onclick='@(() => ToggleGroup(firstItem.Id))' aria-expanded="@isExpanded" aria-controls="license-group-@firstItem.Id">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <ProductImage Src="@firstItem.ImageUrl" Alt="@firstItem.Name" ImageClass="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-white/10 shrink-0" FallbackClass="w-16 h-16 sm:w-20 sm:h-20 rounded-xl flex items-center justify-center bg-[#202024] border border-white/10 shrink-0" IconClass="w-8 h-8 text-white/50" />
+                            <div class="min-w-0">
+                                <h3 class="text-base sm:text-lg font-bold text-white truncate">@firstItem.Name</h3>
+                                <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                    <span class="text-xs text-white/60">Sở hữu <span class="text-[#0078f2] font-bold">@keys.Count</span> key bản quyền</span>
+                                    <span class="text-white/40">•</span>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Chính hãng 100%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs font-bold text-white/60 hidden sm:inline">@(isExpanded ? "Thu gọn" : "Xem Key")</span>
+                            <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/60">
+                                <Icon Name="@(isExpanded ? HeroiconName.ChevronUp : HeroiconName.ChevronDown)" Class="w-5 h-5" />
+                            </div>
+                        </div>
+                    </button>
+                    
+                    @if (isExpanded)
+                    {
+                        <div id="license-group-@firstItem.Id" class="px-4 sm:px-6 pb-5 pt-3 border-t border-white/5 bg-[#202024]/40">
+                            <div class="space-y-3 w-full">
+                                @foreach (var keyItem in keys)
+                                {
+                                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-[#18181c] p-4 rounded-xl border border-white/10">
+                                        <div class="flex flex-col">
+                                            <span class="text-[11px] text-white/60 mb-1">Ngày mua: @keyItem.AcquiredDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                            @if (_revealedKeys.Contains(keyItem.KeyCode))
+                                            {
+                                                <button type="button" @onclick='@(() => CopyToClipboard(keyItem.KeyCode))' class="font-mono text-left text-white hover:text-[#0078f2] tracking-widest font-black text-base sm:text-lg select-all transition-colors flex items-center gap-2 group cursor-pointer" title="Nhấp để sao chép mã">
+                                                    <span>@keyItem.KeyCode</span>
+                                                    <Icon Name="HeroiconName.DocumentDuplicate" Class="w-4 h-4 opacity-0 group-hover:opacity-100 text-[#0078f2] transition-opacity" />
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="font-mono text-white/50 tracking-widest font-bold text-base sm:text-lg select-none">••••-••••-••••-••••</span>
+                                            }
+                                        </div>
+                                        <div class="flex items-center gap-2 w-full md:w-auto">
+                                            @if (_revealedKeys.Contains(keyItem.KeyCode))
+                                            {
+                                                <button type="button" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-bold transition-colors flex items-center gap-1.5" @onclick='@(() => _revealedKeys.Remove(keyItem.KeyCode))'>
+                                                    <Icon Name="HeroiconName.EyeSlash" Class="w-4 h-4" />
+                                                    <span>Ẩn</span>
+                                                </button>
+                                                <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 active:scale-95 @(_copiedKey == keyItem.KeyCode ? "bg-emerald-600 text-white shadow-emerald-600/30" : "bg-[#0078f2] hover:bg-[#0060c2] text-white shadow-[#0078f2]/30")" @onclick='@(() => CopyToClipboard(keyItem.KeyCode))' title="Sao chép mã Key">
+                                                    @if (_copiedKey == keyItem.KeyCode)
+                                                    {
+                                                        <Icon Name="HeroiconName.Check" Class="w-4 h-4" />
+                                                        <span>Đã sao chép!</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <Icon Name="HeroiconName.DocumentDuplicate" Class="w-4 h-4" />
+                                                        <span>Sao chép</span>
+                                                    }
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="px-4 py-2 rounded-lg bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-[#0078f2]/30 flex items-center gap-1.5 active:scale-95" @onclick='@(() => _revealedKeys.Add(keyItem.KeyCode))'>
+                                                    <Icon Name="HeroiconName.Eye" Class="w-4 h-4" />
+                                                    <span>Hiển thị Key</span>
+                                                </button>
+                                            }
+                                            <button type="button" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#0078f2] text-xs font-bold transition-colors flex items-center gap-1.5" title="Hướng dẫn kích hoạt bản quyền" @onclick="@(() => OpenKeyGuideModal(firstItem.Name, firstItem.ImageUrl, keyItem.KeyCode, keyItem.AcquiredDate))">
+                                                <Icon Name="HeroiconName.InformationCircle" Class="w-4 h-4" />
+                                                <span>Hướng dẫn</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <nav class="flex items-center justify-center gap-2 mt-8" aria-label="Phân trang kho game">
+                <button type="button" class="w-9 h-9 rounded-lg bg-[#18181c] hover:bg-[#202024] border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Trang trước" disabled="@(_currentPage == 1)" @onclick="() => ChangePage(_currentPage - 1)">
+                    <Icon Name="HeroiconName.ChevronLeft" Class="w-4 h-4" />
+                </button>
+                @for (var page = 1; page <= totalPages; page++)
+                {
+                    var pageNumber = page;
+                    <button type="button" class="w-9 h-9 rounded-lg border text-xs font-black transition-all @(_currentPage == pageNumber ? "bg-[#0078f2] border-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "bg-[#18181c] border-white/10 text-white/70 hover:text-white hover:bg-[#202024]")" aria-label="Trang @pageNumber" aria-current="@(_currentPage == pageNumber ? "page" : null)" @onclick="() => ChangePage(pageNumber)">@pageNumber</button>
+                }
+                <button type="button" class="w-9 h-9 rounded-lg bg-[#18181c] hover:bg-[#202024] border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Trang sau" disabled="@(_currentPage == totalPages)" @onclick="() => ChangePage(_currentPage + 1)">
+                    <Icon Name="HeroiconName.ChevronRight" Class="w-4 h-4" />
+                </button>
+            </nav>
+        }
+    }
+</div>
+
+@* Key Activation & Security Modal *@
+@if (_showKeyModal && _selectedKeyData != null)
+{
+    <div class="egs-modal-backdrop" @onclick="CloseKeyModal" role="dialog" aria-modal="true" aria-labelledby="key-modal-title">
+        <div class="egs-modal-card max-w-lg p-6 sm:p-8" @onclick:stopPropagation="true">
+            <button type="button" 
+                    class="absolute top-5 right-5 w-8 h-8 rounded-lg text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors"
+                    aria-label="Đóng hộp thoại"
+                    @onclick="CloseKeyModal">
+                <Icon Name="HeroiconName.XMark" Class="w-5 h-5" />
+            </button>
+
+            <div class="flex items-start gap-4 mb-6">
+                <ProductImage Src="@_selectedKeyData.ImageUrl" Alt="@_selectedKeyData.Title" ImageClass="w-16 h-20 rounded-xl object-cover shrink-0 border border-white/10" FallbackClass="w-16 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0" IconClass="w-8 h-8 text-white/50" />
+                <div class="flex-1 min-w-0 pr-6">
+                    <span class="text-xs font-black uppercase tracking-widest text-[#0078f2] block mb-1">Bản quyền chính thức</span>
+                    <h3 id="key-modal-title" class="text-lg font-bold text-white truncate leading-snug">@_selectedKeyData.Title</h3>
+                    <p class="text-xs text-white/60 mt-1">Ngày mua: @_selectedKeyData.Date.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+
+            @* License Key Display Box *@
+            <div class="p-4 rounded-xl bg-[#202024] border border-[#0078f2]/40 shadow-inner mb-6 text-center">
+                <span class="text-xs font-bold uppercase tracking-wider text-white/60 block mb-1">Mã kích hoạt sản phẩm (Product Key)</span>
+                <div class="font-mono text-xl sm:text-2xl font-black text-white tracking-widest my-2 select-all">
+                    @_selectedKeyData.Key
+                </div>
+                <button type="button" @onclick="@(() => CopyToClipboard(_selectedKeyData.Key))" class="mt-2 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-md inline-flex items-center gap-2 active:scale-95 @(_copiedKey == _selectedKeyData.Key ? "bg-emerald-600 text-white shadow-emerald-600/30" : "bg-[#0078f2] hover:bg-[#0068d6] text-white shadow-[#0078f2]/30")">
+                    @if (_copiedKey == _selectedKeyData.Key)
+                    {
+                        <Icon Name="HeroiconName.Check" Class="w-4 h-4" />
+                        <span>Đã sao chép Key!</span>
+                    }
+                    else
+                    {
+                        <Icon Name="HeroiconName.DocumentDuplicate" Class="w-4 h-4" />
+                        <span>Sao chép mã Key</span>
+                    }
+                </button>
+            </div>
+
+            @* Step by Step Activation Guide *@
+            <div class="space-y-3 mb-6">
+                <h4 class="text-xs font-black uppercase tracking-wider text-white/70">Hướng dẫn kích hoạt bản quyền:</h4>
+                <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs text-white/80">
+                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                    <p>Mở ứng dụng <strong>Epic Games Launcher</strong> hoặc <strong>Steam Client</strong> trên máy tính của bạn.</p>
+                </div>
+                <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs text-white/80">
+                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <p>Nhấp vào biểu tượng tài khoản góc trên bên phải ➔ chọn <strong>"Redeem Code" (Đổi mã)</strong>.</p>
+                </div>
+                <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs text-white/80">
+                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <p>Dán mã key vừa sao chép ở trên và nhấn <strong>Redeem</strong>. Game sẽ được kích hoạt vĩnh viễn vào thư viện của bạn.</p>
+                </div>
+            </div>
+
+            @* Security warning *@
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-center gap-2.5 mb-6">
+                <Icon Name="HeroiconName.ShieldExclamation" Class="w-5 h-5 text-amber-400 shrink-0" />
+                <p>Khóa bảo mật: Tuyệt đối không chia sẻ mã kích hoạt này cho người lạ để tránh mất quyền sở hữu.</p>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                <a href="/download" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors flex items-center gap-1.5">
+                    <Icon Name="HeroiconName.ArrowDownTray" Class="w-4 h-4" />
+                    Tải Client Game
+                </a>
+                <button type="button" class="px-5 py-2 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white text-xs font-bold uppercase transition-colors" @onclick="CloseKeyModal">
+                    Hoàn tất
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private const int PageSize = 6;
+    private string _searchQuery = "";
+    private int _currentPage = 1;
+    private HashSet<string> _revealedKeys = new();
+    private HashSet<int> _expandedGroups = new();
+    private string? _copiedKey;
+
+    private bool _showKeyModal = false;
+    private KeyModalData? _selectedKeyData = null;
+
+    private class KeyModalData
+    {
+        public string Title { get; set; } = "";
+        public string? ImageUrl { get; set; }
+        public string Key { get; set; } = "";
+        public DateTime Date { get; set; }
+    }
+
+    private void OpenKeyGuideModal(string title, string? imageUrl, string key, DateTime date)
+    {
+        _selectedKeyData = new KeyModalData
+        {
+            Title = title,
+            ImageUrl = imageUrl,
+            Key = key,
+            Date = date
+        };
+        _showKeyModal = true;
+    }
+
+    private void CloseKeyModal()
+    {
+        _showKeyModal = false;
+        _selectedKeyData = null;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        VM.StateChanged += StateHasChanged;
+        await VM.LoadLibraryAsync();
+    }
+    
+    public void Dispose()
+    {
+        VM.StateChanged -= StateHasChanged;
+    }
+
+    private async Task CopyToClipboard(string text)
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        _copiedKey = text;
+        ToastService.ShowSuccess("Đã sao chép Key vào khay nhớ tạm!");
+        StateHasChanged();
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(2500);
+            if (_copiedKey == text)
+            {
+                _copiedKey = null;
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    private void ToggleGroup(int id)
+    {
+        if (_expandedGroups.Contains(id))
+            _expandedGroups.Remove(id);
+        else
+            _expandedGroups.Add(id);
+    }
+
+    private string SearchQuery
+    {
+        get => _searchQuery;
+        set
+        {
+            _searchQuery = value;
+            _currentPage = 1;
+        }
+    }
+
+    private void ChangePage(int page)
+    {
+        _currentPage = Math.Max(1, page);
+    }
+}

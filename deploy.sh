@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "🚀 GameStore Deploy Script"
-echo "=========================="
+echo "🚀 NexusKeys Game Store Deploy Script"
+echo "======================================"
 
 # Variables
 PROJECT_DIR="/opt/gamestore"
@@ -31,10 +31,9 @@ git pull origin main
 if [ ! -f ".env" ]; then
     echo "🔧 Creating .env file..."
     cat > .env << EOF
-SA_PASSWORD=Hoangky123@
-DOCKER_USERNAME=your-registry-username
+DOCKER_USERNAME=nexus
 EOF
-    echo "⚠️  Please edit .env file with your actual values!"
+    echo "⚠️  Please edit .env file with your actual values if needed!"
 fi
 
 # Step 4: Build and start containers
@@ -52,7 +51,7 @@ if curl -sf http://localhost:5021/ > /dev/null 2>&1; then
     echo "✅ API is running!"
 else
     echo "❌ API health check failed!"
-    docker compose logs api --tail=20
+    docker compose logs nexuskeys-api --tail=20
     exit 1
 fi
 
@@ -76,3 +75,4 @@ echo "🎉 Deployment completed successfully!"
 echo "   API:      http://localhost:5021"
 echo "   Frontend: http://localhost:5205"
 echo "   Admin:    http://localhost:3001"
+echo "   Nginx:    http://localhost:80"

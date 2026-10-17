@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.9" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\NexusKeys.Domain\NexusKeys.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\src\NexusKeys.Infrastructure\NexusKeys.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\NexusKeys.Api\NexusKeys.Api.csproj" />
+  </ItemGroup>
+
+</Project>

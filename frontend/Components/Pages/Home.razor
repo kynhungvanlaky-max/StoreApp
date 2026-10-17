@@ -1,419 +1,891 @@
 @page "/"
-@inject Frontend.Services.RecentlyViewedService RecentlyViewedService
-@inject Frontend.Services.RecommendationService RecommendationService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
-<PageTitle>Nexus Store</PageTitle>
+<PageTitle>Epic Games Store | Official Storefront</PageTitle>
 
-<div class="px-6 py-8 mx-auto max-w-7xl">
-    
-    @* Hero Carousel (Epic Style) *@
-    @if (featuredProducts.Any())
-    {
-        var hero = featuredProducts.First();
-        <div class="relative w-full aspect-[21/9] lg:aspect-[2.5/1] rounded-2xl overflow-hidden group mb-12 cursor-pointer">
-            <div class="absolute inset-0 bg-[#1e1e1e]">
-                <img src="@(string.IsNullOrEmpty(hero.ImageUrl) ? "/images/placeholder-game.jpg" : hero.ImageUrl)" class="w-full h-full object-cover opacity-80" alt="@hero.Name" />
+<div class="egs-wrap">
+    <div class="egs-content">
+
+        @* ================================================================= *@
+        @* SUB-NAV: SEARCH STORE | DISCOVER | BROWSE | NEWS                  *@
+        @* ================================================================= *@
+        <div class="egs-subnav relative">
+            @* Search Bar with Live Autocomplete Popover *@
+            <div class="relative">
+                <div class="egs-search-box">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" placeholder="Search store" aria-label="Search store"
+                           @bind="_searchKeyword" @bind:event="oninput"
+                           @onfocus="() => _showSearchDropdown = true"
+                           @onkeydown="HandleSearchKeyDown" />
+                </div>
+
+                @if (_showSearchDropdown)
+                {
+                    <div class="fixed inset-0 z-[55] bg-transparent" @onclick="() => _showSearchDropdown = false"></div>
+                    <div class="egs-quick-search-dropdown absolute left-0 top-12 z-[60] w-80 sm:w-96 p-3 bg-[#18181c] border border-white/10 rounded-2xl shadow-2xl text-white" style="max-height: 420px; overflow-y: auto;">
+                        @if (string.IsNullOrWhiteSpace(_searchKeyword))
+                        {
+                            <div class="p-2">
+                                <span class="text-xs font-black uppercase tracking-wider text-white/40 block mb-2">Xu hướng tìm kiếm</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    @foreach (var tag in _trendingKeywords)
+                                    {
+                                        <button type="button" @onclick="() => SelectTrending(tag)" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-xs text-white/80 hover:text-white transition-colors">
+                                            @tag
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            var filtered = _quickSearchResults;
+                            <div class="p-1">
+                                <span class="text-xs font-black uppercase tracking-wider text-white/40 block px-2 mb-2">Gợi ý sản phẩm</span>
+                                @if (filtered.Any())
+                                {
+                                    <div class="space-y-1">
+                                        @foreach (var item in filtered)
+                                        {
+                                            <a href="@item.Link" @onclick="() => _showSearchDropdown = false" class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors">
+                                                <img src="@item.Image" alt="@item.Title" class="w-10 h-12 rounded-lg object-cover bg-white/5" />
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-xs font-bold text-white truncate">@item.Title</h4>
+                                                    <span class="text-xs text-white/50 block">@item.Genre</span>
+                                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                                        @if (item.Discount > 0)
+                                                        {
+                                                            <span class="px-2 py-0.5 rounded text-xs font-extrabold bg-[#0078f2] text-white">-@item.Discount%</span>
+                                                        }
+                                                        <span class="text-xs font-bold text-white">@item.Price</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="py-4 text-center text-xs text-white/50">
+                                        Không tìm thấy game nào cho "@_searchKeyword"
+                                    </div>
+                                }
+
+                                <div class="pt-2 mt-2 border-t border-white/10">
+                                    <a href="/products?search=@Uri.EscapeDataString(_searchKeyword)" @onclick="() => _showSearchDropdown = false" class="text-xs text-[#0078f2] hover:underline font-bold block text-center py-1">
+                                        Xem tất cả kết quả cho "@_searchKeyword" ➔
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
-            <div class="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#121212]/80 to-transparent"></div>
-            
-            <div class="absolute inset-y-0 left-0 flex items-center p-8 lg:p-12 w-full md:w-2/3 lg:w-1/2">
-                <div class="space-y-4">
-                    @if (hero.BasePrice > 0 && hero.Pricing != hero.BasePrice.ToString())
-                    {
-                        <span class="px-2 py-1 text-xs font-bold text-[#121212] bg-white rounded uppercase tracking-wider">Khuyến mãi</span>
-                    }
-                    <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight">
-                        @hero.Name
-                    </h1>
-                    <p class="text-base text-gray-300 line-clamp-3">@hero.Description</p>
-                    <p class="text-lg font-medium text-white">@GetDisplayPrice(hero)</p>
-                    
-                    <div class="pt-2 flex gap-3">
-                        <a href="/products/@hero.Id" class="px-8 py-3 text-sm font-bold text-[#121212] bg-white rounded hover:bg-gray-200 transition-colors uppercase tracking-wide">
-                            Mua Ngay
-                        </a>
-                        <button class="px-4 py-3 text-white bg-white/10 rounded hover:bg-white/20 transition-colors" title="Thêm vào wishlist">
-                            <Icon Name="HeroiconName.Plus" Class="w-5 h-5" />
+
+            @* Store Links *@
+            <a href="/" class="egs-subnav-link active">Discover</a>
+            <a href="/products" class="egs-subnav-link">Browse</a>
+            <a href="/news" class="egs-subnav-link">News</a>
+            <a href="/assistant" class="egs-subnav-link">Trợ lý AI</a>
+        </div>
+
+        @* ================================================================= *@
+        @* SECTION 1: HERO SPOTLIGHT (Stage & Animated Rail)                 *@
+        @* ================================================================= *@
+        <section aria-label="Hero Spotlight">
+            <div class="egs-hero-grid">
+                @* Hero Stage with Animated Slide Transition, Verified Official Cover Art & Overlay *@
+                <a href="@CurrentSlide.Link" class="egs-hero-stage egs-card-hover egs-shimmer-card" aria-label="@CurrentSlide.Title">
+                    <img @key="_heroIndex" src="@CurrentSlide.Image" alt="@CurrentSlide.Title" class="egs-hero-bg egs-hero-stage-animated" />
+                    <div class="egs-hero-overlay">
+                        <span class="egs-hero-badge">@CurrentSlide.Badge</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight drop-shadow-md">@CurrentSlide.Title</h2>
+                        <p class="egs-hero-desc">@CurrentSlide.Description</p>
+                        <span class="egs-hero-price">@CurrentSlide.Price</span>
+                        <div class="egs-hero-actions">
+                            <span class="egs-hero-btn-buy">Khám phá ngay</span>
+                            <span class="egs-hero-btn-icon" title="Thêm vào danh sách ước">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                @* Hero Rail with Authentic Dynamic Visuals & Animated Progress Bar *@
+                <div class="egs-hero-rail-wrap">
+                    <div class="egs-hero-rail">
+                        @for (int i = 0; i < _slides.Length; i++)
+                        {
+                            var idx = i;
+                            var slide = _slides[idx];
+                            var isActive = _heroIndex == idx;
+                            <button type="button"
+                                    class="egs-rail-item @(isActive ? "active" : "")"
+                                    @onclick="() => SetHeroSlide(idx)"
+                                    @onmouseenter="PauseAutoSlide"
+                                    @onmouseleave="ResumeAutoSlide">
+                                <img src="@slide.Thumb" alt="@slide.Title" class="egs-rail-thumb" />
+                                <span class="egs-rail-title">@slide.Title</span>
+                                @if (isActive)
+                                {
+                                    <div @key="@($"timer-{_heroIndex}")" class="egs-rail-timer"></div>
+                                }
+                            </button>
+                        }
+                    </div>
+
+                    @* Rail Carousel Controls *@
+                    <div class="egs-rail-arrows">
+                        <button type="button" class="egs-circle-btn" @onclick="PrevHeroSlide" aria-label="Previous">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button type="button" class="egs-circle-btn" @onclick="NextHeroSlide" aria-label="Next">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        </section>
 
-    @* Special Offers - Portrait Cards (Epic Style) *@
-    <div class="mb-12">
-        <div class="flex justify-between items-end mb-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                Đang Giảm Giá
-                <Icon Name="HeroiconName.ChevronRight" Class="w-5 h-5 text-gray-400" />
-            </h2>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-            @foreach (var p in specialOffers)
-            {
-                <a href="/products/@p.Id" class="group block">
-                    <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
-                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
-                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-                        <span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded @GetTypeBadgeClass(p.Type, p.Categories) shadow-md">
-                            @GetTypeBadge(p.Type, p.Categories)
-                        </span>
-                        @if (p.BasePrice > 0)
-                        {
-                            <span class="absolute top-2 left-2 px-1.5 py-0.5 text-[11px] font-bold text-[#121212] bg-[#0078F2] rounded shadow">-20%</span>
-                        }
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate" title="@p.Name">@p.Name</h3>
-                        <div class="flex items-center gap-2">
-                            @if (p.BasePrice > 0)
-                            {
-                                <span class="text-xs text-gray-500 line-through">@p.BasePrice.ToString("N0") đ</span>
-                            }
-                            <span class="text-sm font-medium text-white">@GetDisplayPrice(p)</span>
-                        </div>
-                    </div>
-                </a>
-            }
-        </div>
-    </div>
-    
-    @* Categories - Minimal Epic Style *@
-    <div class="mb-16 border-t border-[#303030] pt-8">
-        <h2 class="text-xl font-bold text-white mb-6">Danh mục phổ biến</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @{
-                var categories = new[] 
-                { 
-                    ("Hành động", "PuzzlePiece"),
-                    ("Nhập vai (RPG)", "Map"),
-                    ("Chiến thuật", "Trophy"),
-                    ("Thể thao", "GlobeAlt")
-                };
-            }
-            @foreach (var cat in categories)
-            {
-                <a href="/products" class="flex flex-col items-center justify-center p-6 rounded-xl bg-[#202020] hover:bg-[#303030] transition-colors group">
-                    <Icon Name="@cat.Item2" Class="w-8 h-8 text-gray-400 group-hover:text-white mb-3 transition-colors" />
-                    <h3 class="font-bold text-gray-300 group-hover:text-white text-sm">@cat.Item1</h3>
-                </a>
-            }
-        </div>
-    </div>
-
-    @* New Releases - Horizontal List Epic Style *@
-    <div>
-        <div class="flex justify-between items-end mb-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                Mới Ra Mắt
-                <Icon Name="HeroiconName.ChevronRight" Class="w-5 h-5 text-gray-400" />
-            </h2>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-            @foreach (var p in newReleases)
-            {
-                <a href="/products/@p.Id" class="flex gap-4 p-3 rounded-lg hover:bg-[#202020] transition-colors group items-center">
-                    <div class="w-16 h-20 rounded overflow-hidden bg-[#303030] shrink-0">
-                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover" />
-                    </div>
-                    <div class="flex-1 min-w-0 flex flex-col justify-center">
-                        <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
-                        <div class="font-medium text-white text-sm">@GetDisplayPrice(p)</div>
-                    </div>
-                </a>
-            }
-        </div>
-    </div>
-
-    @* Trending Now - List Style *@
-    <div class="mb-16 border-t border-[#303030] pt-8 mt-12">
-        <div class="flex justify-between items-end mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <Icon Name="HeroiconName.Fire" Class="w-6 h-6 text-orange-500" />
-                Xu Hướng Hiện Tại
-            </h2>
-            <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @foreach (var p in trendingProducts)
-            {
-                <a href="/products/@p.Id" class="flex gap-4 p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#202020] border border-transparent hover:border-[#303030] transition-colors group items-center">
-                    <div class="w-20 h-24 rounded-lg overflow-hidden bg-[#303030] shrink-0">
-                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                    </div>
-                    <div class="flex-1 min-w-0 flex flex-col justify-center">
-                        <h3 class="text-sm font-bold text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
-                        <p class="text-xs text-gray-500 line-clamp-1 mb-2">@p.Description</p>
-                        <div class="font-bold text-[#0078F2] text-sm">@GetDisplayPrice(p)</div>
-                    </div>
-                </a>
-            }
-        </div>
-    </div>
-
-    @* Wallet Promo Banner *@
-    <div class="mb-16 relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#004b96] to-[#0078F2] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between shadow-2xl">
-        <div class="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
-        <div class="relative z-10 space-y-3 mb-6 md:mb-0 max-w-xl">
-            <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Nạp Ví Nexus Hôm Nay</h2>
-            <p class="text-blue-100 text-lg">Nhận ngay ưu đãi <span class="font-bold text-white bg-white/20 px-2 py-0.5 rounded">+10% giá trị</span> cho mọi lần nạp từ 500.000đ trở lên. Mua game thả ga không lo về giá!</p>
-        </div>
-        <div class="relative z-10 shrink-0">
-            <a href="/profile/wallet" class="px-8 py-4 bg-white text-[#0078F2] font-black rounded-xl hover:bg-gray-100 transition-transform hover:scale-105 shadow-xl uppercase tracking-wider text-sm inline-block">
-                Nạp Ví Ngay
-            </a>
-        </div>
-    </div>
-
-    @* Featured Applications *@
-    @if (featuredApps.Any())
-    {
-        <div class="mb-16">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    <Icon Name="HeroiconName.CpuChip" Class="w-6 h-6 text-[#0078F2]" />
-                    Ứng Dụng Nổi Bật
-                </h2>
-                <a href="/products?type=Software" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Khám phá</a>
+        @* ================================================================= *@
+        @* SECTION 2: DISCOVER SOMETHING NEW & 4 MINI CARDS                   *@
+        @* ================================================================= *@
+        <section aria-label="Discover Something New">
+            <div class="egs-section-header mb-4">
+                <div class="egs-section-title-wrap">
+                    <a href="/products" class="egs-section-title hover:text-white flex items-center gap-2">
+                        <span>Khám phá tựa game mới</span>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
             </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-                @foreach (var p in featuredApps)
-                {
-                    <a href="/products/@p.Id" class="group block">
-                        <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
-                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-                            <span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded @GetTypeBadgeClass(p.Type, p.Categories) shadow-md">
-                                @GetTypeBadge(p.Type, p.Categories)
-                            </span>
+
+            <div class="egs-discover-row">
+                <a href="/products" class="egs-discover-banner egs-card-hover egs-shimmer-card">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1174180/library_hero.jpg" alt="Red Dead Redemption 2" />
+                    <div class="egs-discover-overlay">
+                        <span class="egs-discover-badge">Tâm điểm nổi bật</span>
+                        <h3 class="egs-discover-title">Red Dead Redemption 2</h3>
+                        <p class="egs-discover-desc">Trải nghiệm tuyệt phẩm miền Tây hoang dã với hơn 175 giải thưởng Game của Năm danh giá.</p>
+                        <div class="pt-1">
+                            <span class="egs-discover-btn">Khám phá ngay</span>
                         </div>
-                        <div class="space-y-1">
-                            <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate" title="@p.Name">@p.Name</h3>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-white">@GetDisplayPrice(p)</span>
+                    </div>
+                </a>
+
+                <div class="egs-mini-grid">
+                    @* Mini 1: Chop Chop Together (From User Screenshot) *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/3065360/header.jpg" alt="Chop Chop Together" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Game cơ bản</span>
+                            <span class="egs-mini-title">Chop Chop Together</span>
+                            <span class="egs-mini-price">136.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 2: Control Ultimate Edition *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/870780/library_600x900.jpg" alt="Control Ultimate Edition" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Bản đặc biệt</span>
+                            <span class="egs-mini-title">Control Ultimate Edition</span>
+                            <span class="egs-mini-price">599.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 3: Dave The Diver *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/1868140/library_600x900.jpg" alt="Dave The Diver" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Game cơ bản</span>
+                            <span class="egs-mini-title">Dave The Diver</span>
+                            <span class="egs-mini-price">260.000 <u>đ</u></span>
+                        </div>
+                    </a>
+
+                    @* Mini 4: Hades II *@
+                    <a href="/products" class="egs-mini-card group">
+                        <div class="egs-mini-thumb-wrap">
+                            <img src="https://cdn.akamai.steamstatic.com/steam/apps/1145350/library_600x900.jpg" alt="Hades II" class="egs-mini-thumb" />
+                            <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="egs-mini-info">
+                            <span class="egs-mini-tag">Truy cập sớm</span>
+                            <span class="egs-mini-title">Hades II</span>
+                            <span class="egs-mini-price">385.000 <u>đ</u></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 3: SPOTLIGHT FULL BANNER (Helldivers 2)                    *@
+        @* ================================================================= *@
+        <section aria-label="Featured Banner Spotlight">
+            <div class="egs-full-banner-wrap">
+                <a href="/products" class="egs-full-banner egs-card-hover egs-shimmer-card">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/553850/library_hero.jpg" alt="HELLDIVERS™ 2" />
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent p-6 sm:p-10 flex flex-col justify-center max-w-xl">
+                        <span class="text-xs uppercase tracking-widest font-extrabold text-[#0078f2] mb-1">Hiện có trên Store</span>
+                        <h3 class="text-2xl sm:text-4xl font-black text-white leading-tight mb-2">HELLDIVERS™ 2</h3>
+                        <p class="text-xs sm:text-sm text-white/80 line-clamp-2 mb-4">Gia nhập Lực lượng Helldivers và chiến đấu vì Tự Do trên khắp thiên hà rực lửa trong tựa game bắn súng góc nhìn thứ ba kịch tính.</p>
+                        <div class="flex items-center gap-3">
+                            <span class="egs-hero-btn-buy">Chơi ngay • 790.000 đ</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 4: FREE GAMES VAULT                                       *@
+        @* ================================================================= *@
+        <section aria-label="Free Games Vault" class="my-8">
+            <div class="p-6 sm:p-8 lg:p-9 rounded-2xl bg-gradient-to-b from-[#202024] to-[#16161a] border border-white/10 shadow-2xl relative overflow-hidden">
+                @* Ambient Top Glow *@
+                <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-[#0078f2]/10 blur-3xl pointer-events-none rounded-full"></div>
+
+                @* Header *@
+                <div class="flex items-center justify-between mb-7 relative z-10">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-md">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V4.5a2.5 2.5 0 10-5 0V8m5 0V4.5a2.5 2.5 0 115 0V8m-10 0h10a2 2 0 012 2v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2a2 2 0 012-2zm-1 6h12a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a2 2 0 012-2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight leading-none">Free Games</h2>
+                            <span class="text-xs text-white/40 font-medium block mt-1">Cập nhật mỗi thứ Năm • Nhận miễn phí vĩnh viễn</span>
+                        </div>
+                    </div>
+
+                    <a href="/products?pricing=free" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 hover:border-white/35 text-white text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 shadow-sm group">
+                        <span>Xem thêm</span>
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                @* 4 Cards Grid *@
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative z-10">
+                    @* Card 1: Apex Legends - Free Now *@
+                    <a href="/products" class="group flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-2">
+                        <div class="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-[#18181c] border border-white/10 group-hover:border-[#0078f2]/60 group-hover:shadow-[0_16px_32px_rgba(0,120,242,0.25)] transition-all duration-300 flex flex-col relative">
+                            @* Live Badge *@
+                            <div class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2] animate-pulse"></span>
+                                <span>Miễn phí tuần này</span>
+                            </div>
+
+                            <div class="w-full flex-1 min-h-0 overflow-hidden relative">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1172470/library_600x900.jpg" alt="Apex Legends" 
+                                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" 
+                                     style="object-position: center 10%;" />
+                            </div>
+                            
+                            <div class="w-full h-9 bg-gradient-to-r from-[#0078f2] to-[#0066d6] text-white text-[11px] font-black tracking-wider uppercase flex items-center justify-center shrink-0 shadow-inner">
+                                MIỄN PHÍ NGAY BÂY GIỜ
                             </div>
                         </div>
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mt-3.5 line-clamp-1">Apex Legends</h3>
+                        <p class="text-xs sm:text-[13px] text-white/50 group-hover:text-white/70 transition-colors mt-1 font-medium flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Miễn phí đến 22 thg 10 lúc 22:00</span>
+                        </p>
                     </a>
-                }
-            </div>
-        </div>
-    }
 
-    @* Recently Viewed Games & Apps *@
-    @if (recentlyViewedProducts.Any())
-    {
-        <div class="mb-12 border-t border-[#303030] pt-8">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    <Icon Name="HeroiconName.Clock" Class="w-6 h-6 text-blue-500" />
-                    Đã Xem Gần Đây
-                </h2>
-                <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-                @foreach (var p in recentlyViewedProducts)
-                {
-                    <a href="/products/@p.ProductId" class="group block">
-                        <div class="aspect-[3/4] rounded-lg overflow-hidden bg-[#202020] mb-3 relative">
-                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="@p.Name" />
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-                            <span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded @GetTypeBadgeClass(p.Type) shadow-md">
-                                @GetTypeBadge(p.Type)
-                            </span>
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="text-sm font-medium text-gray-200 group-hover:text-white truncate" title="@p.Name">@p.Name</h3>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-white">@p.BasePrice.ToString("N0") đ</span>
+                    @* Card 2: Agent A: A puzzle in disguise - Coming Soon *@
+                    <a href="/products" class="group flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-2">
+                        <div class="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-[#18181c] border border-white/10 group-hover:border-white/30 group-hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)] transition-all duration-300 flex flex-col relative">
+                            @* Coming Soon Badge *@
+                            <div class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md border border-white/15 text-amber-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+                                <span>⏳</span>
+                                <span>Tuần tới</span>
+                            </div>
+
+                            <div class="w-full flex-1 min-h-0 overflow-hidden relative">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/801480/library_600x900.jpg" alt="Agent A: A puzzle in disguise" 
+                                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" 
+                                     style="object-position: center center;" />
+                            </div>
+                            
+                            <div class="w-full h-9 bg-[#0c0c0e] border-t border-white/10 text-white/85 text-[11px] font-black tracking-wider uppercase flex items-center justify-center shrink-0">
+                                SẮP RA MẮT
                             </div>
                         </div>
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-amber-400 transition-colors mt-3.5 line-clamp-1">Agent A: A puzzle in disguise</h3>
+                        <p class="text-xs sm:text-[13px] text-white/50 group-hover:text-white/70 transition-colors mt-1 font-medium flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>15 thg 10 – 22 thg 10 miễn phí</span>
+                        </p>
                     </a>
-                }
-            </div>
-        </div>
-    }
 
-    @* Game Recommendations *@
-    @if (recommendedProducts.Any())
-    {
-        <div class="mb-12 border-t border-[#303030] pt-8">
-            <div class="flex justify-between items-end mb-6">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    <Icon Name="HeroiconName.LightBulb" Class="w-6 h-6 text-yellow-500" />
-                    Gợi Ý Cho Bạn
-                </h2>
-                <a href="/products" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach (var p in recommendedProducts)
-                {
-                    <a href="/products/@p.Id" class="flex gap-4 p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#202020] border border-transparent hover:border-[#303030] transition-colors group items-center">
-                        <div class="w-20 h-24 rounded-lg overflow-hidden bg-[#303030] shrink-0">
-                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder-game.jpg" : p.ImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    @* Card 3: Destiny 2 - Free Now *@
+                    <a href="/products" class="group flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-2">
+                        <div class="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-[#18181c] border border-white/10 group-hover:border-[#0078f2]/60 group-hover:shadow-[0_16px_32px_rgba(0,120,242,0.25)] transition-all duration-300 flex flex-col relative">
+                            @* Live Badge *@
+                            <div class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2] animate-pulse"></span>
+                                <span>Miễn phí tuần này</span>
+                            </div>
+
+                            <div class="w-full flex-1 min-h-0 overflow-hidden relative">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1085660/library_600x900.jpg" alt="Destiny 2" 
+                                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" 
+                                     style="object-position: center 25%;" />
+                            </div>
+                            
+                            <div class="w-full h-9 bg-gradient-to-r from-[#0078f2] to-[#0066d6] text-white text-[11px] font-black tracking-wider uppercase flex items-center justify-center shrink-0 shadow-inner">
+                                MIỄN PHÍ NGAY BÂY GIỜ
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0 flex flex-col justify-center">
-                            <h3 class="text-sm font-bold text-gray-200 group-hover:text-white truncate mb-1">@p.Name</h3>
-                            <p class="text-xs text-gray-500 line-clamp-1 mb-2">@p.Description</p>
-                            <div class="font-bold text-[#0078F2] text-sm">@GetDisplayPrice(p)</div>
-                        </div>
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-[#0078f2] transition-colors mt-3.5 line-clamp-1">Destiny 2</h3>
+                        <p class="text-xs sm:text-[13px] text-white/50 group-hover:text-white/70 transition-colors mt-1 font-medium flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Miễn phí ngay bây giờ</span>
+                        </p>
                     </a>
-                }
-            </div>
-        </div>
-    }
 
-    @* Latest News *@
-    <div class="mb-8 border-t border-[#303030] pt-8">
-        <div class="flex justify-between items-end mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <Icon Name="HeroiconName.Newspaper" Class="w-6 h-6 text-purple-500" />
-                Tin Tức Mới Nhất
-            </h2>
-            <a href="/news" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Xem tất cả</a>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach (var article in latestNews)
-            {
-                <a href="/news/@article.Id" class="group bg-[#1a1a1a] rounded-2xl overflow-hidden border border-[#303030] hover:border-gray-500 transition-colors flex flex-col h-full">
-                    <div class="aspect-video relative overflow-hidden bg-[#202020]">
-                        <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-game.jpg" : article.CoverImageUrl)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    @* Card 4: Warframe - Coming Soon *@
+                    <a href="/products" class="group flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-2">
+                        <div class="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-[#18181c] border border-white/10 group-hover:border-white/30 group-hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)] transition-all duration-300 flex flex-col relative">
+                            @* Coming Soon Badge *@
+                            <div class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md border border-white/15 text-amber-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+                                <span>⏳</span>
+                                <span>Tuần tới</span>
+                            </div>
+
+                            <div class="w-full flex-1 min-h-0 overflow-hidden relative">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/230410/library_600x900.jpg" alt="Warframe" 
+                                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" 
+                                     style="object-position: center 15%;" />
+                            </div>
+                            
+                            <div class="w-full h-9 bg-[#0c0c0e] border-t border-white/10 text-white/85 text-[11px] font-black tracking-wider uppercase flex items-center justify-center shrink-0">
+                                SẮP RA MẮT
+                            </div>
+                        </div>
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-amber-400 transition-colors mt-3.5 line-clamp-1">Warframe</h3>
+                        <p class="text-xs sm:text-[13px] text-white/50 group-hover:text-white/70 transition-colors mt-1 font-medium flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>22 thg 10 – 29 thg 10 miễn phí</span>
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 5: FEATURED DISCOUNTS                                     *@
+        @* ================================================================= *@
+        <section aria-label="Featured Discounts">
+            <div class="egs-section-header" style="margin-bottom: 16px;">
+                <a href="/products" class="egs-section-title-wrap">
+                    <h2 class="egs-section-title">
+                        Featured Discounts
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </h2>
+                </a>
+
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="egs-circle-btn" @onclick='() => ScrollTrack("discounts-track", -380)' aria-label="Previous discounts">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button type="button" class="egs-circle-btn" @onclick='() => ScrollTrack("discounts-track", 380)' aria-label="Next discounts">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="egs-discounts-grid" id="discounts-track" style="scroll-behavior: smooth;">
+                @* Discount 1: The Witcher 3 *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg" alt="The Witcher 3: Wild Hunt" />
+                        <button type="button" class="egs-card-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
                     </div>
-                    <div class="p-5 flex flex-col flex-1">
-                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">@article.PublishedAt.ToString("dd/MM/yyyy")</div>
-                        <h3 class="text-base font-bold text-white leading-snug mb-2 group-hover:text-[#0078F2] transition-colors">@article.Title</h3>
-                        <p class="text-sm text-gray-400 line-clamp-2 mt-auto">@article.Summary</p>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">The Witcher 3: Wild Hunt</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-75%</span>
+                        <span class="egs-old-price">660.000 đ*</span>
+                        <span class="egs-new-price">165.000 đ</span>
                     </div>
                 </a>
-            }
-        </div>
+
+                @* Discount 2: Cyberpunk 2077 *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg" alt="Cyberpunk 2077" />
+                        <button type="button" class="egs-card-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Cyberpunk 2077</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-50%</span>
+                        <span class="egs-old-price">990.000 đ*</span>
+                        <span class="egs-new-price">495.000 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 3: Resident Evil 4 Remake *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/2050650/library_600x900.jpg" alt="Resident Evil 4 Remake" />
+                        <button type="button" class="egs-card-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Resident Evil 4 Remake</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-50%</span>
+                        <span class="egs-old-price">960.000 đ*</span>
+                        <span class="egs-new-price">480.000 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 4: Outward Definitive Edition *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/794260/library_600x900.jpg" alt="Outward Definitive Edition" />
+                        <button type="button" class="egs-card-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Outward Definitive Edition</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-85%</span>
+                        <span class="egs-old-price">666.000 đ*</span>
+                        <span class="egs-new-price">99.900 đ</span>
+                    </div>
+                </a>
+
+                @* Discount 5: Medieval Dynasty (Exact Match with User Screenshot) *@
+                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                    <div class="egs-discount-poster relative" style="position: relative;">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1129580/library_600x900.jpg" alt="Medieval Dynasty" />
+                        <button type="button" class="egs-card-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                    <span class="egs-card-tag">Trò chơi cơ bản</span>
+                    <h3 class="egs-card-name">Medieval Dynasty</h3>
+                    <div class="egs-price-row">
+                        <span class="egs-pill-discount">-50%</span>
+                        <span class="egs-old-price">490.000 đ*</span>
+                        <span class="egs-new-price">245.000 đ</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 6: TOP 3 LISTS                                            *@
+        @* ================================================================= *@
+        <section aria-label="Game Rankings">
+            <div class="egs-lists-row">
+                @* Column 1: Coming Soon *@
+                <div class="egs-list-col">
+                    <a href="/products" class="egs-list-col-header">
+                        <h2 class="egs-list-col-title">
+                            Sắp ra mắt
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </h2>
+                    </a>
+
+                    <div class="egs-list-col-items">
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2246340/library_600x900.jpg" alt="Monster Hunter Wilds" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Monster Hunter Wilds</span>
+                                <span class="egs-list-item-price">1.299.000 đ</span>
+                            </div>
+                        </a>
+
+                        @* Graveyard Keeper 2 (Exact Match from User Screenshot Image 1) *@
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/599140/library_600x900.jpg" alt="Graveyard Keeper 2" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Graveyard Keeper 2</span>
+                                <span class="egs-list-item-price">261.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1845910/library_600x900.jpg" alt="Dragon Age: The Veilguard" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Dragon Age: The Veilguard</span>
+                                <span class="egs-list-item-price">1.190.000 đ</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                @* Column 2: Top Upcoming Wishlisted *@
+                <div class="egs-list-col">
+                    <a href="/products" class="egs-list-col-header">
+                        <h2 class="egs-list-col-title">
+                            Được ước nhiều nhất
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </h2>
+                    </a>
+
+                    <div class="egs-list-col-items">
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg" alt="Black Myth: Wukong" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Black Myth: Wukong</span>
+                                <span class="egs-list-item-price">1.299.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2124490/library_600x900.jpg" alt="Silent Hill 2" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Silent Hill 2</span>
+                                <span class="egs-list-item-price">1.420.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/990080/library_600x900.jpg" alt="Hogwarts Legacy" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Hogwarts Legacy</span>
+                                <span class="egs-list-item-price">990.000 đ</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                @* Column 3: Top New Releases *@
+                <div class="egs-list-col">
+                    <a href="/products" class="egs-list-col-header">
+                        <h2 class="egs-list-col-title">
+                            Mới phát hành hot
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </h2>
+                    </a>
+
+                    <div class="egs-list-col-items">
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2669320/library_600x900.jpg" alt="EA SPORTS FC 25" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">EA SPORTS FC™ 25</span>
+                                <span class="egs-list-item-price">1.299.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/2322010/library_600x900.jpg" alt="God of War Ragnarök" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">God of War Ragnarök</span>
+                                <span class="egs-list-item-price">1.490.000 đ</span>
+                            </div>
+                        </a>
+
+                        <a href="/products" class="egs-list-item group">
+                            <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
+                                <img src="https://cdn.akamai.steamstatic.com/steam/apps/1086940/library_600x900.jpg" alt="Baldur's Gate 3" class="egs-list-item-thumb" />
+                                <button type="button" class="egs-mini-bookmark" @onclick:preventDefault="true" @onclick:stopPropagation="true" title="Thêm vào danh sách ước" aria-label="Thêm vào danh sách ước">
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="egs-list-item-info">
+                                <span class="egs-list-item-name">Baldur's Gate 3</span>
+                                <span class="egs-list-item-price">990.000 đ</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 7: DUO BANNERS (Baldur's Gate 3 & Black Myth: Wukong)     *@
+        @* ================================================================= *@
+        <section aria-label="Featured Duo">
+            <div class="egs-duo-grid">
+                @* Left: Baldur's Gate 3 *@
+                <div class="egs-duo-card egs-shimmer-card">
+                    <div class="egs-duo-poster">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1086940/capsule_616x353.jpg" alt="Baldur's Gate 3" />
+                    </div>
+                    <h3 class="egs-duo-title">BALDUR'S GATE 3</h3>
+                    <p class="egs-duo-desc">
+                        Tuyệt tác RPG của thập kỷ - Khám phá thế giới Forgotten Realms với hàng trăm giờ cốt truyện sâu sắc và quyết định then chốt.
+                    </p>
+                    <a href="/products" class="egs-duo-btn">Mua ngay • 990.000 đ</a>
+                </div>
+
+                @* Right: Black Myth: Wukong *@
+                <div class="egs-duo-card egs-shimmer-card">
+                    <div class="egs-duo-poster">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_616x353.jpg" alt="Black Myth: Wukong" />
+                    </div>
+                    <h3 class="egs-duo-title">BLACK MYTH: WUKONG</h3>
+                    <p class="egs-duo-desc">
+                        Trở thành Thiên Mệnh Nhân, dấn thân vào hành trình khám phá những huyền tích bí ẩn và đối đầu với vô số yêu ma chốn thần thoại.
+                    </p>
+                    <a href="/products" class="egs-duo-btn">Mua ngay • 1.299.000 đ</a>
+                </div>
+            </div>
+        </section>
+
+        @* ================================================================= *@
+        @* SECTION 8: TRENDING                                               *@
+        @* ================================================================= *@
+        <section aria-label="Trending Games">
+            <div class="egs-section-header" style="margin-bottom: 16px;">
+                <h2 class="egs-section-title">Trending</h2>
+                <a href="/products" class="egs-outline-btn">View More</a>
+            </div>
+
+            <div class="egs-trending-grid">
+                <a href="/products" class="egs-trending-card egs-card-hover">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_616x353.jpg" alt="Forza Horizon 5" />
+                </a>
+                <a href="/products" class="egs-trending-card egs-card-hover">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_616x353.jpg" alt="Red Dead Redemption 2" />
+                </a>
+                <a href="/products" class="egs-trending-card egs-card-hover">
+                    <img src="https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_616x353.jpg" alt="Ghost of Tsushima DIRECTOR'S CUT" />
+                </a>
+            </div>
+        </section>
+
     </div>
 </div>
 
 @code {
-    [Inject] public Frontend.Services.ProductService ProductService { get; set; } = default!;
-    [Inject] public Frontend.Services.NewsService NewsService { get; set; } = default!;
-    
-    private List<Frontend.Models.Product.ProductDto> featuredProducts = new();
-    private List<Frontend.Models.Product.ProductDto> specialOffers = new();
-    private List<Frontend.Models.Product.ProductDto> newReleases = new();
-    private List<Frontend.Models.Product.ProductDto> trendingProducts = new();
-    private List<Frontend.Models.Product.ProductDto> featuredApps = new();
-    private List<Frontend.Models.News.NewsArticleDto> latestNews = new();
-    private List<Frontend.Services.RecentlyViewedItem> recentlyViewedProducts = new();
-    private List<Frontend.Models.Product.ProductDto> recommendedProducts = new();
+    private record HeroSlide(string Image, string Thumb, string Badge, string Title, string Description, string Price, string Link);
 
-    protected override async Task OnInitializedAsync()
+    private readonly HeroSlide[] _slides = new[]
     {
-        var result = await ProductService.GetProductsAsync(1, 20);
-        if (result != null && result.Items.Any())
-        {
-            var products = result.Items;
-            featuredProducts = products.Take(1).ToList();
-            specialOffers = products.Skip(1).Take(5).ToList();
-            newReleases = products.OrderByDescending(p => p.ReleaseDate).Take(6).ToList();
-            trendingProducts = products.Skip(6).Take(6).ToList();
-        }
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg",
+            "BÁN CHẠY NHẤT",
+            "Black Myth: Wukong",
+            "Hóa thân thành Thiên Mệnh Nhân, dấn thân vào hành trình Tây Du kỳ ảo đầy thử thách và hiểm nguy.",
+            "1.299.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg",
+            "SIÊU PHẨM NHẬP VAI",
+            "Cyberpunk 2077: Ultimate Edition",
+            "Trở thành lính đánh thuê cyberpunk V giữa thành phố Night City rực rỡ nhưng đầy hiểm họa chết chóc.",
+            "990.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_600x900.jpg",
+            "GAME CỦA NĂM",
+            "Elden Ring: Shadow of the Erdtree",
+            "Bước vào Vùng Đất Bóng Tối, khám phá những bí mật chưa từng được kể cùng Thánh Kiếm Miquella.",
+            "1.099.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/2215430/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/2215430/library_600x900.jpg",
+            "TUYỆT TÁC HÀNH ĐỘNG",
+            "Ghost of Tsushima DIRECTOR'S CUT",
+            "Theo chân samurai Jin Sakai trên con đường bảo vệ quê hương đảo Tsushima khỏi quân xâm lược.",
+            "1.399.000 đ",
+            "/products"),
+        new HeroSlide(
+            "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_hero.jpg",
+            "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg",
+            "ƯU ĐÃI ĐẶC BIỆT -75%",
+            "The Witcher 3: Wild Hunt",
+            "Săn lùng Đứa Trẻ Lời Nguyền trong thế giới mở kỳ ảo tàn khốc, chiến đấu với quái vật cổ xưa.",
+            "165.000 đ",
+            "/products")
+    };
 
-        // Load featured applications
-        var appsResult = await ProductService.GetProductsAsync(1, 6, type: "Software");
-        if (appsResult?.Items?.Any() == true)
-        {
-            featuredApps = appsResult.Items.Take(6).ToList();
-        }
-        else if (result != null && result.Items.Any())
-        {
-            featuredApps = result.Items
-                .Where(p => p.Type?.Equals("Software", StringComparison.OrdinalIgnoreCase) == true 
-                         || p.Type?.Equals("App", StringComparison.OrdinalIgnoreCase) == true 
-                         || (p.Categories != null && p.Categories.Any(c => c.Contains("Phần mềm", StringComparison.OrdinalIgnoreCase) || c.Contains("Ứng dụng", StringComparison.OrdinalIgnoreCase))))
-                .Take(6)
-                .ToList();
-        }
+    private int _heroIndex = 0;
+    private HeroSlide CurrentSlide => _slides[_heroIndex];
+    private System.Threading.Timer? _autoSlideTimer;
+    private bool _isPaused = false;
 
-        var newsResult = await NewsService.GetNewsAsync();
-        if (newsResult != null && newsResult.Items != null)
+    protected override void OnInitialized()
+    {
+        _autoSlideTimer = new System.Threading.Timer(_ =>
         {
-            latestNews = newsResult.Items.OrderByDescending(n => n.PublishedAt).Take(3).ToList();
-        }
-
-        // Load recently viewed from local storage
-        recentlyViewedProducts = await RecentlyViewedService.GetRecentlyViewedAsync();
-
-        // Load recommendations based on recently viewed product's category
-        var lastViewed = recentlyViewedProducts.FirstOrDefault();
-        var productResult = lastViewed != null ? await ProductService.GetProductByIdAsync(lastViewed.ProductId) : null;
-        if (productResult != null)
-        {
-            var firstCategory = productResult.Categories?.FirstOrDefault();
-            if (firstCategory != null)
+            if (_isPaused) return;
+            InvokeAsync(() =>
             {
-                recommendedProducts = await RecommendationService.GetRecommendationsAsync(null, lastViewed?.ProductId);
-            }
-        }
+                _heroIndex = (_heroIndex + 1) % _slides.Length;
+                StateHasChanged();
+            });
+        }, null, 5000, 5000);
+    }
 
-        if (!recommendedProducts.Any())
+    private void SetHeroSlide(int index)
+    {
+        if (index >= 0 && index < _slides.Length)
         {
-            recommendedProducts = await RecommendationService.GetTrendingAsync(6);
+            _heroIndex = index;
+            ResetTimer();
         }
     }
 
-    private string GetDisplayPrice(Frontend.Models.Product.ProductDto p)
+    private void NextHeroSlide()
     {
-        if (decimal.TryParse(p.Pricing?.Replace(".", "").Replace(",", "").Replace("đ", "").Replace(" ", "").Trim(), out var price))
-        {
-            return price.ToString("N0") + " đ";
-        }
-        
-        if (!string.IsNullOrEmpty(p.Pricing) && p.Pricing != "Paid" && p.Pricing != "Free")
-        {
-            return p.Pricing.Contains("đ") ? p.Pricing : p.Pricing + " đ";
-        }
-        
-        if (p.BasePrice > 0)
-        {
-            return p.BasePrice.ToString("N0") + " đ";
-        }
-        
-        return p.Pricing?.Trim().Equals("Miễn phí", StringComparison.OrdinalIgnoreCase) == true || p.Pricing == "Free" ? "Miễn phí" : "Liên hệ";
+        _heroIndex = (_heroIndex + 1) % _slides.Length;
+        ResetTimer();
     }
 
-    private bool IsApp(string? type, List<string>? categories = null)
+    private void PrevHeroSlide()
     {
-        if (string.Equals(type, "Software", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(type, "App", StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        if (categories != null && categories.Any(c => 
-            c.Contains("Phần mềm", StringComparison.OrdinalIgnoreCase) || 
-            c.Contains("Ứng dụng", StringComparison.OrdinalIgnoreCase) ||
-            c.Contains("Software", StringComparison.OrdinalIgnoreCase) ||
-            c.Contains("App", StringComparison.OrdinalIgnoreCase)))
-        {
-            return true;
-        }
-
-        return false;
+        _heroIndex = (_heroIndex - 1 + _slides.Length) % _slides.Length;
+        ResetTimer();
     }
 
-    private string GetTypeBadge(string? type, List<string>? categories = null)
+    private void PauseAutoSlide()
     {
-        return IsApp(type, categories) ? "App" : "Game";
+        _isPaused = true;
     }
 
-    private string GetTypeBadgeClass(string? type, List<string>? categories = null)
+    private void ResumeAutoSlide()
     {
-        return IsApp(type, categories)
-            ? "bg-[#0078F2] text-white border border-blue-400/40"
-            : "bg-purple-600 text-white border border-purple-400/40";
+        _isPaused = false;
+        ResetTimer();
+    }
+
+    private void ResetTimer()
+    {
+        _autoSlideTimer?.Change(5000, 5000);
+    }
+
+    private async Task ScrollTrack(string elementId, int delta)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", $"document.getElementById('{elementId}')?.scrollBy({{ left: {delta}, behavior: 'smooth' }})");
+        }
+        catch
+        {
+            // fallback
+        }
+    }
+
+    private bool _showSearchDropdown = false;
+    private string _searchKeyword = "";
+    private readonly string[] _trendingKeywords = new[] { "EA SPORTS FC 25", "Cyberpunk 2077", "Elden Ring", "Black Myth: Wukong", "The Witcher 3", "Helldivers 2" };
+
+    private record SearchResultItem(string Title, string Genre, string Price, int Discount, string Image, string Link);
+
+    private readonly SearchResultItem[] _allSearchItems = new[]
+    {
+        new SearchResultItem("EA SPORTS FC™ 25", "Sports • Simulation", "₫1,299,000", 0, "https://cdn.akamai.steamstatic.com/steam/apps/2669320/library_600x900.jpg", "/products"),
+        new SearchResultItem("Cyberpunk 2077: Ultimate Edition", "RPG • Open World", "₫495,000", 50, "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg", "/products"),
+        new SearchResultItem("Black Myth: Wukong", "Action • Souls-like", "₫1,299,000", 0, "https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg", "/products"),
+        new SearchResultItem("Elden Ring: Shadow of the Erdtree", "Action • Dark Fantasy", "₫1,099,000", 0, "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_600x900.jpg", "/products"),
+        new SearchResultItem("The Witcher 3: Wild Hunt", "RPG • Open World", "₫165,000", 75, "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg", "/products"),
+        new SearchResultItem("Dragon Age: The Veilguard", "Action • RPG", "₫1,190,000", 0, "https://cdn.akamai.steamstatic.com/steam/apps/1845910/library_600x900.jpg", "/products"),
+        new SearchResultItem("Silent Hill 2 Remake", "Horror • Survival", "₫1,064,000", 20, "https://cdn.akamai.steamstatic.com/steam/apps/2124490/library_600x900.jpg", "/products"),
+        new SearchResultItem("Hogwarts Legacy", "Adventure • Magic", "₫396,000", 70, "https://cdn.akamai.steamstatic.com/steam/apps/990080/library_600x900.jpg", "/products"),
+        new SearchResultItem("DAVE THE DIVER", "Adventure • RPG", "₫260,000", 0, "https://cdn.akamai.steamstatic.com/steam/apps/1868140/library_600x900.jpg", "/products"),
+        new SearchResultItem("Risk of Rain 2", "Roguelike • Co-op", "₫220,000", 0, "https://cdn.akamai.steamstatic.com/steam/apps/632360/library_600x900.jpg", "/products")
+    };
+
+    private IEnumerable<SearchResultItem> _quickSearchResults =>
+        string.IsNullOrWhiteSpace(_searchKeyword)
+            ? Enumerable.Empty<SearchResultItem>()
+            : _allSearchItems.Where(i => i.Title.Contains(_searchKeyword, StringComparison.OrdinalIgnoreCase) || i.Genre.Contains(_searchKeyword, StringComparison.OrdinalIgnoreCase)).Take(4);
+
+    private void SelectTrending(string tag)
+    {
+        _searchKeyword = tag;
+        _showSearchDropdown = false;
+        NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(tag)}");
+    }
+
+    private void HandleSearchKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_searchKeyword))
+        {
+            _showSearchDropdown = false;
+            NavigationManager.NavigateTo($"/products?search={Uri.EscapeDataString(_searchKeyword)}");
+        }
+        else if (e.Key == "Escape")
+        {
+            _showSearchDropdown = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _autoSlideTimer?.Dispose();
     }
 }

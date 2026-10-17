@@ -1,0 +1,225 @@
+@namespace Frontend.Components.Shared
+@using Frontend.Models.Product
+@using Frontend.Services
+@using System.Globalization
+@inject Frontend.ViewModels.WishlistViewModel WishlistVM
+@inject Frontend.Services.ToastService ToastService
+
+@if (Product != null)
+{
+<article class="nui-product-card group relative transition-all duration-300 @ContainerClass">
+    <a href="/products/@Product.Id" class="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0078f2]" aria-label="@($"Xem chi tiết {Product.Name}")">
+        @* Card Poster Container with Epic Hover Zoom *@
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#202024] mb-2.5 transition-all duration-300 ease-out group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.6)]" style="position: relative;">
+            <ProductImage Src="@GameMediaHelper.GetCover(Product.Name, Product.ImageUrl)"
+                          Alt="@Product.Name"
+                          ShowFallbackText="true"
+                          ImageClass="@(Product.IsOutOfStock
+                              ? "w-full h-full object-cover opacity-40 grayscale transition-transform duration-500 group-hover:scale-105"
+                              : "w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105")" />
+            
+            @* Dual Badge: Top-Left Poster Identifier (R3) *@
+            <div class="absolute top-2 left-2 z-10 pointer-events-none">
+                @if (GameMediaHelper.IsApp(Product.Name, Product.Type, Product.Categories))
+                {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-600/90 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/30">
+                        <span>💻</span>
+                        <span>APP</span>
+                    </span>
+                }
+                else if (GameMediaHelper.IsGiftCard(Product.Name, Product.Type, Product.Categories))
+                {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-600/90 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-amber-400/30">
+                        <span>🎁</span>
+                        <span>GIFT CARD</span>
+                    </span>
+                }
+                else
+                {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30">
+                        <span>🎮</span>
+                        <span>GAME</span>
+                    </span>
+                }
+            </div>
+
+            @* Out of stock badge *@
+            @if (Product.IsOutOfStock)
+            {
+                <div class="absolute inset-0 flex items-center justify-center bg-black/70 pointer-events-none">
+                    <span class="px-3 py-1 bg-red-600/90 text-white text-xs font-bold rounded-lg uppercase tracking-wider shadow-lg">Hết hàng</span>
+                </div>
+            }
+
+            @* Platform Badge (Bottom right) *@
+            @if (!string.IsNullOrWhiteSpace(Product.Platform))
+            {
+                <div class="absolute bottom-2 right-2 z-10 pointer-events-none">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/75 backdrop-blur-md text-white/90 text-xs font-semibold border border-white/10 min-h-[16px]">
+                        <PlatformIcon Platform="@Product.Platform" Class="w-3 h-3 text-white/90" />
+                        <span class="capitalize">@Product.Platform</span>
+                    </span>
+                </div>
+            }
+
+            @* Wishlist Bookmark Button (Top-Right on Image) *@
+            @if (IsWishlistMode)
+            {
+                <button type="button" class="egs-card-bookmark is-active text-red-500 hover:text-red-400"
+                        @onclick="HandleRemove" @onclick:stopPropagation="true" aria-label="@($"Xóa {Product.Name} khỏi yêu thích")" title="Xóa khỏi danh sách ước">
+                    <Icon Name="HeroiconName.Trash" Class="w-4 h-4" />
+                </button>
+            }
+            else if (ShowWishlistButton && !Product.IsOutOfStock)
+            {
+                <button type="button"
+                        class="egs-card-bookmark @(IsWishlisted ? "is-active" : "")"
+                        @onclick="HandleWishlistToggle"
+                        @onclick:stopPropagation="true"
+                        aria-pressed="@IsWishlisted.ToString().ToLowerInvariant()"
+                        title="@(IsWishlisted ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                        aria-label="@(IsWishlisted ? $"Xóa {Product.Name} khỏi yêu thích" : $"Thêm {Product.Name} vào yêu thích")">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="@(IsWishlisted ? "#ffffff" : "none")" stroke="currentColor" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                </button>
+            }
+        </div>
+        
+        @* Card Metadata *@
+        <div class="space-y-1">
+            @* Product Name *@
+            <h3 class="text-sm sm:text-base font-bold text-white/95 group-hover:text-[#4da6ff] line-clamp-1 transition-colors leading-snug" title="@Product.Name">
+                @Product.Name
+            </h3>
+
+            @* Detailed Classification Meta Tag below name (R3) *@
+            <div class="text-xs font-medium @GameMediaHelper.GetDetailedBadgeColor(Product.Name, Product.Type, Product.Categories)">
+                @GameMediaHelper.GetDetailedBadge(Product.Name, Product.Type, Product.Categories)
+            </div>
+            
+            @* Price Row *@
+            <div class="flex items-center gap-2 pt-0.5 flex-wrap">
+                @if (IsFree())
+                {
+                    <span class="text-xs sm:text-sm font-bold text-white">Miễn phí</span>
+                }
+                else if (Product.DiscountPercent is > 0 && Product.DiscountPrice.HasValue)
+                {
+                    <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white leading-[16px] min-h-[16px] inline-flex items-center whitespace-nowrap shrink-0 shadow-sm">-@FormatDiscount(Product.DiscountPercent.Value)%</span>
+                    <span class="text-xs text-white/65 line-through font-normal">@FormatPrice(Product.BasePrice)*</span>
+                    <span class="text-xs sm:text-sm font-bold text-white">@GetDisplayPrice()</span>
+                }
+                else
+                {
+                    <span class="text-xs sm:text-sm font-bold text-white">@GetDisplayPrice()</span>
+                }
+            </div>
+        </div>
+    </a>
+</article>
+}
+
+@code {
+    [Parameter]
+    public ProductDto Product { get; set; } = default!;
+
+    [Parameter]
+    public bool IsWishlistMode { get; set; }
+
+    [Parameter]
+    public bool Surface { get; set; }
+
+    [Parameter]
+    public bool ShowWishlistButton { get; set; } = true;
+
+    [Parameter]
+    public bool IsWishlisted { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnAddToCart { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRemoveFromWishlist { get; set; }
+
+    [Parameter]
+    public EventCallback<Frontend.Models.Product.ProductDto> OnWishlistToggle { get; set; }
+
+    private string ContainerClass => Surface
+        ? "rounded-xl bg-[#202024]/60 p-2.5 transition-all duration-300 hover:bg-[#202024]"
+        : "rounded-xl";
+
+    protected override void OnParametersSet()
+    {
+        if (!IsWishlisted && Product != null && WishlistVM.Items.Any(i => i.ProductId == Product.Id))
+        {
+            IsWishlisted = true;
+        }
+    }
+
+    private async Task HandleRemove()
+    {
+        if (OnRemoveFromWishlist.HasDelegate)
+        {
+            await OnRemoveFromWishlist.InvokeAsync(Product.Id);
+        }
+    }
+
+    private async Task HandleAddToCart()
+    {
+        if (OnAddToCart.HasDelegate)
+        {
+            await OnAddToCart.InvokeAsync(Product.Id);
+        }
+    }
+
+    private async Task HandleWishlistToggle()
+    {
+        if (OnWishlistToggle.HasDelegate)
+        {
+            await OnWishlistToggle.InvokeAsync(Product);
+        }
+        else
+        {
+            if (WishlistVM.Items.Any(i => i.ProductId == Product.Id) || IsWishlisted)
+            {
+                await WishlistVM.RemoveFromWishlistAsync(Product.Id);
+                IsWishlisted = false;
+            }
+            else
+            {
+                await WishlistVM.AddToWishlistAsync(Product.Id, Product.Name);
+                IsWishlisted = true;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private bool IsFree()
+    {
+        return Product.Pricing?.Trim().Equals("Miễn phí", StringComparison.OrdinalIgnoreCase) == true
+            || Product.Pricing?.Trim() == "0"
+            || Product.BasePrice == 0;
+    }
+
+    private static readonly CultureInfo ViCulture = new("vi-VN");
+
+    private string FormatPrice(decimal price)
+    {
+        return price.ToString("#,##0", ViCulture) + " đ";
+    }
+
+    private string GetDisplayPrice()
+    {
+        if (Product.DiscountPrice is > 0)
+        {
+            return FormatPrice(Product.DiscountPrice.Value);
+        }
+        return FormatPrice(Product.BasePrice);
+    }
+
+    private string FormatDiscount(decimal discount)
+    {
+        return Math.Round(discount, 0).ToString();
+    }
+}

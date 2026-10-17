@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>GameStore.API</AssemblyName>
+    <RootNamespace>GameStore.API</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="GameStore.API.Data" />
+    <Using Include="GameStore.API.Entities" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NexusKeys.Domain\NexusKeys.Domain.csproj" />
+    <ProjectReference Include="..\NexusKeys.Infrastructure\NexusKeys.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
+  </ItemGroup>
+
+</Project>

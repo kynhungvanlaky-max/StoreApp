@@ -1,10 +1,11 @@
 @page "/products"
 @inject Frontend.ViewModels.ProductViewModel ViewModel
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <PageTitle>Cửa Hàng — NexusKeys</PageTitle>
 
-<div class="px-4 md:px-6 lg:px-8 py-8 mx-auto max-w-[1600px] min-h-screen">
+<div class="px-4 md:px-6 lg:px-8 py-8 mx-auto max-w-[1600px] min-h-[70vh]">
     
     @* Search Header *@
     <div class="mb-8">
@@ -13,17 +14,19 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div class="relative w-full sm:max-w-md md:max-w-lg">
                 <Icon Name="HeroiconName.MagnifyingGlass" Class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input @bind="ViewModel.SearchQuery" @bind:event="oninput"
-                       @onkeyup="@(async e => { if(e.Key=="Enter") await ViewModel.SearchAsync(ViewModel.SearchQuery); })"
+                <label for="store-search" class="sr-only">Tìm kiếm sản phẩm</label>
+                <input id="store-search" @bind="ViewModel.SearchQuery" @bind:event="oninput"
+                       @onkeyup="@(e => { if(e.Key=="Enter") NavigateToCurrentState(1); })"
                        type="text" placeholder="Tìm kiếm sản phẩm..." 
                        class="w-full bg-[#1a1a1a] border border-[#2a2a2a] text-gray-200 text-sm rounded-xl pl-12 pr-4 py-3 outline-none focus:border-[#0078F2] focus:bg-[#1e1e1e] transition-all duration-300" />
             </div>
             
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <span class="text-sm text-gray-400 whitespace-nowrap">Sắp xếp:</span>
-                <select class="w-full sm:w-auto bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm rounded-lg outline-none cursor-pointer px-3 py-2 hover:border-[#3a3a3a] focus:border-[#0078F2] transition-all duration-300"
+                <label for="store-sort" class="sr-only">Sắp xếp sản phẩm</label>
+                <select id="store-sort" class="w-full sm:w-auto bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm rounded-lg outline-none cursor-pointer px-3 py-2 hover:border-[#3a3a3a] focus:border-[#0078F2] transition-all duration-300"
                         value="@ViewModel.SortBy"
-                        @onchange='@(async (e) => await ViewModel.SetSortByAsync(e.Value?.ToString() ?? "newest"))'>
+                        @onchange='@(e => ChangeSort(e.Value?.ToString() ?? "newest"))'>
                     <option class="bg-[#1a1a1a]" value="newest">Mới phát hành</option>
                     <option class="bg-[#1a1a1a]" value="price_asc">Giá tăng dần</option>
                     <option class="bg-[#1a1a1a]" value="price_desc">Giá giảm dần</option>
@@ -40,7 +43,7 @@
             <span class="text-xs text-gray-500 uppercase tracking-wider mr-1">Đang lọc:</span>
             @foreach (var cat in ViewModel.SelectedCategories)
             {
-                <button @onclick="@(async () => await ViewModel.ToggleCategoryAsync(cat))"
+                <button @onclick="@(() => ToggleCategory(cat))"
                         class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#0078F2]/15 border border-[#0078F2]/30 text-[#4da6ff] text-xs font-medium rounded-full hover:bg-[#0078F2]/25 transition-all duration-200">
                     @cat
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -48,13 +51,13 @@
             }
             @foreach (var pr in ViewModel.SelectedPriceRanges)
             {
-                <button @onclick="@(async () => await ViewModel.TogglePriceRangeAsync(pr))"
+                <button @onclick="@(() => TogglePriceRange(pr))"
                         class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#0078F2]/15 border border-[#0078F2]/30 text-[#4da6ff] text-xs font-medium rounded-full hover:bg-[#0078F2]/25 transition-all duration-200">
                     @GetPriceRangeLabel(pr)
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             }
-            <button @onclick='@(() => { ViewModel.SelectedCategories.Clear(); ViewModel.SelectedPriceRanges.Clear(); _ = ViewModel.LoadAsync(1); })'
+            <button @onclick="ResetFilters"
                     class="text-xs text-gray-400 hover:text-white ml-2 underline underline-offset-2 transition-colors duration-200">
                 Xóa tất cả
             </button>
@@ -69,7 +72,7 @@
             Bộ lọc
             @if (ViewModel.SelectedCategories.Any() || ViewModel.SelectedPriceRanges.Any())
             {
-                <span class="flex items-center justify-center w-5 h-5 bg-[#0078F2] text-white text-[10px] font-bold rounded-full">
+                <span class="flex items-center justify-center w-5 h-5 bg-[#0078F2] text-white text-xs font-bold rounded-full">
                     @(ViewModel.SelectedCategories.Count + ViewModel.SelectedPriceRanges.Count)
                 </span>
             }
@@ -88,13 +91,13 @@
                     
                     @* Panel Header *@
                     <div class="flex justify-between items-center">
-                        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
                             <Icon Name="HeroiconName.AdjustmentsHorizontal" Class="w-4 h-4 text-gray-400" />
                             Bộ lọc
-                        </h3>
+                        </h2>
                         @if (ViewModel.SelectedCategories.Any() || ViewModel.SelectedPriceRanges.Any())
                         {
-                            <button @onclick='@(() => { ViewModel.SelectedCategories.Clear(); ViewModel.SelectedPriceRanges.Clear(); _ = ViewModel.LoadAsync(1); })' 
+                            <button @onclick="ResetFilters"
                                     class="text-[11px] text-[#4da6ff] hover:text-white font-medium uppercase tracking-wider transition-colors duration-200">
                                 Đặt lại
                             </button>
@@ -105,7 +108,7 @@
                     <div>
                         <button @onclick="@(() => _showCategories = !_showCategories)" 
                                 class="flex items-center justify-between w-full py-2 group">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300 transition-colors">Thể loại</h4>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300 transition-colors">Thể loại</h3>
                             <svg class="w-3.5 h-3.5 text-gray-500 transition-transform duration-300 @(_showCategories ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
@@ -123,7 +126,7 @@
                                     <label class="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200 @(isSelected ? "bg-[#0078F2]/10" : "hover:bg-white/[0.03]")">
                                         <div class="relative flex items-center justify-center w-[18px] h-[18px] rounded-[5px] border-2 transition-all duration-200 @(isSelected ? "bg-[#0078F2] border-[#0078F2]" : "border-[#3a3a3a] hover:border-[#555]")">
                                             <input type="checkbox" checked="@isSelected" 
-                                                   @onchange='@(async (e) => await ViewModel.ToggleCategoryAsync(cat))'
+                                                   @onchange='@(_ => ToggleCategory(cat))'
                                                    class="absolute opacity-0 cursor-pointer w-full h-full" />
                                             @if (isSelected)
                                             {
@@ -146,7 +149,7 @@
                     <div>
                         <button @onclick="@(() => _showPriceRanges = !_showPriceRanges)" 
                                 class="flex items-center justify-between w-full py-2 group">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300 transition-colors">Khoảng giá</h4>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300 transition-colors">Khoảng giá</h3>
                             <svg class="w-3.5 h-3.5 text-gray-500 transition-transform duration-300 @(_showPriceRanges ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
@@ -168,7 +171,7 @@
                                     <label class="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200 @(isSelected ? "bg-[#0078F2]/10" : "hover:bg-white/[0.03]")">
                                         <div class="relative flex items-center justify-center w-[18px] h-[18px] rounded-[5px] border-2 transition-all duration-200 @(isSelected ? "bg-[#0078F2] border-[#0078F2]" : "border-[#3a3a3a] hover:border-[#555]")">
                                             <input type="checkbox" checked="@isSelected" 
-                                                   @onchange='@(async (e) => await ViewModel.TogglePriceRangeAsync(pr.Key))'
+                                                   @onchange='@(_ => TogglePriceRange(pr.Key))'
                                                    class="absolute opacity-0 cursor-pointer w-full h-full" />
                                             @if (isSelected)
                                             {
@@ -189,10 +192,11 @@
 
         @* Right Column: Product Grid *@
         <div class="flex-1 min-w-0">
+            <h2 class="sr-only">Danh sách sản phẩm</h2>
             @if (ViewModel.IsLoading)
             {
                 <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-5">
-                    @for (int i = 0; i < 20; i++)
+                    @for (int i = 0; i < 10; i++)
                     {
                         <div class="animate-pulse">
                             <div class="aspect-[3/4] bg-[#1a1a1a] rounded-xl mb-3"></div>
@@ -203,15 +207,24 @@
                     }
                 </div>
             }
+            else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+            {
+                <div class="flex flex-col items-center justify-center py-24 text-center" role="alert">
+                    <Icon Name="HeroiconName.ExclamationTriangle" Class="w-12 h-12 text-amber-400 mb-4" />
+                    <h2 class="text-xl font-bold text-white mb-2">Không thể tải cửa hàng</h2>
+                    <p class="text-gray-400 mb-6 max-w-md">@ViewModel.ErrorMessage</p>
+                    <button type="button" @onclick="@(() => ViewModel.LoadAsync(ViewModel.CurrentPage))" class="px-6 py-2.5 text-sm font-bold text-white bg-[#0078F2] rounded-lg hover:bg-[#0066cc]">Thử lại</button>
+                </div>
+            }
             else if (ViewModel.Products.Count == 0)
             {
                 <div class="flex flex-col items-center justify-center py-24 text-center">
                     <div class="w-20 h-20 bg-[#1a1a1a] rounded-full flex items-center justify-center mb-5">
                         <Icon Name="HeroiconName.MagnifyingGlass" Class="w-10 h-10 text-[#303030]" />
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Không tìm thấy kết quả</h3>
+                    <h2 class="text-xl font-bold text-white mb-2">Không tìm thấy kết quả</h2>
                     <p class="text-gray-400 mb-6 max-w-md">Thử thay đổi từ khóa tìm kiếm hoặc xóa bớt bộ lọc để tìm thấy sản phẩm bạn cần.</p>
-                    <button @onclick='@(() => { ViewModel.SearchQuery = ""; ViewModel.SelectedCategories.Clear(); ViewModel.SelectedPriceRanges.Clear(); ViewModel.SortBy = "newest"; _ = ViewModel.LoadAsync(); })' 
+                    <button @onclick="ResetAll"
                             class="px-6 py-2.5 text-sm font-medium text-white bg-[#0078F2] rounded-lg hover:bg-[#0066cc] transition-colors duration-200">
                         Đặt lại bộ lọc
                     </button>
@@ -230,9 +243,10 @@
                 @if (ViewModel.TotalPages > 1)
                 {
                     <div class="flex justify-center items-center gap-1.5 mt-12">
-                        <button class="w-9 h-9 flex items-center justify-center rounded-lg text-white disabled:opacity-30 hover:bg-[#1a1a1a] disabled:hover:bg-transparent transition-colors duration-200" 
+                        <button class="w-11 h-11 flex items-center justify-center rounded-lg text-white disabled:opacity-30 hover:bg-[#1a1a1a] disabled:hover:bg-transparent transition-colors duration-200"
+                                aria-label="Trang trước"
                                 disabled="@(ViewModel.CurrentPage == 1)"
-                                @onclick="@(() => ViewModel.LoadAsync(ViewModel.CurrentPage - 1))">
+                                @onclick="@(() => NavigateToCurrentState(ViewModel.CurrentPage - 1))">
                             <Icon Name="HeroiconName.ChevronLeft" Class="w-4 h-4" />
                         </button>
                         
@@ -241,20 +255,22 @@
                             var pageNum = i;
                             @if (ShouldShowPage(pageNum))
                             {
-                                <button class="w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 @(pageNum == ViewModel.CurrentPage ? "bg-[#0078F2] text-white" : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white")"
-                                        @onclick="@(() => ViewModel.LoadAsync(pageNum))">
+                                <button class="w-11 h-11 flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 @(pageNum == ViewModel.CurrentPage ? "bg-[#0078F2] text-white" : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white")"
+                                        aria-label="@($"Trang {pageNum}")" aria-current="@(pageNum == ViewModel.CurrentPage ? "page" : null)"
+                                        @onclick="@(() => NavigateToCurrentState(pageNum))">
                                     @pageNum
                                 </button>
                             }
                             else if (ShouldShowEllipsis(pageNum))
                             {
-                                <span class="w-9 h-9 flex items-center justify-center text-gray-500 text-sm">…</span>
+                                <span class="w-11 h-11 flex items-center justify-center text-gray-500 text-sm">…</span>
                             }
                         }
                         
-                        <button class="w-9 h-9 flex items-center justify-center rounded-lg text-white disabled:opacity-30 hover:bg-[#1a1a1a] disabled:hover:bg-transparent transition-colors duration-200"
+                        <button class="w-11 h-11 flex items-center justify-center rounded-lg text-white disabled:opacity-30 hover:bg-[#1a1a1a] disabled:hover:bg-transparent transition-colors duration-200"
+                                aria-label="Trang sau"
                                 disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
-                                @onclick="@(() => ViewModel.LoadAsync(ViewModel.CurrentPage + 1))">
+                                @onclick="@(() => NavigateToCurrentState(ViewModel.CurrentPage + 1))">
                             <Icon Name="HeroiconName.ChevronRight" Class="w-4 h-4" />
                         </button>
                     </div>
@@ -272,11 +288,19 @@
     [SupplyParameterFromQuery]
     public string? Search { get; set; }
 
-    [SupplyParameterFromQuery]
-    public string? Type { get; set; }
+    [SupplyParameterFromQuery(Name = "page")]
+    public int Page { get; set; } = 1;
 
-    private string? _lastSearch;
-    private string? _lastType;
+    [SupplyParameterFromQuery(Name = "categories")]
+    public string[]? Categories { get; set; }
+
+    [SupplyParameterFromQuery(Name = "priceRanges")]
+    public string[]? PriceRanges { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sortBy")]
+    public string? Sort { get; set; }
+
+    private string? _lastStateSignature;
 
     protected override void OnInitialized()
     {
@@ -285,30 +309,22 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        bool needReload = false;
+        var categories = Categories?.Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().ToList() ?? new();
+        var priceRanges = PriceRanges?.Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().ToList() ?? new();
+        var sort = Sort is "price_asc" or "price_desc" or "discount" ? Sort : "newest";
+        var page = Math.Max(1, Page);
+        var signature = $"{page}|{Search}|{sort}|{string.Join(',', categories)}|{string.Join(',', priceRanges)}";
 
-        if (Search != _lastSearch)
+        if (!string.Equals(signature, _lastStateSignature, StringComparison.Ordinal))
         {
-            _lastSearch = Search;
+            _lastStateSignature = signature;
             ViewModel.SearchQuery = Search ?? "";
-            needReload = true;
-        }
-
-        if (Type != _lastType)
-        {
-            _lastType = Type;
-            ViewModel.SelectedType = Type;
-            needReload = true;
-        }
-
-        if (needReload)
-        {
-            await ViewModel.LoadAsync();
-        }
-        else if (ViewModel.Products.Count == 0 && !ViewModel.IsLoading)
-        {
-            // Initial load if no params change but we haven't loaded yet
-            await ViewModel.LoadAsync();
+            ViewModel.SortBy = sort;
+            ViewModel.SelectedCategories.Clear();
+            ViewModel.SelectedCategories.AddRange(categories);
+            ViewModel.SelectedPriceRanges.Clear();
+            ViewModel.SelectedPriceRanges.AddRange(priceRanges);
+            await ViewModel.LoadAsync(page);
         }
     }
     
@@ -339,5 +355,72 @@
         if (page == 2 && ViewModel.CurrentPage > 3) return true;
         if (page == ViewModel.TotalPages - 1 && ViewModel.CurrentPage < ViewModel.TotalPages - 2) return true;
         return false;
+    }
+
+    private void ToggleCategory(string category)
+    {
+        if (!ViewModel.SelectedCategories.Remove(category))
+        {
+            ViewModel.SelectedCategories.Add(category);
+        }
+        NavigateToCurrentState(1);
+    }
+
+    private void TogglePriceRange(string range)
+    {
+        if (!ViewModel.SelectedPriceRanges.Remove(range))
+        {
+            ViewModel.SelectedPriceRanges.Add(range);
+        }
+        NavigateToCurrentState(1);
+    }
+
+    private void ChangeSort(string sortBy)
+    {
+        ViewModel.SortBy = sortBy;
+        NavigateToCurrentState(1);
+    }
+
+    private void ResetFilters()
+    {
+        ViewModel.SelectedCategories.Clear();
+        ViewModel.SelectedPriceRanges.Clear();
+        NavigateToCurrentState(1);
+    }
+
+    private void ResetAll()
+    {
+        ViewModel.SearchQuery = string.Empty;
+        ViewModel.SortBy = "newest";
+        ViewModel.SelectedCategories.Clear();
+        ViewModel.SelectedPriceRanges.Clear();
+        NavigateToCurrentState(1);
+    }
+
+    private void NavigateToCurrentState(int page)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(ViewModel.SearchQuery))
+        {
+            parts.Add($"search={Uri.EscapeDataString(ViewModel.SearchQuery.Trim())}");
+        }
+        if (!string.Equals(ViewModel.SortBy, "newest", StringComparison.Ordinal))
+        {
+            parts.Add($"sortBy={Uri.EscapeDataString(ViewModel.SortBy)}");
+        }
+        foreach (var category in ViewModel.SelectedCategories)
+        {
+            parts.Add($"categories={Uri.EscapeDataString(category)}");
+        }
+        foreach (var range in ViewModel.SelectedPriceRanges)
+        {
+            parts.Add($"priceRanges={Uri.EscapeDataString(range)}");
+        }
+        if (page > 1)
+        {
+            parts.Add($"page={page}");
+        }
+
+        NavigationManager.NavigateTo(parts.Count == 0 ? "/products" : $"/products?{string.Join("&", parts)}");
     }
 }

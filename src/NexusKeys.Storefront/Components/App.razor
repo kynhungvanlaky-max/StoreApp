@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark" style="background-color: #121212; color: #ffffff;">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="NexusKeys - Cửa hàng bản quyền game kỹ thuật số." />
+    <meta name="theme-color" content="#121212" />
+    <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/epic-games.css?v=20261016" />
+    <link rel="stylesheet" href="design/atlas.css?v=20261016" />
+    <link rel="stylesheet" href="css/nexus-ui.css?v=20261016" />
+    <link rel="stylesheet" href="@Assets["Frontend.styles.css"]" />
+    <script src="js/ui-helpers.js"></script>
+    <script src="js/admin-portal-bridge.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="js/google-auth.js"></script>
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+
+<body style="background-color: #121212; color: #f5f5f5; font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <Routes @rendermode="InteractiveServer" />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+
+</html>

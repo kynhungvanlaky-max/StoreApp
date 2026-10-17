@@ -1,0 +1,128 @@
+@page "/careers"
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<PageTitle>Cơ Hội Nghề Nghiệp — Tuyển Dụng NexusKeys</PageTitle>
+
+<div class="egs-wrap">
+    <div class="egs-content">
+
+        @* HERO CAREERS BANNER *@
+        <section class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-[#141419] via-[#1c1d27] to-[#121216] border border-white/10 p-8 md:p-14 mb-12 shadow-2xl">
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#40a9ff] text-xs font-bold uppercase tracking-wider mb-6">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Gia Nhập Đội Ngũ NexusKeys
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
+                    Kiến Tạo Trải Nghiệm Bản Quyền Đỉnh Cao
+                </h1>
+
+                <p class="text-white/70 text-base sm:text-lg mb-8 leading-relaxed">
+                    Chúng tôi là các kỹ sư, nhà thiết kế và chuyên gia công nghệ đang định hình tương lai của nền tảng phân phối game bản quyền chính hãng tại Việt Nam và khu vực.
+                </p>
+
+                <div class="flex items-center gap-4">
+                    <a href="#positions" class="egs-auth-btn-primary inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-sm tracking-wide shadow-lg shadow-[#0078f2]/30 transition-all cursor-pointer">
+                        <span>Xem Vị Trí Tuyển Dụng (@_jobs.Length)</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        @* PERKS & CULTURE *@
+        <section class="mb-14">
+            <h2 class="text-xl font-bold text-white mb-6 tracking-tight">Môi Trường Làm Việc Tại NexusKeys</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="egs-card-hover egs-shimmer-card rounded-2xl bg-[#1c1c20] border border-white/10 p-6">
+                    <div class="w-10 h-10 rounded-lg bg-[#0078f2]/15 text-[#0078f2] flex items-center justify-center font-bold mb-4">
+                        💡
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Tự Do Sáng Tạo & Đổi Mới</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Chủ động làm việc với các công nghệ hiện đại, phát triển các giải pháp thương mại điện tử game phục vụ hàng triệu người chơi.
+                    </p>
+                </div>
+
+                <div class="egs-card-hover egs-shimmer-card rounded-2xl bg-[#1c1c20] border border-white/10 p-6">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold mb-4">
+                        🌍
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Linh Hoạt & Thân Thiện Remote</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Hợp tác cùng đồng nghiệp xuất sắc với chế độ làm việc kết hợp (Hybrid/Remote) và cân bằng cuộc sống tối ưu.
+                    </p>
+                </div>
+
+                <div class="egs-card-hover egs-shimmer-card rounded-2xl bg-[#1c1c20] border border-white/10 p-6">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold mb-4">
+                        🛡️
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Đãi Ngộ Toàn Diện</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">
+                        Bảo hiểm sức khỏe cao cấp, thưởng hiệu quả kinh doanh, hỗ trợ thiết bị chơi game và ngân sách học tập phát triển kỹ năng.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        @* OPEN POSITIONS *@
+        <section id="positions" class="mb-14 scroll-mt-28">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-white tracking-tight">Vị Trí Đang Mở Tuyển</h2>
+                <span class="text-xs text-white/50">Hiện có @_jobs.Length vị trí mở</span>
+            </div>
+
+            <div class="space-y-3">
+                @foreach (var job in _jobs)
+                {
+                    <div class="egs-card-hover rounded-xl bg-[#18181c] border border-white/10 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:border-[#0078f2]/40">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-white/5 text-white/70">@job.Team</span>
+                                <span class="text-xs text-white/40">• @job.Location</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white">@job.Title</h3>
+                        </div>
+
+                        <button type="button" @onclick="() => SelectJob(job.Title)" class="px-5 py-2.5 rounded-lg bg-[#202024] hover:bg-[#0078f2] text-white text-xs font-bold transition-colors cursor-pointer shrink-0">
+                            Ứng Tuyển
+                        </button>
+                    </div>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(_appliedMessage))
+            {
+                <div class="mt-6 p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-pulse">
+                    @_appliedMessage
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@code {
+
+
+    private record JobItem(string Title, string Team, string Location);
+
+    private readonly JobItem[] _jobs = new[]
+    {
+        new JobItem("Senior Backend Engineer — Store Platform", "Kỹ thuật Nền tảng", "Hybrid / Hà Nội, Việt Nam"),
+        new JobItem("Lead UI/UX Designer — Games Economy", "Trải nghiệm Người dùng", "Hybrid / TP. Hồ Chí Minh"),
+        new JobItem("Core Systems & Payment Engineer", "Hệ thống Thanh toán", "Remote / Toàn quốc"),
+        new JobItem("Cloud Infrastructure & Security Specialist", "Bảo mật & Cloud", "Remote / Toàn quốc"),
+        new JobItem("Catalog & Publisher Relations Specialist", "Đối tác Phát hành", "Hà Nội / TP. Hồ Chí Minh")
+    };
+
+    private string? _appliedMessage;
+
+    private void SelectJob(string title)
+    {
+        _appliedMessage = $"Cảm ơn bạn! Nguyện vọng ứng tuyển vị trí '{title}' đã được ghi nhận. Vui lòng gửi CV của bạn tới careers@nexuskeys.com.";
+    }
+}

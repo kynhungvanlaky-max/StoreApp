@@ -1,9 +1,34 @@
 @page "/checkout/success"
-@inject NavigationManager NavigationManager
+@inject Frontend.Services.OrderService OrderService
+@using Frontend.Models.Order
 
-<PageTitle>Thanh Toán Thành Công — NexusKeys</PageTitle>
+<PageTitle>@(_order is null ? "Xác Minh Thanh Toán" : "Thanh Toán Thành Công") — NexusKeys</PageTitle>
 
 <div class="flex items-center justify-center min-h-[calc(100vh-200px)] py-12 px-4">
+    @if (_isLoading)
+    {
+        <div class="text-center" role="status">
+            <h1 class="sr-only">Đang xác minh thanh toán</h1>
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+            <p class="mt-4 text-base-content/60">Đang xác minh giao dịch của bạn...</p>
+        </div>
+    }
+    else if (_order == null)
+    {
+        <div class="max-w-lg w-full bg-base-200 rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-base-300">
+            <div class="w-20 h-20 bg-warning/15 text-warning rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-warning/20">
+                <Icon Name="HeroiconName.ExclamationTriangle" Class="w-10 h-10" />
+            </div>
+            <h1 class="text-2xl md:text-3xl font-black text-base-content mb-3">Chưa thể xác nhận thanh toán</h1>
+            <p class="text-base-content/60 mb-8">@_errorMessage</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/orders" class="btn btn-primary flex-1">Kiểm Tra Đơn Hàng</a>
+                <a href="/support" class="btn btn-outline flex-1">Liên Hệ Hỗ Trợ</a>
+            </div>
+        </div>
+    }
+    else
+    {
     <div class="max-w-lg w-full bg-base-200 rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-base-300 relative overflow-hidden">
         @* Decorative background glow *@
         <div class="absolute -top-24 -left-24 w-48 h-48 bg-success/20 rounded-full blur-3xl"></div>
@@ -14,23 +39,27 @@
                 <Icon Name="HeroiconName.CheckCircle" Class="w-12 h-12 text-success" />
             </div>
             
-            <h1 class="text-3xl font-black text-white mb-2">Thanh Toán Thành Công!</h1>
-            <p class="text-gray-400 mb-8">Cảm ơn bạn đã mua hàng tại Nexus Store. Giao dịch của bạn đã được xác nhận và license/key đã được chuyển vào thư viện.</p>
+            <h1 class="text-3xl font-black text-base-content mb-2">Thanh Toán Thành Công!</h1>
+            <p class="text-base-content/60 mb-8">Cảm ơn bạn đã mua hàng tại NexusKeys. Giao dịch đã được xác nhận và license key đã được chuyển vào thư viện.</p>
             
             <div class="bg-base-300/50 rounded-2xl p-6 mb-8 border border-base-300 text-left">
-                <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                <h2 class="font-bold text-base-content mb-4 flex items-center gap-2">
                     <Icon Name="HeroiconName.InformationCircle" Class="w-5 h-5 text-primary" />
                     Thông tin đơn hàng
-                </h3>
+                </h2>
                 
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Mã đơn hàng:</span>
-                        <span class="text-white font-mono bg-base-100 px-2 py-0.5 rounded">#@DisplayOrderId</span>
+                        <span class="text-base-content/60">Mã đơn hàng:</span>
+                        <span class="text-base-content font-mono bg-base-100 px-2 py-0.5 rounded">#@_order.Id</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Thời gian:</span>
-                        <span class="text-white">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="text-base-content/60">Thời gian:</span>
+                        <span class="text-base-content">@_order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div class="flex justify-between gap-4">
+                        <span class="text-base-content/60">Tổng thanh toán:</span>
+                        <span class="text-primary font-bold">@_order.TotalAmount.ToString("N0") đ</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-400">Trạng thái:</span>
@@ -49,11 +78,44 @@
             </div>
         </div>
     </div>
+    }
 </div>
 
 @code {
     [SupplyParameterFromQuery]
     public string? OrderId { get; set; }
 
-    public string DisplayOrderId => string.IsNullOrEmpty(OrderId) ? "" : OrderId.Split('_')[0];
+    private OrderDto? _order;
+    private bool _isLoading = true;
+    private string _errorMessage = "Không tìm thấy thông tin giao dịch hợp lệ.";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _order = null;
+
+        var rawOrderId = OrderId?.Split('_', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        if (!int.TryParse(rawOrderId, out var parsedOrderId) || parsedOrderId <= 0)
+        {
+            _errorMessage = "Liên kết thanh toán không chứa mã đơn hàng hợp lệ.";
+            _isLoading = false;
+            return;
+        }
+
+        var order = await OrderService.GetOrderByIdAsync(parsedOrderId);
+        if (order == null)
+        {
+            _errorMessage = "Không tìm thấy đơn hàng hoặc bạn không có quyền xem giao dịch này.";
+        }
+        else if (!string.Equals(order.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+        {
+            _errorMessage = "Giao dịch chưa được xác nhận hoàn tất. Vui lòng kiểm tra lại trong lịch sử đơn hàng.";
+        }
+        else
+        {
+            _order = order;
+        }
+
+        _isLoading = false;
+    }
 }
