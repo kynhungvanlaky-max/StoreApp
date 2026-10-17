@@ -14,6 +14,7 @@ namespace Frontend.ViewModels
         public bool HasLoadedInitialData { get; private set; }
         public int CurrentPage { get; private set; } = 1;
         public int TotalPages { get; private set; } = 1;
+        public int TotalCount { get; private set; } = 0;
         public string SearchQuery { get; set; } = "";
         public string? SelectedType { get; set; }
         public List<string> SelectedCategories { get; set; } = new();
@@ -57,6 +58,7 @@ namespace Frontend.ViewModels
                     {
                         Products = result.Items;
                         TotalPages = result.TotalPages;
+                        TotalCount = result.TotalCount;
                         CurrentPage = result.PageNumber;
                     }
                 }
@@ -68,6 +70,7 @@ namespace Frontend.ViewModels
                     {
                         Products = result.Items;
                         TotalPages = result.TotalPages;
+                        TotalCount = result.TotalCount;
                         CurrentPage = result.PageNumber;
                     }
                 }

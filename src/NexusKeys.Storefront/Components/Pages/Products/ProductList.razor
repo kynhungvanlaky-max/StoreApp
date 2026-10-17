@@ -8,68 +8,105 @@
 <div class="egs-wrap">
     <div class="egs-content">
 
-        @* R1 & R3: Quick Type Navigation Tabs (Game vs App vs All) *@
-        <div class="mb-6" role="tablist" aria-label="Phân loại cấp cao sản phẩm">
-            <div class="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#18181c] border border-[#303030] shadow-sm max-w-full overflow-x-auto no-scrollbar">
+        @* R1 & R3: Modern Quick Type Navigation Tabs (Game vs App vs All) *@
+        <div class="mb-8" role="tablist" aria-label="Phân loại cấp cao sản phẩm">
+            <div class="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-[#16161a]/90 backdrop-blur-md border border-white/10 shadow-lg shadow-black/40 max-w-full overflow-x-auto no-scrollbar">
+                @{
+                    var isAllSelected = string.IsNullOrEmpty(ViewModel.SelectedType);
+                    var isGameSelected = string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase);
+                    var isAppSelected = string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase);
+                }
                 <button type="button" role="tab"
                         id="tab-all-products"
-                        aria-selected="@(string.IsNullOrEmpty(ViewModel.SelectedType) ? "true" : "false")"
+                        aria-selected="@(isAllSelected ? "true" : "false")"
                         @onclick='() => SelectType(null)'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(string.IsNullOrEmpty(ViewModel.SelectedType) ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30 font-black border border-[#0078f2]" : "text-white/75 hover:text-white hover:bg-white/5 border border-transparent")">
-                    <span>🌐</span>
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer @(isAllSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
+                    <span class="text-base">🌐</span>
                     <span>Tất cả sản phẩm</span>
+                    @if (isAllSelected)
+                    {
+                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse"></span>
+                    }
                 </button>
+
                 <button type="button" role="tab"
                         id="tab-game-products"
-                        aria-selected="@(string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase) ? "true" : "false")"
+                        aria-selected="@(isGameSelected ? "true" : "false")"
                         @onclick='() => SelectType("Game")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase) ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30 font-black border border-[#0078f2]" : "text-white/75 hover:text-white hover:bg-white/5 border border-transparent")">
-                    <span>🎮</span>
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer @(isGameSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
+                    <span class="text-base">🎮</span>
                     <span>Trò chơi (Game)</span>
+                    @if (isGameSelected)
+                    {
+                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse"></span>
+                    }
                 </button>
+
                 <button type="button" role="tab"
                         id="tab-app-products"
-                        aria-selected="@((string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase)) ? "true" : "false")"
+                        aria-selected="@(isAppSelected ? "true" : "false")"
                         @onclick='() => SelectType("App")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @((string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase)) ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30 font-black border border-[#0078f2]" : "text-white/75 hover:text-white hover:bg-white/5 border border-transparent")">
-                    <span>💻</span>
-                    <span>Ứng dụng & Phần mềm (App)</span>
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer @(isAppSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
+                    <span class="text-base">💻</span>
+                    <span>Ứng dụng & Phần mềm</span>
+                    @if (isAppSelected)
+                    {
+                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse"></span>
+                    }
                 </button>
             </div>
         </div>
 
-        @* Epic Browse Header Bar *@
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
+        @* Modern Catalog Header Bar *@
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-white/10">
             <div>
-                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                    @GetHeaderTitle()
-                </h1>
-                <p class="text-xs text-white/70 mt-1">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                        @GetHeaderTitle()
+                    </h1>
+                    @if (!ViewModel.IsLoading && ViewModel.TotalCount > 0)
+                    {
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#0078f2]/15 border border-[#0078f2]/30 text-[#4da6ff]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2] animate-pulse"></span>
+                            @ViewModel.TotalCount.ToString("N0") sản phẩm
+                        </span>
+                    }
+                </div>
+                <p class="text-xs sm:text-sm text-zinc-400 mt-1">
                     @GetHeaderDescription()
                 </p>
             </div>
+
             <div class="flex items-center gap-3">
-                <span class="text-xs text-white/70 uppercase tracking-wider font-bold">Sắp xếp:</span>
-                <select id="store-sort" class="min-h-[44px] bg-[#202024] border border-white/15 text-white text-xs font-bold rounded-lg outline-none cursor-pointer px-3.5 py-2 hover:border-white/30 transition-colors shadow-sm"
-                        value="@ViewModel.SortBy"
-                        @onchange='@(e => ChangeSort(e.Value?.ToString() ?? "newest"))'>
-                    <option class="bg-[#202024]" value="newest">Mới nhất (New Releases)</option>
-                    <option class="bg-[#202024]" value="discount">Ưu đãi giảm giá tốt nhất</option>
-                    <option class="bg-[#202024]" value="price_asc">Giá: Thấp đến Cao</option>
-                    <option class="bg-[#202024]" value="price_desc">Giá: Cao đến Thấp</option>
-                </select>
+                @{
+                    int activeFilterCount = ViewModel.SelectedCategories.Count + ViewModel.SelectedPriceRanges.Count + (!string.IsNullOrEmpty(ViewModel.SelectedType) ? 1 : 0);
+                }
+
+                <div class="relative flex items-center">
+                    <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider hidden sm:inline mr-2.5">Sắp xếp:</span>
+                    <div class="relative">
+                        <select id="store-sort" class="appearance-none min-h-[44px] bg-[#1c1c22] border border-white/15 text-white text-xs font-bold rounded-xl outline-none cursor-pointer pl-4 pr-10 py-2.5 hover:border-[#0078f2]/50 focus:border-[#0078f2] focus:ring-2 focus:ring-[#0078f2]/30 transition-all shadow-md"
+                                value="@ViewModel.SortBy"
+                                @onchange='@(e => ChangeSort(e.Value?.ToString() ?? "newest"))'>
+                            <option class="bg-[#1c1c22]" value="newest">⚡ Mới nhất (New Releases)</option>
+                            <option class="bg-[#1c1c22]" value="discount">🔥 Ưu đãi giảm giá tốt nhất</option>
+                            <option class="bg-[#1c1c22]" value="price_asc">🏷️ Giá: Thấp đến Cao</option>
+                            <option class="bg-[#1c1c22]" value="price_desc">💎 Giá: Cao đến Thấp</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
+                </div>
 
                 @* Mobile Filter Trigger Button *@
-                <button @onclick="@(() => _showMobileFilter = !_showMobileFilter)"
-                        class="lg:hidden min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#202024] border border-white/15 text-white text-xs font-bold rounded-lg hover:bg-white/10 transition-colors">
+                <button type="button" @onclick="@(() => _showMobileFilter = true)"
+                        class="lg:hidden min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 bg-[#1c1c22] hover:bg-[#25252e] border border-white/15 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4 text-[#0078f2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                    Bộ lọc
-                    @{
-                        int activeFilterCount = ViewModel.SelectedCategories.Count + ViewModel.SelectedPriceRanges.Count + (!string.IsNullOrEmpty(ViewModel.SelectedType) ? 1 : 0);
-                    }
+                    <span>Bộ lọc</span>
                     @if (activeFilterCount > 0)
                     {
-                        <span class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center">
+                        <span class="min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white text-[11px] font-black flex items-center justify-center shadow-sm shadow-[#0078f2]/50">
                             @activeFilterCount
                         </span>
                     }
@@ -80,50 +117,51 @@
         @* Active Filter Chips *@
         @if (ViewModel.SelectedCategories.Any() || ViewModel.SelectedPriceRanges.Any() || !string.IsNullOrWhiteSpace(ViewModel.SearchQuery) || !string.IsNullOrWhiteSpace(ViewModel.SelectedType))
         {
-            <div class="flex flex-wrap items-center gap-2.5 mb-6 p-3 bg-[#18181c] border border-white/10 rounded-xl">
-                <span class="text-xs text-white/70 uppercase tracking-wider mr-1 font-bold flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-[#0078f2]"></span>
+            <div class="flex flex-wrap items-center gap-2.5 mb-6 p-3.5 bg-[#16161a]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-sm">
+                <span class="text-xs text-zinc-300 uppercase tracking-wider mr-1 font-bold flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_8px_#0078f2] animate-pulse"></span>
                     Đang lọc:
                 </span>
                 @if (!string.IsNullOrWhiteSpace(ViewModel.SelectedType))
                 {
-                    <span class="min-h-[44px] inline-flex items-center gap-2 px-3.5 py-2 bg-[#0078F2]/20 border border-[#0078F2]/40 text-[#4da6ff] text-xs font-bold rounded-full">
+                    <span class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0078F2]/15 border border-[#0078F2]/40 text-[#4da6ff] text-xs font-bold rounded-xl shadow-sm">
                         <span>@GetTypeChipLabel(ViewModel.SelectedType)</span>
-                        <button type="button" @onclick='() => SelectType(null)' class="p-1 hover:text-red-400 focus:outline-none flex items-center justify-center" aria-label="Xóa bộ lọc loại sản phẩm">
+                        <button type="button" @onclick='() => SelectType(null)' class="p-1 hover:bg-[#0078F2]/30 rounded-lg text-white/70 hover:text-white transition-all cursor-pointer" aria-label="Xóa bộ lọc loại sản phẩm">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </span>
                 }
                 @if (!string.IsNullOrWhiteSpace(ViewModel.SearchQuery))
                 {
-                    <span class="min-h-[44px] inline-flex items-center gap-2 px-3.5 py-2 bg-white/10 border border-white/20 text-white text-xs font-semibold rounded-full">
-                        Từ khóa: "@ViewModel.SearchQuery"
-                        <button type="button" @onclick='() => { ViewModel.SearchQuery = ""; NavigateToCurrentState(1); }' class="p-1 hover:text-red-400 focus:outline-none flex items-center justify-center" aria-label="Xóa bộ lọc từ khóa">
+                    <span class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-purple-500/15 border border-purple-500/40 text-purple-300 text-xs font-semibold rounded-xl shadow-sm">
+                        <span>🔍 "@ViewModel.SearchQuery"</span>
+                        <button type="button" @onclick='() => { ViewModel.SearchQuery = ""; NavigateToCurrentState(1); }' class="p-1 hover:bg-purple-500/30 rounded-lg text-white/70 hover:text-white transition-all cursor-pointer" aria-label="Xóa bộ lọc từ khóa">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </span>
                 }
                 @foreach (var cat in ViewModel.SelectedCategories)
                 {
-                    <button @onclick="@(() => ToggleCategory(cat))"
-                            class="min-h-[44px] inline-flex items-center gap-2 px-3.5 py-2 bg-[#0078F2]/20 border border-[#0078F2]/40 text-[#4da6ff] text-xs font-bold rounded-full hover:bg-[#0078F2]/30 transition-all"
+                    <button type="button" @onclick="@(() => ToggleCategory(cat))"
+                            class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-sky-500/15 border border-sky-500/40 text-sky-300 text-xs font-bold rounded-xl hover:bg-sky-500/25 transition-all cursor-pointer group shadow-sm"
                             aria-label="@($"Xóa bộ lọc thể loại {cat}")">
-                        @cat
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <span>🏷️ @cat</span>
+                        <svg class="w-3.5 h-3.5 text-sky-400/80 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 }
                 @foreach (var pr in ViewModel.SelectedPriceRanges)
                 {
-                    <button @onclick="@(() => TogglePriceRange(pr))"
-                            class="min-h-[44px] inline-flex items-center gap-2 px-3.5 py-2 bg-[#0078F2]/20 border border-[#0078F2]/40 text-[#4da6ff] text-xs font-bold rounded-full hover:bg-[#0078F2]/30 transition-all"
+                    <button type="button" @onclick="@(() => TogglePriceRange(pr))"
+                            class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl hover:bg-emerald-500/25 transition-all cursor-pointer group shadow-sm"
                             aria-label="@($"Xóa bộ lọc giá {GetPriceRangeLabel(pr)}")">
-                        @GetPriceRangeLabel(pr)
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <span>💰 @GetPriceRangeLabel(pr)</span>
+                        <svg class="w-3.5 h-3.5 text-emerald-400/80 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 }
-                <button @onclick="ResetFilters"
-                        class="min-h-[44px] px-3 py-2 text-xs text-white/70 hover:text-white ml-auto underline underline-offset-4 transition-colors font-semibold inline-flex items-center cursor-pointer">
-                    Xóa tất cả
+                <button type="button" @onclick="ResetFilters"
+                        class="min-h-[36px] px-3.5 py-1.5 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition-all font-bold inline-flex items-center gap-1.5 ml-auto cursor-pointer shadow-sm active:scale-95">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    <span>Xóa tất cả</span>
                 </button>
             </div>
         }
@@ -219,56 +257,50 @@
                 }
             </div>
 
-            @* Right Column: Epic Filter Sidebar (270px - 280px) *@
-            <aside class="egs-filter-sidebar @(_showMobileFilter ? "block" : "hidden") lg:block">
-                <div class="lg:sticky lg:top-[104px] bg-[#18181c] border border-[#303030] rounded-2xl p-5 shadow-xl space-y-5">
+            @* Right Column: Modern Filter Sidebar (Hidden on mobile, sticky on desktop) *@
+            <aside class="egs-filter-sidebar hidden lg:block">
+                <div class="lg:sticky lg:top-[104px] bg-[#16161a]/95 backdrop-blur-xl border border-[#2a2a34] rounded-2xl p-5 shadow-2xl shadow-black/50 space-y-5">
                     
                     @* Filter Header *@
                     <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-[#0078f2]/15 border border-[#0078f2]/30 flex items-center justify-center text-[#0078f2]">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0078f2] to-[#0050a0] flex items-center justify-center text-white shadow-md shadow-[#0078f2]/30 flex-shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                                 </svg>
                             </div>
                             <div>
                                 <h3 class="text-sm font-black text-white uppercase tracking-wider">Bộ lọc</h3>
-                                <p class="text-xs text-white/70">Tùy biến kết quả tìm kiếm</p>
+                                <p class="text-xs text-zinc-400">Tùy biến kho sản phẩm</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2">
-                            @if (ViewModel.SelectedCategories.Any() || ViewModel.SelectedPriceRanges.Any() || !string.IsNullOrEmpty(ViewModel.SelectedType))
-                            {
-                                <button type="button" @onclick="ResetFilters" 
-                                        class="min-h-[36px] px-3 py-1.5 text-xs font-bold text-[#0078f2] hover:text-white bg-[#0078f2]/10 hover:bg-[#0078f2] border border-[#0078f2]/30 rounded-lg transition-all active:scale-[0.98] inline-flex items-center justify-center cursor-pointer">
-                                    Đặt lại
-                                </button>
-                            }
-                            <button type="button" @onclick="@(() => _showMobileFilter = false)" 
-                                    class="lg:hidden w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
-                                    aria-label="Đóng bộ lọc">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        @if (ViewModel.SelectedCategories.Any() || ViewModel.SelectedPriceRanges.Any() || !string.IsNullOrEmpty(ViewModel.SelectedType))
+                        {
+                            <button type="button" @onclick="ResetFilters" 
+                                    class="min-h-[34px] px-3 py-1 text-xs font-bold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-600 border border-rose-500/30 rounded-lg transition-all active:scale-[0.98] inline-flex items-center gap-1 cursor-pointer">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                <span>Đặt lại</span>
                             </button>
-                        </div>
+                        }
                     </div>
 
-                    @* Filter Group 0: Product Type / Loại sản phẩm (R2) *@
+                    @* Filter Group 0: Product Type / Loại sản phẩm *@
                     <div class="border-b border-white/10 pb-4">
                         <button type="button" @onclick="@(() => _showProductTypes = !_showProductTypes)" 
                                 class="flex items-center justify-between w-full py-2.5 min-h-[44px] text-left group cursor-pointer">
-                            <span class="text-xs font-bold text-white/90 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2]"></span>
+                            <span class="text-xs font-bold text-zinc-300 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2]"></span>
                                 Loại sản phẩm
                             </span>
                             <div class="flex items-center gap-2">
                                 @if (!string.IsNullOrEmpty(ViewModel.SelectedType))
                                 {
-                                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center">
+                                    <span class="min-w-[20px] h-5 px-1.5 rounded-full bg-[#0078f2] text-white text-[11px] font-black flex items-center justify-center shadow-sm">
                                         1
                                     </span>
                                 }
-                                <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-200 @(_showProductTypes ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-zinc-400 group-hover:text-white transition-transform duration-200 @(_showProductTypes ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </div>
@@ -276,13 +308,13 @@
 
                         @if (_showProductTypes)
                         {
-                            <div class="space-y-1.5 mt-3">
+                            <div class="space-y-2 mt-2">
                                 @{
-                                    var typeOptions = new (string? Key, string Label, string Icon)[]
+                                    var typeOptions = new (string? Key, string Label, string Subtitle, string Icon)[]
                                     {
-                                        (null, "Tất cả sản phẩm", "🌐"),
-                                        ("Game", "Trò chơi (Game)", "🎮"),
-                                        ("App", "Ứng dụng & Phần mềm (App)", "💻")
+                                        (null, "Tất cả sản phẩm", "Kho tổng hợp toàn bộ", "🌐"),
+                                        ("Game", "Trò chơi (Game)", "AAA & Indie bản quyền", "🎮"),
+                                        ("App", "Ứng dụng & Phần mềm", "Đồ họa, dựng phim, tiện ích", "💻")
                                     };
                                 }
                                 @foreach (var opt in typeOptions)
@@ -293,25 +325,28 @@
                                             ? (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
                                             : string.Equals(ViewModel.SelectedType, opt.Key, StringComparison.OrdinalIgnoreCase));
 
-                                    <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isTypeSelected ? "bg-[#0078F2]/20 border border-[#0078F2]/50 shadow-sm" : "hover:bg-white/10 border border-transparent")">
+                                    <label class="group flex items-center justify-between min-h-[48px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isTypeSelected ? "bg-gradient-to-r from-[#0078f2]/20 to-[#0078f2]/5 border border-[#0078f2] shadow-[0_0_15px_rgba(0,120,242,0.2)]" : "bg-[#1f1f26]/60 hover:bg-[#25252e] border border-white/5 hover:border-white/15")">
                                         <div class="flex items-center gap-3 min-w-0">
-                                            <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isTypeSelected ? "bg-[#0078F2] border border-[#0078F2] shadow-[0_0_10px_rgba(0,120,242,0.8)]" : "bg-[#28282e] border border-white/40 group-hover:border-white/80 group-hover:bg-[#32323a]")">
-                                                <input type="radio" name="product-type-filter" checked="@isTypeSelected" 
+                                            <div class="relative flex items-center justify-center w-5 h-5 rounded-full transition-all flex-shrink-0 @(isTypeSelected ? "border-2 border-[#0078F2] bg-[#0078F2]/20" : "border border-white/30 bg-[#25252e] group-hover:border-white/60")">
+                                                <input type="radio" name="desktop-product-type-filter" checked="@isTypeSelected" 
                                                        @onchange='@(_ => SelectType(opt.Key))'
                                                        class="absolute opacity-0 cursor-pointer w-full h-full" />
                                                 @if (isTypeSelected)
                                                 {
-                                                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                                                    <span class="w-2.5 h-2.5 rounded-full bg-[#0078F2] shadow-[0_0_8px_#0078f2]"></span>
                                                 }
                                             </div>
-                                            <span class="text-[13px] transition-colors truncate flex items-center gap-2 @(isTypeSelected ? "text-white font-bold" : "text-white/85 group-hover:text-white font-medium")">
-                                                <span>@opt.Icon</span>
-                                                <span>@opt.Label</span>
-                                            </span>
+                                            <div class="flex flex-col min-w-0">
+                                                <span class="text-xs sm:text-[13px] transition-colors truncate flex items-center gap-1.5 @(isTypeSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">
+                                                    <span>@opt.Icon</span>
+                                                    <span>@opt.Label</span>
+                                                </span>
+                                                <span class="text-[11px] text-zinc-500 group-hover:text-zinc-400 truncate">@opt.Subtitle</span>
+                                            </div>
                                         </div>
                                         @if (isTypeSelected)
                                         {
-                                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
+                                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_8px_#0078f2] flex-shrink-0"></span>
                                         }
                                     </label>
                                 }
@@ -319,22 +354,22 @@
                         }
                     </div>
 
-                    @* Filter Group 1: Category / Thể loại (Contextual Sub-Filters R2) *@
+                    @* Filter Group 1: Category / Thể loại (Contextual Sub-Filters) *@
                     <div class="border-b border-white/10 pb-4">
                         <button type="button" @onclick="@(() => _showCategories = !_showCategories)" 
                                 class="flex items-center justify-between w-full py-2.5 min-h-[44px] text-left group cursor-pointer">
-                            <span class="text-xs font-bold text-white/90 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2]"></span>
+                            <span class="text-xs font-bold text-zinc-300 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2]"></span>
                                 @GetCategoryGroupLabel()
                             </span>
                             <div class="flex items-center gap-2">
                                 @if (ViewModel.SelectedCategories.Any())
                                 {
-                                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center">
+                                    <span class="min-w-[20px] h-5 px-1.5 rounded-full bg-[#0078f2] text-white text-[11px] font-black flex items-center justify-center shadow-sm">
                                         @ViewModel.SelectedCategories.Count
                                     </span>
                                 }
-                                <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-200 @(_showCategories ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-zinc-400 group-hover:text-white transition-transform duration-200 @(_showCategories ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </div>
@@ -342,35 +377,65 @@
                         
                         @if (_showCategories)
                         {
-                            <div class="space-y-1.5 mt-3">
+                            <div class="mt-2 space-y-2">
                                 @{
                                     var contextualCategories = GetContextualCategories();
                                 }
-                                @foreach (var cat in contextualCategories)
+                                @if (contextualCategories.Length > 6)
                                 {
-                                    var isSelected = ViewModel.SelectedCategories.Contains(cat);
-                                    <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-[#0078F2]/20 border border-[#0078F2]/50 shadow-sm" : "hover:bg-white/10 border border-transparent")">
-                                        <div class="flex items-center gap-3 min-w-0">
-                                            @* Checkbox nổi bật rõ ràng *@
-                                            <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-[#0078F2] border border-[#0078F2] shadow-[0_0_10px_rgba(0,120,242,0.8)]" : "bg-[#28282e] border border-white/40 group-hover:border-white/80 group-hover:bg-[#32323a]")">
-                                                <input type="checkbox" checked="@isSelected" 
-                                                       @onchange='@(_ => ToggleCategory(cat))'
-                                                       class="absolute opacity-0 cursor-pointer w-full h-full" />
+                                    <div class="relative mb-2">
+                                        <input type="text" 
+                                               placeholder="Tìm thể loại..." 
+                                               @bind="_categorySearchText" 
+                                               @bind:event="oninput"
+                                               class="w-full bg-[#1f1f26] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#0078f2]/60 focus:ring-1 focus:ring-[#0078f2]/50 transition-all" />
+                                        @if (!string.IsNullOrEmpty(_categorySearchText))
+                                        {
+                                            <button type="button" @onclick='() => _categorySearchText = ""' class="absolute right-2.5 top-2.5 text-zinc-400 hover:text-white">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="space-y-1.5 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
+                                    @{
+                                        var filteredCats = GetFilteredCategories().ToList();
+                                    }
+                                    @if (!filteredCats.Any())
+                                    {
+                                        <div class="py-4 text-center text-xs text-zinc-500">
+                                            Không có thể loại khớp với "@_categorySearchText"
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var cat in filteredCats)
+                                        {
+                                            var isSelected = ViewModel.SelectedCategories.Contains(cat);
+                                            <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-[#0078F2]/15 border border-[#0078F2]/50 shadow-sm" : "bg-[#1f1f26]/40 hover:bg-[#25252e] border border-transparent hover:border-white/10")">
+                                                <div class="flex items-center gap-3 min-w-0">
+                                                    <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-gradient-to-br from-[#0078f2] to-[#005fb8] border border-[#4da6ff]/50 shadow-[0_0_10px_rgba(0,120,242,0.6)]" : "bg-[#25252e] border border-white/30 group-hover:border-white/60")">
+                                                        <input type="checkbox" checked="@isSelected" 
+                                                               @onchange='@(_ => ToggleCategory(cat))'
+                                                               class="absolute opacity-0 cursor-pointer w-full h-full" />
+                                                        @if (isSelected)
+                                                        {
+                                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                                            </svg>
+                                                        }
+                                                    </div>
+                                                    <span class="text-xs sm:text-[13px] transition-colors truncate @(isSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">@cat</span>
+                                                </div>
                                                 @if (isSelected)
                                                 {
-                                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                                    </svg>
+                                                    <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
                                                 }
-                                            </div>
-                                            <span class="text-[13px] transition-colors truncate @(isSelected ? "text-white font-bold" : "text-white/85 group-hover:text-white font-medium")">@cat</span>
-                                        </div>
-                                        @if (isSelected)
-                                        {
-                                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
+                                            </label>
                                         }
-                                    </label>
-                                }
+                                    }
+                                </div>
                             </div>
                         }
                     </div>
@@ -379,18 +444,18 @@
                     <div class="pb-1">
                         <button type="button" @onclick="@(() => _showPriceRanges = !_showPriceRanges)" 
                                 class="flex items-center justify-between w-full py-2.5 min-h-[44px] text-left group cursor-pointer">
-                            <span class="text-xs font-bold text-white/90 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#0078f2]"></span>
+                            <span class="text-xs font-bold text-zinc-300 uppercase tracking-wider group-hover:text-white transition-colors flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2]"></span>
                                 Khoảng giá
                             </span>
                             <div class="flex items-center gap-2">
                                 @if (ViewModel.SelectedPriceRanges.Any())
                                 {
-                                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white text-xs font-black flex items-center justify-center">
+                                    <span class="min-w-[20px] h-5 px-1.5 rounded-full bg-[#0078f2] text-white text-[11px] font-black flex items-center justify-center shadow-sm">
                                         @ViewModel.SelectedPriceRanges.Count
                                     </span>
                                 }
-                                <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-200 @(_showPriceRanges ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-zinc-400 group-hover:text-white transition-transform duration-200 @(_showPriceRanges ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </div>
@@ -398,20 +463,20 @@
                         
                         @if (_showPriceRanges)
                         {
-                            <div class="space-y-1.5 mt-3">
+                            <div class="space-y-2 mt-2">
                                 @{
-                                    var priceRanges = new (string Key, string Label)[] {
-                                        ("under_100k", "Dưới 100.000 đ"),
-                                        ("100k_500k", "100.000 đ – 500.000 đ"),
-                                        ("over_500k", "Trên 500.000 đ")
+                                    var priceRanges = new (string Key, string Label, string Subtitle, string Icon)[] {
+                                        ("under_100k", "Dưới 100.000 đ", "Tiết kiệm & Phổ thông", "🏷️"),
+                                        ("100k_500k", "100.000 đ – 500.000 đ", "Thịnh hành & Ưu đãi hot", "💎"),
+                                        ("over_500k", "Trên 500.000 đ", "Bản quyền cao cấp AAA", "👑")
                                     };
                                 }
                                 @foreach (var pr in priceRanges)
                                 {
                                     var isSelected = ViewModel.SelectedPriceRanges.Contains(pr.Key);
-                                    <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-[#0078F2]/20 border border-[#0078F2]/50 shadow-sm" : "hover:bg-white/10 border border-transparent")">
+                                    <label class="group flex items-center justify-between min-h-[48px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-gradient-to-r from-[#0078f2]/20 to-[#0078f2]/5 border border-[#0078f2] shadow-[0_0_15px_rgba(0,120,242,0.2)]" : "bg-[#1f1f26]/60 hover:bg-[#25252e] border border-white/5 hover:border-white/15")">
                                         <div class="flex items-center gap-3 min-w-0">
-                                            <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-[#0078F2] border border-[#0078F2] shadow-[0_0_10px_rgba(0,120,242,0.8)]" : "bg-[#28282e] border border-white/40 group-hover:border-white/80 group-hover:bg-[#32323a]")">
+                                            <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-gradient-to-br from-[#0078f2] to-[#005fb8] border border-[#4da6ff]/50 shadow-[0_0_10px_rgba(0,120,242,0.6)]" : "bg-[#25252e] border border-white/30 group-hover:border-white/60")">
                                                 <input type="checkbox" checked="@isSelected" 
                                                        @onchange='@(_ => TogglePriceRange(pr.Key))'
                                                        class="absolute opacity-0 cursor-pointer w-full h-full" />
@@ -422,11 +487,17 @@
                                                     </svg>
                                                 }
                                             </div>
-                                            <span class="text-[13px] transition-colors truncate @(isSelected ? "text-white font-bold" : "text-white/85 group-hover:text-white font-medium")">@pr.Label</span>
+                                            <div class="flex flex-col min-w-0">
+                                                <span class="text-xs sm:text-[13px] transition-colors truncate flex items-center gap-1.5 @(isSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">
+                                                    <span>@pr.Icon</span>
+                                                    <span>@pr.Label</span>
+                                                </span>
+                                                <span class="text-[11px] text-zinc-500 group-hover:text-zinc-400 truncate">@pr.Subtitle</span>
+                                            </div>
                                         </div>
                                         @if (isSelected)
                                         {
-                                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
+                                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_8px_#0078f2] flex-shrink-0"></span>
                                         }
                                     </label>
                                 }
@@ -441,11 +512,240 @@
     </div>
 </div>
 
+@* Mobile Slide-Over Filter Drawer *@
+@if (_showMobileFilter)
+{
+    <div class="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Bộ lọc sản phẩm">
+        @* Backdrop Blur *@
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
+             @onclick="@(() => _showMobileFilter = false)"></div>
+
+        @* Drawer Panel *@
+        <div class="fixed inset-y-0 right-0 max-w-full w-full sm:w-[420px] bg-[#16161a] border-l border-white/10 shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
+            @* Drawer Header *@
+            <div class="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#1c1c24]">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0078f2] to-[#0050a0] flex items-center justify-center text-white shadow-md shadow-[#0078f2]/30 flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white uppercase tracking-wider">Bộ lọc tìm kiếm</h3>
+                        <p class="text-xs text-zinc-400">Tùy biến kho sản phẩm</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    @if (ViewModel.SelectedCategories.Any() || ViewModel.SelectedPriceRanges.Any() || !string.IsNullOrEmpty(ViewModel.SelectedType))
+                    {
+                        <button type="button" @onclick="ResetFilters" 
+                                class="min-h-[34px] px-3 py-1 text-xs font-bold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-600 border border-rose-500/30 rounded-lg transition-all cursor-pointer">
+                            Đặt lại
+                        </button>
+                    }
+                    <button type="button" @onclick="@(() => _showMobileFilter = false)" 
+                            class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
+                            aria-label="Đóng bộ lọc">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            @* Drawer Scrollable Content *@
+            <div class="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+                
+                @* Mobile Section 0: Product Type *@
+                <div class="space-y-3">
+                    <div class="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2]"></span>
+                        Loại sản phẩm
+                    </div>
+                    <div class="space-y-2">
+                        @{
+                            var mTypeOptions = new (string? Key, string Label, string Subtitle, string Icon)[]
+                            {
+                                (null, "Tất cả sản phẩm", "Kho tổng hợp toàn bộ", "🌐"),
+                                ("Game", "Trò chơi (Game)", "AAA & Indie bản quyền", "🎮"),
+                                ("App", "Ứng dụng & Phần mềm", "Đồ họa, dựng phim, tiện ích", "💻")
+                            };
+                        }
+                        @foreach (var opt in mTypeOptions)
+                        {
+                            var isTypeSelected = opt.Key == null
+                                ? string.IsNullOrEmpty(ViewModel.SelectedType)
+                                : ((string.Equals(opt.Key, "App", StringComparison.OrdinalIgnoreCase) || string.Equals(opt.Key, "Software", StringComparison.OrdinalIgnoreCase))
+                                    ? (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
+                                    : string.Equals(ViewModel.SelectedType, opt.Key, StringComparison.OrdinalIgnoreCase));
+
+                            <label class="group flex items-center justify-between min-h-[48px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isTypeSelected ? "bg-gradient-to-r from-[#0078f2]/20 to-[#0078f2]/5 border border-[#0078f2] shadow-[0_0_15px_rgba(0,120,242,0.2)]" : "bg-[#1f1f26] border border-white/5")">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="relative flex items-center justify-center w-5 h-5 rounded-full transition-all flex-shrink-0 @(isTypeSelected ? "border-2 border-[#0078F2] bg-[#0078F2]/20" : "border border-white/30 bg-[#25252e]")">
+                                        <input type="radio" name="mobile-product-type-filter" checked="@isTypeSelected" 
+                                               @onchange='@(_ => SelectType(opt.Key))'
+                                               class="absolute opacity-0 cursor-pointer w-full h-full" />
+                                        @if (isTypeSelected)
+                                        {
+                                            <span class="w-2.5 h-2.5 rounded-full bg-[#0078F2] shadow-[0_0_8px_#0078f2]"></span>
+                                        }
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-xs transition-colors truncate flex items-center gap-1.5 @(isTypeSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">
+                                            <span>@opt.Icon</span>
+                                            <span>@opt.Label</span>
+                                        </span>
+                                        <span class="text-[11px] text-zinc-500 truncate">@opt.Subtitle</span>
+                                    </div>
+                                </div>
+                                @if (isTypeSelected)
+                                {
+                                    <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_8px_#0078f2] flex-shrink-0"></span>
+                                }
+                            </label>
+                        }
+                    </div>
+                </div>
+
+                @* Mobile Section 1: Contextual Categories *@
+                <div class="space-y-3 pt-4 border-t border-white/10">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2]"></span>
+                            @GetCategoryGroupLabel()
+                        </span>
+                        @if (ViewModel.SelectedCategories.Any())
+                        {
+                            <span class="min-w-[20px] h-5 px-1.5 rounded-full bg-[#0078f2] text-white text-[11px] font-black flex items-center justify-center">
+                                @ViewModel.SelectedCategories.Count
+                            </span>
+                        }
+                    </div>
+
+                    @{
+                        var mContextualCats = GetContextualCategories();
+                    }
+                    @if (mContextualCats.Length > 6)
+                    {
+                        <div class="relative mb-2">
+                            <input type="text" 
+                                   placeholder="Tìm thể loại..." 
+                                   @bind="_categorySearchText" 
+                                   @bind:event="oninput"
+                                   class="w-full bg-[#1f1f26] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#0078f2]/60 focus:ring-1 focus:ring-[#0078f2]/50 transition-all" />
+                        </div>
+                    }
+
+                    <div class="space-y-1.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                        @{
+                            var mFilteredCats = GetFilteredCategories().ToList();
+                        }
+                        @foreach (var cat in mFilteredCats)
+                        {
+                            var isSelected = ViewModel.SelectedCategories.Contains(cat);
+                            <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-[#0078F2]/15 border border-[#0078F2]/50" : "bg-[#1f1f26] border border-transparent")">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-gradient-to-br from-[#0078f2] to-[#005fb8] border border-[#4da6ff]/50 shadow-[0_0_10px_rgba(0,120,242,0.6)]" : "bg-[#25252e] border border-white/30")">
+                                        <input type="checkbox" checked="@isSelected" 
+                                               @onchange='@(_ => ToggleCategory(cat))'
+                                               class="absolute opacity-0 cursor-pointer w-full h-full" />
+                                        @if (isSelected)
+                                        {
+                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        }
+                                    </div>
+                                    <span class="text-xs transition-colors truncate @(isSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">@cat</span>
+                                </div>
+                                @if (isSelected)
+                                {
+                                    <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
+                                }
+                            </label>
+                        }
+                    </div>
+                </div>
+
+                @* Mobile Section 2: Price Ranges *@
+                <div class="space-y-3 pt-4 border-t border-white/10">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2]"></span>
+                            Khoảng giá
+                        </span>
+                        @if (ViewModel.SelectedPriceRanges.Any())
+                        {
+                            <span class="min-w-[20px] h-5 px-1.5 rounded-full bg-[#0078f2] text-white text-[11px] font-black flex items-center justify-center">
+                                @ViewModel.SelectedPriceRanges.Count
+                            </span>
+                        }
+                    </div>
+                    <div class="space-y-2">
+                        @{
+                            var mPriceRanges = new (string Key, string Label, string Subtitle, string Icon)[] {
+                                ("under_100k", "Dưới 100.000 đ", "Tiết kiệm & Phổ thông", "🏷️"),
+                                ("100k_500k", "100.000 đ – 500.000 đ", "Thịnh hành & Ưu đãi hot", "💎"),
+                                ("over_500k", "Trên 500.000 đ", "Bản quyền cao cấp AAA", "👑")
+                            };
+                        }
+                        @foreach (var pr in mPriceRanges)
+                        {
+                            var isSelected = ViewModel.SelectedPriceRanges.Contains(pr.Key);
+                            <label class="group flex items-center justify-between min-h-[48px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-gradient-to-r from-[#0078f2]/20 to-[#0078f2]/5 border border-[#0078f2] shadow-[0_0_15px_rgba(0,120,242,0.2)]" : "bg-[#1f1f26] border border-white/5")">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-gradient-to-br from-[#0078f2] to-[#005fb8] border border-[#4da6ff]/50 shadow-[0_0_10px_rgba(0,120,242,0.6)]" : "bg-[#25252e] border border-white/30")">
+                                        <input type="checkbox" checked="@isSelected" 
+                                               @onchange='@(_ => TogglePriceRange(pr.Key))'
+                                               class="absolute opacity-0 cursor-pointer w-full h-full" />
+                                        @if (isSelected)
+                                        {
+                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        }
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-xs transition-colors truncate flex items-center gap-1.5 @(isSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">
+                                            <span>@pr.Icon</span>
+                                            <span>@pr.Label</span>
+                                        </span>
+                                        <span class="text-[11px] text-zinc-500 truncate">@pr.Subtitle</span>
+                                    </div>
+                                </div>
+                                @if (isSelected)
+                                {
+                                    <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_8px_#0078f2] flex-shrink-0"></span>
+                                }
+                            </label>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+            @* Drawer Sticky Footer Actions *@
+            <div class="p-4 border-t border-white/10 bg-[#1c1c24] flex items-center gap-3">
+                <button type="button" @onclick="ResetFilters" class="flex-1 min-h-[44px] px-4 py-2 rounded-xl border border-white/15 text-zinc-300 hover:text-white hover:bg-white/5 font-bold text-xs transition-colors cursor-pointer">
+                    Đặt lại
+                </button>
+                <button type="button" @onclick="@(() => _showMobileFilter = false)" class="flex-1 min-h-[44px] px-4 py-2 rounded-xl bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white font-bold text-xs shadow-lg shadow-[#0078f2]/30 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                    <span>Xem kết quả</span>
+                    @if (ViewModel.TotalCount > 0)
+                    {
+                        <span class="px-2 py-0.5 rounded-full bg-white/20 text-white text-[11px]">@ViewModel.TotalCount</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private bool _showMobileFilter = false;
     private bool _showProductTypes = true;
     private bool _showCategories = true;
     private bool _showPriceRanges = true;
+    private string _categorySearchText = "";
 
     [SupplyParameterFromQuery]
     public string? Search { get; set; }
@@ -559,6 +859,16 @@
         };
     }
 
+    private IEnumerable<string> GetFilteredCategories()
+    {
+        var cats = GetContextualCategories();
+        if (string.IsNullOrWhiteSpace(_categorySearchText))
+        {
+            return cats;
+        }
+        return cats.Where(c => c.Contains(_categorySearchText.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
+
     private string GetTypeChipLabel(string type) => type switch
     {
         "Game" => "🎮 Loại: Trò chơi",
@@ -594,6 +904,7 @@
     {
         ViewModel.SelectedType = type;
         ViewModel.SelectedCategories.Clear();
+        _categorySearchText = "";
         NavigateToCurrentState(1);
     }
 
@@ -626,6 +937,7 @@
         ViewModel.SelectedCategories.Clear();
         ViewModel.SelectedPriceRanges.Clear();
         ViewModel.SelectedType = null;
+        _categorySearchText = "";
         NavigateToCurrentState(1);
     }
 
@@ -636,6 +948,7 @@
         ViewModel.SelectedCategories.Clear();
         ViewModel.SelectedPriceRanges.Clear();
         ViewModel.SelectedType = null;
+        _categorySearchText = "";
         NavigateToCurrentState(1);
     }
 
