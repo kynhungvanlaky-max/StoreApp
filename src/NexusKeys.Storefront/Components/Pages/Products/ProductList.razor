@@ -8,39 +8,6 @@
 <div class="egs-wrap">
     <div class="egs-content">
 
-        @* R1 & R3: Modern Quick Type Navigation Tabs (Game vs App vs All) *@
-        <div class="mb-8" role="tablist" aria-label="Phân loại cấp cao sản phẩm">
-            <div class="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-[#16161a]/90 backdrop-blur-md border border-white/10 shadow-lg shadow-black/40 max-w-full overflow-x-auto no-scrollbar">
-                @{
-                    var isAllSelected = string.IsNullOrEmpty(ViewModel.SelectedType);
-                    var isGameSelected = string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase);
-                    var isAppSelected = string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) || string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase);
-                }
-                <button type="button" role="tab"
-                        id="tab-all-products"
-                        aria-selected="@(isAllSelected ? "true" : "false")"
-                        @onclick='() => SelectType(null)'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center cursor-pointer @(isAllSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
-                    <span>Tất cả sản phẩm</span>
-                </button>
-
-                <button type="button" role="tab"
-                        id="tab-game-products"
-                        aria-selected="@(isGameSelected ? "true" : "false")"
-                        @onclick='() => SelectType("Game")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center cursor-pointer @(isGameSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
-                    <span>Trò chơi (Game)</span>
-                </button>
-
-                <button type="button" role="tab"
-                        id="tab-app-products"
-                        aria-selected="@(isAppSelected ? "true" : "false")"
-                        @onclick='() => SelectType("App")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center cursor-pointer @(isAppSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
-                    <span>Ứng dụng & Phần mềm</span>
-                </button>
-            </div>
-        </div>
 
         @* Modern Catalog Header Bar *@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-white/10">
