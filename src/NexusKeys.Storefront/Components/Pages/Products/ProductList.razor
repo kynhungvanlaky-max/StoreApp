@@ -20,36 +20,24 @@
                         id="tab-all-products"
                         aria-selected="@(isAllSelected ? "true" : "false")"
                         @onclick='() => SelectType(null)'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(isAllSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center cursor-pointer @(isAllSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
                     <span>Tất cả sản phẩm</span>
-                    @if (isAllSelected)
-                    {
-                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse"></span>
-                    }
                 </button>
 
                 <button type="button" role="tab"
                         id="tab-game-products"
                         aria-selected="@(isGameSelected ? "true" : "false")"
                         @onclick='() => SelectType("Game")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(isGameSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center cursor-pointer @(isGameSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
                     <span>Trò chơi (Game)</span>
-                    @if (isGameSelected)
-                    {
-                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse"></span>
-                    }
                 </button>
 
                 <button type="button" role="tab"
                         id="tab-app-products"
                         aria-selected="@(isAppSelected ? "true" : "false")"
                         @onclick='() => SelectType("App")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(isAppSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center cursor-pointer @(isAppSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
                     <span>Ứng dụng & Phần mềm</span>
-                    @if (isAppSelected)
-                    {
-                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse"></span>
-                    }
                 </button>
             </div>
         </div>
@@ -85,10 +73,10 @@
                         <select id="store-sort" class="appearance-none min-h-[44px] bg-[#1c1c22] border border-white/15 text-white text-xs font-bold rounded-xl outline-none cursor-pointer pl-4 pr-10 py-2.5 hover:border-[#0078f2]/50 focus:border-[#0078f2] focus:ring-2 focus:ring-[#0078f2]/30 transition-all shadow-md"
                                 value="@ViewModel.SortBy"
                                 @onchange='@(e => ChangeSort(e.Value?.ToString() ?? "newest"))'>
-                            <option class="bg-[#1c1c22]" value="newest">⚡ Mới phát hành</option>
-                            <option class="bg-[#1c1c22]" value="discount">🔥 Ưu đãi giảm giá tốt nhất</option>
-                            <option class="bg-[#1c1c22]" value="price_asc">🏷️ Giá: Thấp đến Cao</option>
-                            <option class="bg-[#1c1c22]" value="price_desc">💎 Giá: Cao đến Thấp</option>
+                            <option class="bg-[#1c1c22]" value="newest">Mới phát hành</option>
+                            <option class="bg-[#1c1c22]" value="discount">Ưu đãi giảm giá tốt nhất</option>
+                            <option class="bg-[#1c1c22]" value="price_asc">Giá: Thấp đến Cao</option>
+                            <option class="bg-[#1c1c22]" value="price_desc">Giá: Cao đến Thấp</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -131,7 +119,7 @@
                 @if (!string.IsNullOrWhiteSpace(ViewModel.SearchQuery))
                 {
                     <span class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-purple-500/15 border border-purple-500/40 text-purple-300 text-xs font-semibold rounded-xl shadow-sm">
-                        <span>🔍 "@ViewModel.SearchQuery"</span>
+                        <span>Từ khóa: "@ViewModel.SearchQuery"</span>
                         <button type="button" @onclick='() => { ViewModel.SearchQuery = ""; NavigateToCurrentState(1); }' class="p-1 hover:bg-purple-500/30 rounded-lg text-white/70 hover:text-white transition-all cursor-pointer" aria-label="Xóa bộ lọc từ khóa">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -142,7 +130,7 @@
                     <button type="button" @onclick="@(() => ToggleCategory(cat))"
                             class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-sky-500/15 border border-sky-500/40 text-sky-300 text-xs font-bold rounded-xl hover:bg-sky-500/25 transition-all cursor-pointer group shadow-sm"
                             aria-label="@($"Xóa bộ lọc thể loại {cat}")">
-                        <span>🏷️ @cat</span>
+                        <span>@cat</span>
                         <svg class="w-3.5 h-3.5 text-sky-400/80 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 }
@@ -151,7 +139,7 @@
                     <button type="button" @onclick="@(() => TogglePriceRange(pr))"
                             class="min-h-[40px] inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl hover:bg-emerald-500/25 transition-all cursor-pointer group shadow-sm"
                             aria-label="@($"Xóa bộ lọc giá {GetPriceRangeLabel(pr)}")">
-                        <span>💰 @GetPriceRangeLabel(pr)</span>
+                        <span>@GetPriceRangeLabel(pr)</span>
                         <svg class="w-3.5 h-3.5 text-emerald-400/80 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 }
@@ -461,10 +449,10 @@
                         {
                             <div class="space-y-2 mt-2">
                                 @{
-                                    var priceRanges = new (string Key, string Label, string Subtitle, string Icon)[] {
-                                        ("under_100k", "Dưới 100.000 đ", "Tiết kiệm & Phổ thông", "🏷️"),
-                                        ("100k_500k", "100.000 đ – 500.000 đ", "Thịnh hành & Ưu đãi hot", "💎"),
-                                        ("over_500k", "Trên 500.000 đ", "Bản quyền cao cấp AAA", "👑")
+                                    var priceRanges = new (string Key, string Label, string Subtitle)[] {
+                                        ("under_100k", "Dưới 100.000 đ", "Tiết kiệm & Phổ thông"),
+                                        ("100k_500k", "100.000 đ – 500.000 đ", "Thịnh hành & Ưu đãi hot"),
+                                        ("over_500k", "Trên 500.000 đ", "Bản quyền cao cấp AAA")
                                     };
                                 }
                                 @foreach (var pr in priceRanges)
@@ -484,9 +472,8 @@
                                                 }
                                             </div>
                                             <div class="flex flex-col min-w-0">
-                                                <span class="text-xs sm:text-[13px] transition-colors truncate flex items-center gap-1.5 @(isSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">
-                                                    <span>@pr.Icon</span>
-                                                    <span>@pr.Label</span>
+                                                <span class="text-xs sm:text-[13px] transition-colors truncate @(isSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">
+                                                    @pr.Label
                                                 </span>
                                                 <span class="text-[11px] text-zinc-500 group-hover:text-zinc-400 truncate">@pr.Subtitle</span>
                                             </div>
@@ -692,10 +679,10 @@
                     </div>
                     <div class="space-y-2">
                         @{
-                            var mPriceRanges = new (string Key, string Label, string Subtitle, string Icon)[] {
-                                ("under_100k", "Dưới 100.000 đ", "Tiết kiệm & Phổ thông", "🏷️"),
-                                ("100k_500k", "100.000 đ – 500.000 đ", "Thịnh hành & Ưu đãi hot", "💎"),
-                                ("over_500k", "Trên 500.000 đ", "Bản quyền cao cấp AAA", "👑")
+                            var mPriceRanges = new (string Key, string Label, string Subtitle)[] {
+                                ("under_100k", "Dưới 100.000 đ", "Tiết kiệm & Phổ thông"),
+                                ("100k_500k", "100.000 đ – 500.000 đ", "Thịnh hành & Ưu đãi hot"),
+                                ("over_500k", "Trên 500.000 đ", "Bản quyền cao cấp AAA")
                             };
                         }
                         @foreach (var pr in mPriceRanges)
@@ -715,9 +702,8 @@
                                         }
                                     </div>
                                     <div class="flex flex-col min-w-0">
-                                        <span class="text-xs transition-colors truncate flex items-center gap-1.5 @(isSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">
-                                            <span>@pr.Icon</span>
-                                            <span>@pr.Label</span>
+                                        <span class="text-xs transition-colors truncate @(isSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">
+                                            @pr.Label
                                         </span>
                                         <span class="text-[11px] text-zinc-500 truncate">@pr.Subtitle</span>
                                     </div>
