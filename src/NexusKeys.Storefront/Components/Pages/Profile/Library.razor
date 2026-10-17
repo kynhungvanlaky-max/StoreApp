@@ -5,19 +5,19 @@
 @layout Frontend.Components.Layout.ProfileLayout
 @implements IDisposable
 
-<PageTitle>Kho Game & License Key — NexusKeys</PageTitle>
+<PageTitle>Kho Game & Phần Mềm Bản Quyền — NexusKeys</PageTitle>
 
 <div class="space-y-6 w-full">
     @* Page Header *@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3">
-                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">Kho Game &amp; Bản Quyền</h1>
+                <h1 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">Kho Game &amp; Phần Mềm Bản Quyền</h1>
                 <span class="px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-[#0078f2]/20 text-[#0078f2] border border-[#0078f2]/30">
                     @VM.Library.Count Key
                 </span>
             </div>
-            <p class="text-xs sm:text-sm text-white/60 mt-1">Quản lý mã kích hoạt bản quyền chính thức trên Steam, Epic Games, Ubisoft và EA Play.</p>
+            <p class="text-xs sm:text-sm text-white/60 mt-1">Quản lý mã kích hoạt trò chơi và phần mềm bản quyền chính hãng trong tài khoản NexusKeys.</p>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
                 <Icon Name="HeroiconName.Key" Class="w-8 h-8" />
             </div>
             <h2 class="text-xl font-bold text-white mb-2">Thư viện của bạn đang trống</h2>
-            <p class="text-sm text-white/60 max-w-md mx-auto mb-6">Bạn chưa sở hữu tựa game bản quyền nào. Hãy khám phá kho game AAA và ưu đãi giảm giá độc quyền trên Cửa Hàng!</p>
+            <p class="text-sm text-white/60 max-w-md mx-auto mb-6">Bạn chưa sở hữu tựa game hoặc phần mềm bản quyền nào. Hãy khám phá kho trò chơi AAA, ứng dụng sáng tạo và ưu đãi giảm giá độc quyền trên Cửa Hàng!</p>
             <a href="/products" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#0060c2] text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-[#0078f2]/30 transition-all active:scale-95">
                 <Icon Name="HeroiconName.BuildingStorefront" Class="w-4 h-4" />
                 <span>Khám Phá Cửa Hàng</span>
@@ -55,7 +55,7 @@
             <div class="relative flex-1">
                 <Icon Name="HeroiconName.MagnifyingGlass" Class="w-4 h-4 absolute left-3.5 top-3 text-white/60" />
                 <label for="library-search" class="sr-only">Tìm kiếm game hoặc mã bản quyền</label>
-                <input id="library-search" type="text" @bind="SearchQuery" @bind:event="oninput" placeholder="Tìm kiếm tựa game trong kho của bạn..." class="w-full bg-[#202024] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-white/50 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all" />
+                <input id="library-search" type="text" @bind="SearchQuery" @bind:event="oninput" placeholder="Tìm kiếm tựa game hoặc phần mềm trong kho của bạn..." class="w-full bg-[#202024] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-white/50 focus:border-[#0078f2] focus:ring-1 focus:ring-[#0078f2] outline-none transition-all" />
             </div>
         </div>
 
@@ -223,15 +223,15 @@
                 <h4 class="text-xs font-black uppercase tracking-wider text-white/70">Hướng dẫn kích hoạt bản quyền:</h4>
                 <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs text-white/80">
                     <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
-                    <p>Mở ứng dụng <strong>Epic Games Launcher</strong> hoặc <strong>Steam Client</strong> trên máy tính của bạn.</p>
+                    <p><strong>Đối với Trò chơi (Game):</strong> Mở ứng dụng <strong>NexusKeys Launcher</strong> (hoặc Client tương ứng trên PC), chọn mục <strong>"Redeem Code" (Đổi mã)</strong> ở menu tài khoản.</p>
                 </div>
                 <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs text-white/80">
-                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-                    <p>Nhấp vào biểu tượng tài khoản góc trên bên phải ➔ chọn <strong>"Redeem Code" (Đổi mã)</strong>.</p>
+                    <span class="w-5 h-5 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <p><strong>Đối với Ứng dụng / Phần mềm:</strong> Mở phần mềm hoặc truy cập trang quản trị tài khoản chính thức của hãng, chọn mục <strong>Activate License / Nhập Product Key</strong>.</p>
                 </div>
                 <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs text-white/80">
-                    <span class="w-5 h-5 rounded-full bg-[#0078f2] text-white font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
-                    <p>Dán mã key vừa sao chép ở trên và nhấn <strong>Redeem</strong>. Game sẽ được kích hoạt vĩnh viễn vào thư viện của bạn.</p>
+                    <span class="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <p>Dán mã License Key vừa sao chép ở trên và xác nhận. Bản quyền sẽ được kích hoạt vĩnh viễn cho tài khoản của bạn.</p>
                 </div>
             </div>
 
@@ -244,7 +244,7 @@
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
                 <a href="/download" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors flex items-center gap-1.5">
                     <Icon Name="HeroiconName.ArrowDownTray" Class="w-4 h-4" />
-                    Tải Client Game
+                    Tải NexusKeys Launcher
                 </a>
                 <button type="button" class="px-5 py-2 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white text-xs font-bold uppercase transition-colors" @onclick="CloseKeyModal">
                     Hoàn tất

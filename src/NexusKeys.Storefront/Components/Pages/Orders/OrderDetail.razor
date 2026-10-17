@@ -134,7 +134,7 @@
                             
                             <div class="flex-1 md:text-right w-full md:w-auto">
                                 <div class="text-[11px] text-white/40 uppercase font-bold tracking-wider mb-1">Mã kích hoạt</div>
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 md:justify-end">
                                     <input type="text" value="@key.KeyCode" aria-label="License Key của @key.ProductName" readonly class="w-full md:w-auto font-mono text-center tracking-widest text-[#0078f2] font-black bg-[#18181c] border border-white/15 rounded-xl px-4 py-2 text-xs outline-none" />
                                     <button type="button" aria-label="Sao chép License Key của @key.ProductName" class="w-9 h-9 rounded-xl bg-[#18181c] hover:bg-white/15 border border-white/15 text-white flex items-center justify-center transition-colors" title="Sao chép" @onclick="() => CopyToClipboard(key.KeyCode)">
                                         <Icon Name="HeroiconName.DocumentDuplicate" Class="w-4 h-4" />

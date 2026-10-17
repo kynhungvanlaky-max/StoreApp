@@ -1,3 +1,4 @@
+@page "/policies"
 @page "/terms"
 @page "/privacy"
 @page "/refund-policy"
@@ -5,11 +6,11 @@
 
 <PageTitle>@Title — NexusKeys</PageTitle>
 
-<main class="mx-auto w-full max-w-4xl px-4 sm:px-6 py-12 sm:py-16">
+<div class="mx-auto w-full max-w-4xl px-4 sm:px-6 py-12 sm:py-16">
     <a href="/" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white mb-8">
         <Icon Name="HeroiconName.ArrowLeft" Class="w-4 h-4" /> Trang chủ
     </a>
-    <article class="rounded-xl border border-[#303030] bg-[#1a1a1a] p-6 sm:p-10">
+    <article class="rounded-xl border border-[#303030] bg-[#18181c] p-6 sm:p-10">
         <h1 class="text-3xl font-bold text-white mb-3">@Title</h1>
         <p class="text-sm text-gray-500 mb-8">Cập nhật lần cuối: 14/08/2026</p>
         @foreach (var item in Sections)
@@ -20,7 +21,7 @@
             </section>
         }
     </article>
-</main>
+</div>
 
 @code {
     private string CurrentPath => new Uri(NavigationManager.Uri).AbsolutePath.ToLowerInvariant();

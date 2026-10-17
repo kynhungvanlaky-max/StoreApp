@@ -131,13 +131,13 @@ else
                     
                     @* Prev Arrow *@
                     <button type="button" @onclick="() => PrevMedia(gallery.Count)" aria-label="Hình trước"
-                            class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-xl cursor-pointer">
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15 backdrop-blur-md transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-xl cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     </button>
 
                     @* Next Arrow *@
                     <button type="button" @onclick="() => NextMedia(gallery.Count)" aria-label="Hình kế tiếp"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-xl cursor-pointer">
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15 backdrop-blur-md transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-xl cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
 
@@ -365,7 +365,7 @@ else
                                                 <div class="flex items-center justify-between mb-3">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-8 h-8 rounded-full bg-[#0078f2]/20 border border-[#0078f2]/40 text-[#0078f2] font-black text-xs flex items-center justify-center">
-                                                            @rev.Username.Substring(0, 1).ToUpper()
+                                                            @(!string.IsNullOrEmpty(rev.Username) ? rev.Username.Substring(0, 1).ToUpper() : "U")
                                                         </div>
                                                         <div>
                                                             <span class="text-xs font-bold text-white block">@rev.Username</span>
@@ -435,7 +435,7 @@ else
                             <div class="p-5 sm:p-6 rounded-2xl bg-[#18181c] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-white/20 transition-all">
                                 <div class="space-y-1">
                                     <span class="text-[11px] font-black text-[#0078f2] uppercase tracking-wider">Phiên bản chuẩn</span>
-                                    <h3 class="text-lg font-bold text-white">@product.Name — Standard Edition</h3>
+                                    <h3 class="text-lg font-bold text-white">@product.Name — Phiên Bản Tiêu Chuẩn (Standard)</h3>
                                     <p class="text-xs text-white/75">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Bao gồm ứng dụng gốc và toàn bộ các bản vá cập nhật mới nhất." : "Bao gồm trò chơi gốc và toàn bộ các bản vá cập nhật mới nhất.")</p>
                                 </div>
                                 <div class="flex items-center gap-4 sm:flex-shrink-0">
@@ -460,7 +460,7 @@ else
                             <div class="p-5 sm:p-6 rounded-2xl bg-[#18181c] border border-[#0078f2]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#0078f2] transition-all">
                                 <div class="space-y-1">
                                     <span class="text-[11px] font-black text-amber-400 uppercase tracking-wider">Phiên bản đặc biệt</span>
-                                    <h3 class="text-lg font-bold text-white">@product.Name — Deluxe Edition</h3>
+                                    <h3 class="text-lg font-bold text-white">@product.Name — Phiên Bản Cao Cấp (Deluxe)</h3>
                                     <p class="text-xs text-white/75">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Bao gồm bản quyền đầy đủ, các tiện ích mở rộng (Plugins), tài liệu hướng dẫn và hỗ trợ kỹ thuật ưu tiên." : "Bao gồm game gốc, Season Pass mở rộng, Artbook kỹ thuật số và gói trang phục độc quyền.")</p>
                                 </div>
                                 <div class="flex items-center gap-4 sm:flex-shrink-0">
@@ -475,7 +475,7 @@ else
                                             <div class="text-base font-black text-white">@((product.BasePrice * 1.15m).ToString("N0")) ₫</div>
                                         }
                                     </div>
-                                    <button type="button" @onclick="AddToCart" class="px-5 py-2.5 min-h-[44px] rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg cursor-pointer flex items-center justify-center">
+                                    <button type="button" @onclick="AddDeluxeToCart" class="px-5 py-2.5 min-h-[44px] rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg cursor-pointer flex items-center justify-center">
                                         Nâng cấp
                                     </button>
                                 </div>
@@ -657,7 +657,7 @@ else
                 </div>
                 <div class="flex justify-between items-center py-1.5 border-b border-white/5">
                     <span class="text-white/70">Loại hoàn tiền</span>
-                    <span class="text-white font-semibold text-right">14 ngày tự phục vụ</span>
+                    <span class="text-white font-semibold text-right">Hoàn tiền trong 48 giờ</span>
                 </div>
                 <div class="flex justify-between items-center py-1.5 border-b border-white/5">
                     <span class="text-white/70">Nhà phát triển</span>
@@ -682,13 +682,13 @@ else
 
             @* Age Rating / Certification Banner *@
             <div class="p-3.5 rounded-xl bg-[#18181c] border border-white/10 flex items-center justify-between text-xs text-white/80">
-                @if (GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
+                @if (IsAllAgesProduct(product))
                 {
                     <div class="flex items-center gap-3">
-                        <span class="px-2 py-1 rounded bg-[#202024] border border-emerald-500/30 text-emerald-400 font-black text-xs uppercase">✓ 100%</span>
+                        <span class="px-2 py-1 rounded bg-[#202024] border border-emerald-500/30 text-emerald-400 font-black text-xs uppercase">✓ E</span>
                         <div>
-                            <span class="font-bold block text-white">Bản quyền phần mềm chính hãng</span>
-                            <span class="text-[11px] text-white/70">Kích hoạt an toàn, hỗ trợ nâng cấp</span>
+                            <span class="font-bold block text-white">@(GameMediaHelper.IsApp(product.Name, product.Type, product.Categories) ? "Bản quyền phần mềm chính hãng" : "Nội dung lành mạnh")</span>
+                            <span class="text-[11px] text-white/70">Phù hợp mọi lứa tuổi • Bản quyền chính hãng</span>
                         </div>
                     </div>
                 }
@@ -790,15 +790,26 @@ else
     <div class="egs-modal-backdrop" @onclick="() => _showAgeGateModal = false" role="dialog" aria-modal="true">
         <div class="egs-modal-card max-w-md p-6 sm:p-8" @onclick:stopPropagation="true">
             <div class="text-center mb-6">
-                <span class="inline-block px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-black uppercase mb-2">ESRB M • 18+ MATURE</span>
-                <h3 class="text-xl font-black text-white">Xác Nhận Độ Tuổi</h3>
-                <p class="text-xs text-white/75 mt-2 leading-relaxed">
-                    Tựa game <span class="text-white font-bold">@p.Name</span> có chứa các yếu tố kịch tính hoặc cảnh nhạy cảm. Bạn phải từ đủ 18 tuổi trở lên để tiếp tục.
-                </p>
+                @if (IsAllAgesProduct(p))
+                {
+                    <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black uppercase mb-2">Phù hợp mọi lứa tuổi • Bản quyền chính hãng</span>
+                    <h3 class="text-xl font-black text-white">Thông Tin Độ Tuổi</h3>
+                    <p class="text-xs text-white/75 mt-2 leading-relaxed">
+                        Sản phẩm <span class="text-white font-bold">@p.Name</span> phù hợp cho mọi lứa tuổi và đi kèm chứng nhận bản quyền chính hãng tại NexusKeys.
+                    </p>
+                }
+                else
+                {
+                    <span class="inline-block px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-black uppercase mb-2">ESRB M • 18+ MATURE</span>
+                    <h3 class="text-xl font-black text-white">Xác Nhận Độ Tuổi</h3>
+                    <p class="text-xs text-white/75 mt-2 leading-relaxed">
+                        Tựa game <span class="text-white font-bold">@p.Name</span> có chứa các yếu tố kịch tính hoặc cảnh nhạy cảm. Bạn phải từ đủ 18 tuổi trở lên để tiếp tục.
+                    </p>
+                }
             </div>
             <div class="space-y-2">
                 <button type="button" @onclick="ConfirmAgeGate" class="w-full py-3 min-h-[44px] rounded-xl bg-[#0078f2] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center cursor-pointer">
-                    Tôi đã đủ 18 tuổi — Tiếp tục
+                    @(IsAllAgesProduct(p) ? "Đã hiểu — Tiếp tục" : "Tôi đã đủ 18 tuổi — Tiếp tục")
                 </button>
                 <a href="/products" class="w-full py-2.5 min-h-[44px] rounded-xl text-white/75 hover:text-white text-xs font-semibold uppercase flex items-center justify-center text-center">
                     Rời khỏi trang này
@@ -829,6 +840,27 @@ else
     private string reviewFilter = "All";
 
     private void SetReviewFilter(string filter) => reviewFilter = filter;
+
+    private static bool IsAllAgesProduct(Frontend.Models.Product.ProductDto product)
+    {
+        if (GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
+        {
+            return true;
+        }
+
+        if (product.Categories != null && product.Categories.Any(c =>
+            c.Contains("Thể thao", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Đua xe", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Mô phỏng", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Sports", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Racing", StringComparison.OrdinalIgnoreCase) ||
+            c.Contains("Simulation", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     private void SelectMedia(string url, string type, int index = 0)
     {
@@ -917,6 +949,15 @@ else
     private async Task AddToCart()
     {
         await AddToCartCoreAsync(showModal: true);
+    }
+
+    private async Task AddDeluxeToCart()
+    {
+        await AddToCartCoreAsync(showModal: true);
+        if (ViewModel.Product != null)
+        {
+            ToastService.ShowSuccess($"Đã thêm gói nâng cấp \"{ViewModel.Product.Name} — Phiên Bản Cao Cấp (Deluxe)\" vào giỏ hàng!");
+        }
     }
 
     private async Task AddToCartCoreAsync(bool showModal)

@@ -229,6 +229,7 @@
 
         @* Admin Quick Access (If Staff or Admin) *@
         @if (string.Equals(AuthVM.Role, "Admin", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(AuthVM.Role, "Administrator", StringComparison.OrdinalIgnoreCase) ||
              string.Equals(AuthVM.Role, "Staff", StringComparison.OrdinalIgnoreCase) ||
              string.Equals(AuthVM.Role, "Developer", StringComparison.OrdinalIgnoreCase))
         {
@@ -339,8 +340,24 @@
     
     private async Task GoToAdminPanel()
     {
-        var adminUrl = Configuration["AdminPortal:BaseUrl"]?.TrimEnd('/') ?? "http://localhost:3001";
-        await JS.InvokeVoidAsync("open", $"{adminUrl}/Auth/Login", "_blank", "noopener,noreferrer");
+        var token = await AuthVM.GetTokenAsync();
+        if (string.IsNullOrWhiteSpace(token) && await AuthVM.TryRefreshAsync())
+        {
+            token = await AuthVM.GetTokenAsync();
+        }
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            var adminUrl = Configuration["AdminPortal:BaseUrl"]?.TrimEnd('/') ?? "http://localhost:3001";
+            try
+            {
+                await JS.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
+            }
+            catch
+            {
+                await JS.InvokeVoidAsync("open", $"{adminUrl}/Auth/AutoLogin?token={token}", "_blank");
+            }
+        }
     }
 
     public void Dispose()

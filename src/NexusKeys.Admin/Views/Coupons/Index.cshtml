@@ -159,6 +159,16 @@
             if (res.ok) window.location.reload();
         } catch (e) { console.error(e); }
     }
+
+    document.getElementById('searchInput')?.addEventListener('input', function (e) {
+        const keyword = (e.target.value || '').trim().toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+        rows.forEach(row => {
+            if (row.querySelector('td[colspan]')) return;
+            const text = (row.innerText || '').toLowerCase();
+            row.classList.toggle('hidden', keyword.length > 0 && !text.includes(keyword));
+        });
+    });
 </script>
 }
 

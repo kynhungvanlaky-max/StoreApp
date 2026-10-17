@@ -596,7 +596,7 @@ p, span, a, label {
     align-items: center;
     gap: 16px;
     padding: 10px 12px;
-    margin: 0 -8px;
+    margin: 0;
     border-radius: 14px;
     background-color: transparent;
     border: 1px solid transparent;
@@ -1067,7 +1067,6 @@ p, span, a, label {
     border-radius: 9999px !important;
     background: rgba(0, 0, 0, 0.75) !important;
     border: 1px solid rgba(255, 255, 255, 0.45) !important;
-    color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1107,18 +1106,25 @@ p, span, a, label {
     transform: scale(0.92) !important;
 }
 
+.egs-card-bookmark:not(.text-red-500) {
+    color: #ffffff !important;
+}
+
 .egs-card-bookmark.is-active {
     opacity: 1 !important;
     pointer-events: auto !important;
     background: rgba(0, 0, 0, 0.85) !important;
     border-color: #0078f2 !important;
+}
+
+.egs-card-bookmark.is-active:not(.text-red-500) {
     color: #ffffff !important;
 }
 
 .egs-card-tag {
     font-size: 12px !important;
     font-weight: 400 !important;
-    color: rgba(255, 255, 255, 0.6) !important;
+    color: rgba(255, 255, 255, 0.6);
     text-transform: none !important;
     letter-spacing: normal !important;
     margin-top: 4px;

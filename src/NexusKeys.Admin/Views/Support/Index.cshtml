@@ -77,6 +77,34 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-6 gap-4">
+            <div class="text-sm font-semibold text-slate-500">
+                Tổng cộng @totalItems yêu cầu (Trang @currentPage/@totalPages)
+            </div>
+            <div class="flex items-center gap-1.5">
+                @if (currentPage > 1)
+                {
+                    <a href="?page=@(currentPage - 1)" class="w-9 h-9 flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 transition-all text-slate-600 rounded-xl text-xs shadow-2xs">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                }
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a href="?page=@i" class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs @(i == currentPage ? "bg-indigo-600 text-white shadow-sm shadow-indigo-200" : "border border-slate-200 bg-white hover:bg-slate-50 text-slate-600") transition-all">@i</a>
+                }
+                @if (currentPage < totalPages)
+                {
+                    <a href="?page=@(currentPage + 1)" class="w-9 h-9 flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 transition-all text-slate-600 rounded-xl text-xs shadow-2xs">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 <!-- Modal Reply Ticket -->

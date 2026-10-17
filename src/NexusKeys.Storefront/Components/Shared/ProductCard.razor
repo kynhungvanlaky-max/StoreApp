@@ -45,11 +45,11 @@
             }
 
             @* Wishlist Bookmark Button (Top-Right on Image) *@
-            @if (IsWishlistMode)
+            @if (IsWishlistMode || ShowRemoveFromWishlist)
             {
-                <button type="button" class="egs-card-bookmark is-active text-red-500 hover:text-red-400"
-                        @onclick="HandleRemove" @onclick:stopPropagation="true" aria-label="@($"Xóa {Product.Name} khỏi yêu thích")" title="Xóa khỏi danh sách ước">
-                    <Icon Name="HeroiconName.Trash" Class="w-4 h-4" />
+                <button type="button" class="egs-card-bookmark is-active !bg-red-600/90 hover:!bg-red-500 !border-red-400/50 text-red-500 hover:text-red-400"
+                        @onclick="HandleRemove" @onclick:preventDefault="true" @onclick:stopPropagation="true" aria-label="@($"Xóa {Product.Name} khỏi yêu thích")" title="Xóa khỏi danh sách ước">
+                    <Icon Name="HeroiconName.Trash" Class="w-4 h-4 text-white" />
                 </button>
             }
             else if (ShowWishlistButton && !Product.IsOutOfStock)
@@ -57,6 +57,7 @@
                 <button type="button"
                         class="egs-card-bookmark @(IsWishlisted ? "is-active" : "")"
                         @onclick="HandleWishlistToggle"
+                        @onclick:preventDefault="true"
                         @onclick:stopPropagation="true"
                         aria-pressed="@IsWishlisted.ToString().ToLowerInvariant()"
                         title="@(IsWishlisted ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
@@ -99,6 +100,28 @@
             </div>
         </div>
     </a>
+
+    @if ((IsWishlistMode || ShowRemoveFromWishlist) && OnAddToCart.HasDelegate && !Product.IsOutOfStock)
+    {
+        <div class="mt-2.5 pt-2 border-t border-white/10 flex items-center gap-2">
+            <button type="button"
+                    @onclick="HandleAddToCart"
+                    @onclick:stopPropagation="true"
+                    class="flex-1 min-h-[38px] px-3 py-2 rounded-lg bg-[#0078f2] hover:bg-[#0066cc] text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.98]"
+                    aria-label="@($"Thêm {Product.Name} vào giỏ hàng")">
+                <Icon Name="HeroiconName.ShoppingCart" Class="w-3.5 h-3.5" />
+                <span>Thêm vào giỏ</span>
+            </button>
+            <button type="button"
+                    @onclick="HandleRemove"
+                    @onclick:stopPropagation="true"
+                    class="min-w-[38px] min-h-[38px] p-2 rounded-lg bg-red-500/15 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 transition-all flex items-center justify-center cursor-pointer active:scale-[0.98]"
+                    title="Xóa khỏi danh sách ước"
+                    aria-label="@($"Xóa {Product.Name} khỏi yêu thích")">
+                <Icon Name="HeroiconName.Trash" Class="w-4 h-4" />
+            </button>
+        </div>
+    }
 </article>
 }
 
@@ -108,6 +131,9 @@
 
     [Parameter]
     public bool IsWishlistMode { get; set; }
+
+    [Parameter]
+    public bool ShowRemoveFromWishlist { get; set; }
 
     [Parameter]
     public bool Surface { get; set; }
@@ -152,6 +178,7 @@
         if (OnAddToCart.HasDelegate)
         {
             await OnAddToCart.InvokeAsync(Product.Id);
+            ToastService.ShowSuccess($"Đã thêm \"{Product.Name}\" vào giỏ hàng!");
         }
     }
 

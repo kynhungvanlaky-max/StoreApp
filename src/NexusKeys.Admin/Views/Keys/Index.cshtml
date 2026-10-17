@@ -10,7 +10,7 @@
 }
 
 @{
-    ViewData["Title"] = "Kho Key Game (Product Keys)";
+    ViewData["Title"] = "Kho Key Bản Quyền (Product Keys)";
     var products = ViewBag.Products as List<Backend.Models.ProductDto> ?? new List<Backend.Models.ProductDto>();
     var groupedKeys = (Model ?? new List<Backend.Models.ProductKeyViewModel>())
         .GroupBy(k => new { k.ProductId, ProductName = string.IsNullOrEmpty(k.ProductName) ? "Khác" : k.ProductName })
@@ -28,7 +28,7 @@
         <form method="get" action="/Keys" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <input type="hidden" name="pageSize" value="@pageSize" />
             <div class="relative w-full md:w-96">
-                <input type="search" name="search" value="@search" placeholder="Tìm tên game hoặc mã key..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium placeholder-slate-400" />
+                <input type="search" name="search" value="@search" placeholder="Tìm tên sản phẩm hoặc mã key..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium placeholder-slate-400" />
                 <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-4 top-3.5 text-sm"></i>
             </div>
             <button type="submit" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold">Tìm</button>
@@ -52,7 +52,7 @@
             <div class="text-center py-16 text-slate-400 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
                 <i class="fa-solid fa-key text-4xl text-slate-300 mb-3"></i>
                 <p class="font-semibold text-slate-600">Chưa có mã Key nào được khởi tạo.</p>
-                <p class="text-xs text-slate-400 mt-1">Bấm "Thêm Mã Key Mới" để nhập key cho game.</p>
+                <p class="text-xs text-slate-400 mt-1">Bấm "Thêm Mã Key Mới" để nhập key cho sản phẩm (Game &amp; App).</p>
             </div>
         }
         else
@@ -150,7 +150,7 @@
     {
         <div class="mt-6 flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-6 gap-4">
             <div class="text-sm font-semibold text-slate-500">
-                Tổng cộng @totalItems game (Trang @currentPage/@totalPages)
+                Tổng cộng @totalItems sản phẩm (Trang @currentPage/@totalPages)
             </div>
             <div class="flex items-center gap-1.5">
                 @if (currentPage > 1)
@@ -192,7 +192,7 @@
 
         <form id="addKeyForm" onsubmit="createKey(event)" class="p-8 space-y-5">
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Chọn Sản Phẩm (Game)</label>
+                <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Chọn Sản Phẩm (Game &amp; App)</label>
                 <select id="pSelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-indigo-500 font-medium">
                     @foreach (var p in products)
                     {
@@ -201,7 +201,7 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Mã Key Game</label>
+                <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Mã Key Bản Quyền</label>
                 <div class="flex gap-2">
                     <input type="text" id="pKeyCode" required placeholder="XXXXX-XXXXX-XXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-mono font-bold uppercase focus:outline-none focus:border-indigo-500 placeholder-slate-400" />
                     <button type="button" onclick="autoGenerateCode()" class="px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold whitespace-nowrap transition-all">

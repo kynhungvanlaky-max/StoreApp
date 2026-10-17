@@ -70,7 +70,7 @@
             
             <a href="/Products" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "sidebar-link-active" : "sidebar-link-inactive")">
                 <i class="fa-solid fa-gamepad text-base @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "text-indigo-600" : "text-slate-400")"></i>
-                <span class="flex-1">Sản Phẩm (Game)</span>
+                <span class="flex-1">Sản Phẩm (Game &amp; App)</span>
             </a>
 
             <a href="/Orders" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "sidebar-link-active" : "sidebar-link-inactive")">
@@ -81,7 +81,7 @@
 
             <a href="/Keys" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Keys" ? "sidebar-link-active" : "sidebar-link-inactive")">
                 <i class="fa-solid fa-key text-base @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Keys" ? "text-indigo-600" : "text-slate-400")"></i>
-                <span class="flex-1">Kho Key Game</span>
+                <span class="flex-1">Kho Key Bản Quyền</span>
             </a>
 
             @if (isAdmin)

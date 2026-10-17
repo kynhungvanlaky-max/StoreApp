@@ -107,8 +107,9 @@
                                 <input type="radio" name="paymentMethod" aria-label="Thanh toán bằng VNPay" class="accent-[#0078f2] w-4 h-4"
                                        checked="@(CheckoutVM.SelectedPaymentMethod == "VNPay")" 
                                        @onchange="@(() => CheckoutVM.SelectedPaymentMethod = "VNPay")" />
-                                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center p-1 shrink-0">
-                                    <img src="/images/vnpay.png" alt="VNPay" class="w-full h-full object-contain" />
+                                <div class="w-12 h-12 rounded-xl bg-[#0078f2]/15 border border-[#0078f2]/30 flex flex-col items-center justify-center shrink-0">
+                                    <span class="text-[11px] font-black text-[#0078f2] leading-none">VNPAY</span>
+                                    <span class="text-[9px] font-bold text-emerald-400 uppercase mt-0.5 leading-none">QR</span>
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-white text-sm sm:text-base">Ví điện tử / Cổng thanh toán VNPay</h3>
@@ -123,8 +124,9 @@
                                 <input type="radio" name="paymentMethod" aria-label="Thanh toán bằng MoMo" class="accent-[#0078f2] w-4 h-4"
                                        checked="@(CheckoutVM.SelectedPaymentMethod == "MoMo")" 
                                        @onchange="@(() => CheckoutVM.SelectedPaymentMethod = "MoMo")" />
-                                <div class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
-                                    <img src="/images/momo.png" alt="MoMo" class="w-full h-full object-contain" />
+                                <div class="w-12 h-12 rounded-xl bg-[#d82d8b]/15 border border-[#d82d8b]/30 flex flex-col items-center justify-center shrink-0">
+                                    <span class="text-[11px] font-black text-[#d82d8b] leading-none">MoMo</span>
+                                    <span class="text-[9px] font-bold text-white/70 uppercase mt-0.5 leading-none">Wallet</span>
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-white text-sm sm:text-base">Ví điện tử MoMo</h3>

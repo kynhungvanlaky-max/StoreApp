@@ -6,7 +6,7 @@
     @* Chat Window Popup *@
     @if (_isOpen)
     {
-        <div class="egs-chat-window-animated w-80 sm:w-96 h-[520px] max-h-[75vh] bg-[#18181c] border border-white/10 rounded-2xl flex flex-col overflow-hidden pointer-events-auto shadow-2xl shadow-black/90">
+        <div class="egs-chat-window-animated w-[calc(100vw-2rem)] sm:w-96 h-[520px] max-h-[75vh] bg-[#18181c] border border-white/10 rounded-2xl flex flex-col overflow-hidden pointer-events-auto shadow-2xl shadow-black/90">
             @* Header *@
             <div class="bg-[#202024] px-4 py-3.5 flex items-center gap-3 border-b border-white/10 select-none">
                 <div class="relative">
@@ -59,7 +59,7 @@
                     <label for="chat-widget-input" class="sr-only">Nội dung tin nhắn</label>
                     <input id="chat-widget-input" @bind="VM.InputText" @bind:event="oninput"
                            class="w-full bg-[#202024] text-white placeholder:text-white/50 text-xs sm:text-sm rounded-xl pl-4 pr-11 py-2.5 outline-none focus:border-[#0078f2] border border-white/10 transition-colors"
-                           placeholder="Hỏi về game, đơn hàng, kích hoạt key..." />
+                           placeholder="Hỏi về game, phần mềm, đơn hàng, kích hoạt key..." />
                     <button type="submit" aria-label="Gửi tin nhắn" disabled="@(string.IsNullOrWhiteSpace(VM.InputText) || VM.IsTyping)"
                             class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] text-white disabled:opacity-40 disabled:hover:bg-[#0078f2] flex items-center justify-center transition-colors">
                         <Icon Name="HeroiconName.PaperAirplane" Class="w-4 h-4 transform -rotate-45 ml-0.5" />

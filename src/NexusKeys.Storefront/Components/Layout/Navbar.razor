@@ -74,13 +74,13 @@
                         <div class="flex flex-col py-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
                             @foreach (var product in _searchResults)
                             {
-                                <a href="/product/@product.Id" class="flex items-center gap-3.5 px-4 py-3 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)" @onclick="() => NavigateToProduct(product.Id)">
+                                <a href="/product/@product.Id" class="flex items-center gap-3.5 px-4 py-3 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onclick="() => NavigateToProduct(product.Id)">
                                     <div class="w-12 h-16 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
                                         <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl, product.Type, product.Categories))" class="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-110" alt="@product.Name" />
                                     </div>
                                     <div class="flex-1 min-w-0 flex flex-col justify-center">
                                         <div class="flex items-center gap-2 mb-0.5">
-                                            <span class="text-xs text-gray-400 font-medium truncate max-w-[130px]">@(product.Categories?.FirstOrDefault() ?? "Trò chơi cơ bản")</span>
+                                            <span class="text-xs text-gray-400 font-medium truncate max-w-[130px]">@(product.Categories?.FirstOrDefault() ?? (IsSoftwareProduct(product) ? "Ứng dụng bản quyền" : "Trò chơi cơ bản"))</span>
                                             @if (product.DiscountPercent is > 0 && product.DiscountPrice.HasValue)
                                             {
                                                 <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white leading-none shadow-sm min-h-[16px] inline-flex items-center">
@@ -89,7 +89,7 @@
                                             }
                                         </div>
                                         <div class="flex items-center gap-1.5 min-w-0">
-                                            @if (Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
+                                            @if (IsSoftwareProduct(product))
                                             {
                                                 <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-purple-600/30 text-purple-300 border border-purple-500/40 shrink-0">💻 App</span>
                                             }
@@ -120,7 +120,7 @@
                                 </a>
                             }
                         </div>
-                        <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-left px-5 py-3.5 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-xs font-bold text-[#0078F2] hover:text-white transition-colors" @onmousedown="NavigateToSearch" @onclick="NavigateToSearch">
+                        <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-left px-5 py-3.5 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-xs font-bold text-[#0078F2] hover:text-white transition-colors" @onclick="NavigateToSearch">
                             Xem tất cả kết quả &rarr;
                         </a>
                     }
@@ -253,13 +253,13 @@
                             <div class="flex flex-col py-1 max-h-[50vh] overflow-y-auto custom-scrollbar">
                                 @foreach (var product in _searchResults)
                                 {
-                                    <a href="/product/@product.Id" class="flex items-center gap-3 px-3 py-2.5 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onmousedown="() => NavigateToProduct(product.Id)" @onclick="() => NavigateToProduct(product.Id)">
+                                    <a href="/product/@product.Id" class="flex items-center gap-3 px-3 py-2.5 hover:bg-[#252525] transition-colors cursor-pointer group/item" @onclick="() => NavigateToProduct(product.Id)">
                                         <div class="w-10 h-14 bg-[#303030] rounded-md shrink-0 overflow-hidden shadow-sm">
                                             <img src="@(Frontend.Services.GameMediaHelper.GetCover(product.Name, product.ImageUrl, product.Type, product.Categories))" class="w-full h-full object-cover" alt="@product.Name" />
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center gap-1.5 mb-0.5">
-                                                <span class="text-xs text-gray-400 font-medium">@(product.Categories?.FirstOrDefault() ?? "Trò chơi cơ bản")</span>
+                                                <span class="text-xs text-gray-400 font-medium">@(product.Categories?.FirstOrDefault() ?? (IsSoftwareProduct(product) ? "Ứng dụng bản quyền" : "Trò chơi cơ bản"))</span>
                                                 @if (product.DiscountPercent is > 0 && product.DiscountPrice.HasValue)
                                                 {
                                                     <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#0078f2] text-white leading-none min-h-[16px] inline-flex items-center">
@@ -268,7 +268,7 @@
                                                 }
                                             </div>
                                             <div class="flex items-center gap-1.5 min-w-0">
-                                                @if (Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories))
+                                                @if (IsSoftwareProduct(product))
                                                 {
                                                     <span class="px-1.5 py-0.5 rounded text-[11px] font-black bg-purple-600/30 text-purple-300 border border-purple-500/40 shrink-0">💻 App</span>
                                                 }
@@ -299,7 +299,7 @@
                                     </a>
                                 }
                             </div>
-                            <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-center px-4 py-3 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-xs font-bold text-[#0078F2] hover:text-white transition-colors" @onmousedown="NavigateToSearch" @onclick="NavigateToSearch">
+                            <a href="/products?search=@(Uri.EscapeDataString(_searchQuery))" class="block w-full text-center px-4 py-3 bg-[#202020] hover:bg-[#252525] border-t border-[#333]/50 text-xs font-bold text-[#0078F2] hover:text-white transition-colors" @onclick="NavigateToSearch">
                                 Xem tất cả kết quả &rarr;
                             </a>
                         }
@@ -337,8 +337,12 @@
     private List<Frontend.Models.Product.ProductDto> _searchResults = new();
     private CancellationTokenSource? _searchCts;
 
+    private static bool IsSoftwareProduct(Frontend.Models.Product.ProductDto product) =>
+        Frontend.Services.GameMediaHelper.IsApp(product.Name, product.Type, product.Categories);
+
     private bool IsStaffOrAdmin => AuthViewModel.IsLoggedIn && (
         string.Equals(AuthViewModel.Role, "Administrator", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(AuthViewModel.Role, "Admin", StringComparison.OrdinalIgnoreCase) ||
         string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase) ||
         string.Equals(AuthViewModel.Role, "Staff", StringComparison.OrdinalIgnoreCase));
 

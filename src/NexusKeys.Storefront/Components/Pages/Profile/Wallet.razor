@@ -86,7 +86,13 @@
                                             @tx.CreatedAt.ToString("dd/MM/yyyy HH:mm")
                                         </td>
                                         <td class="py-4 px-4 text-xs sm:text-sm font-medium text-white/90">
-                                            @if(tx.TransactionType == "Deposit") { @("Nạp tiền vào ví NexusPay") } else { @tx.TransactionType }
+                                            @(tx.TransactionType switch
+                                            {
+                                                "Deposit" => "Nạp tiền vào ví NexusPay",
+                                                "Purchase" or "Payment" => "Thanh toán đơn hàng",
+                                                "Refund" => "Hoàn tiền",
+                                                _ => tx.TransactionType
+                                            })
                                             @if (tx.Status == "Pending")
                                             {
                                                 <span class="ml-2 px-2 py-0.5 rounded text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">

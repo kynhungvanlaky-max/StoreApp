@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<PageTitle>Trợ Lý AI NexusKeys — Cửa Hàng Game Bản Quyền</PageTitle>
+<PageTitle>Trợ Lý AI NexusKeys — Cửa Hàng Game & Phần Mềm Bản Quyền</PageTitle>
 
 <div class="egs-wrap">
     <div class="egs-content">
@@ -35,6 +35,11 @@
                             <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
                             "Tôi muốn tìm game nhập vai (RPG) giá dưới 500k?"
                         </button>
+                        <button type="button" @onclick='@(() => { VM.InputText = "Tư vấn phần mềm thiết kế đồ họa, lập trình và văn phòng bản quyền?"; _ = VM.SendMessageAsync(); })'
+                                class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
+                            <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
+                            "Tư vấn phần mềm đồ họa, lập trình & văn phòng?"
+                        </button>
                         <button type="button" @onclick='@(() => { VM.InputText = "Làm sao để thanh toán đơn hàng?"; _ = VM.SendMessageAsync(); })'
                                 class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
                             <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
@@ -45,10 +50,10 @@
                             <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
                             "Elden Ring yêu cầu cấu hình như thế nào?"
                         </button>
-                        <button type="button" @onclick='@(() => { VM.InputText = "Tựa game nào đang có ưu đãi giảm giá tốt nhất hôm nay?"; _ = VM.SendMessageAsync(); })'
+                        <button type="button" @onclick='@(() => { VM.InputText = "Tựa game hoặc phần mềm nào đang có ưu đãi giảm giá tốt nhất hôm nay?"; _ = VM.SendMessageAsync(); })'
                                 class="w-full text-left p-3.5 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/5 hover:border-[#0078f2]/40 transition-all text-xs text-white/80 hover:text-white leading-relaxed group shadow-sm">
                             <span class="text-[#0078f2] mr-1 font-bold group-hover:translate-x-0.5 inline-block transition-transform">➔</span>
-                            "Tựa game nào đang có ưu đãi tốt nhất?"
+                            "Sản phẩm nào đang có ưu đãi tốt nhất?"
                         </button>
                     </div>
                     
@@ -58,7 +63,7 @@
                             <span>Thông tin AI</span>
                         </div>
                         <p class="text-xs leading-relaxed text-white/70">
-                            Nexus AI được hỗ trợ bởi mô hình thông minh giúp tra cứu game, thông số kỹ thuật và hướng dẫn mua hàng 24/7.
+                            Nexus AI được hỗ trợ bởi mô hình thông minh giúp tra cứu game, ứng dụng & phần mềm bản quyền (đồ họa, lập trình, văn phòng), thông số kỹ thuật và hướng dẫn mua hàng 24/7.
                         </p>
                     </div>
                 </div>
@@ -104,7 +109,7 @@
                         <label for="assistant-input" class="sr-only">Nhập câu hỏi cho Nexus AI</label>
                         <input id="assistant-input" @bind="VM.InputText" @bind:event="oninput"
                                class="w-full bg-[#202024] border border-white/15 focus:border-[#0078f2] focus:ring-2 focus:ring-[#0078f2]/20 rounded-xl px-4 py-3.5 pr-14 text-white text-xs sm:text-sm placeholder-white/50 transition-all outline-none"
-                               placeholder="Hỏi bất kỳ điều gì về kho game, cấu hình, đơn hàng..." />
+                               placeholder="Hỏi bất kỳ điều gì về kho game, phần mềm bản quyền, cấu hình, đơn hàng..." />
                         <button type="submit" aria-label="Gửi câu hỏi" disabled="@(string.IsNullOrWhiteSpace(VM.InputText) || VM.IsTyping)"
                                 class="absolute right-2 top-2 h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-[#0078f2] hover:bg-[#0068d6] active:scale-95 text-white flex items-center justify-center transition-all shadow-md shadow-[#0078f2]/30 disabled:opacity-30 disabled:cursor-not-allowed">
                             <Icon Name="HeroiconName.PaperAirplane" Class="w-4 h-4 sm:w-5 sm:h-5" />

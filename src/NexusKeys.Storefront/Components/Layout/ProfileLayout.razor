@@ -25,8 +25,8 @@
             @* User Identity Card *@
             <div class="bg-[#18181c] rounded-2xl border border-white/10 p-5 shadow-xl">
                 @{
-                    var displayName = !string.IsNullOrWhiteSpace(VM.Profile?.FullName) ? VM.Profile.FullName : (!string.IsNullOrWhiteSpace(AuthVM.Username) ? AuthVM.Username : "Người chơi");
-                    var email = !string.IsNullOrWhiteSpace(VM.Profile?.Email) ? VM.Profile.Email : (!string.IsNullOrWhiteSpace(AuthVM.Username) ? $"{AuthVM.Username.ToLower()}@nexuskeys.com" : "player@nexuskeys.com");
+                    var displayName = !string.IsNullOrWhiteSpace(VM.Profile?.FullName) ? VM.Profile.FullName : (!string.IsNullOrWhiteSpace(AuthVM.Username) ? AuthVM.Username : "Thành viên Nexus");
+                    var email = !string.IsNullOrWhiteSpace(VM.Profile?.Email) ? VM.Profile.Email : (!string.IsNullOrWhiteSpace(AuthVM.Username) ? $"{AuthVM.Username.ToLower()}@nexuskeys.com" : "member@nexuskeys.com");
                     var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Substring(0, 1).ToUpper() : "U";
                     var isDev = string.Equals(AuthVM.Role, "Developer", StringComparison.OrdinalIgnoreCase);
                     var isAdmin = string.Equals(AuthVM.Role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(AuthVM.Role, "Administrator", StringComparison.OrdinalIgnoreCase);
@@ -83,7 +83,7 @@
                 <div class="space-y-1">
                     <a href="/profile/library" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/profile/library") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
                         <Icon Name="HeroiconName.Key" Class="w-4 h-4 shrink-0" />
-                        <span>Kho game & Key bản quyền</span>
+                        <span>Thư viện Game & Ứng dụng</span>
                     </a>
                     <a href="/orders" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all @(IsActive("/orders") ? "bg-[#0078f2] text-white shadow-md shadow-[#0078f2]/30" : "text-white/70 hover:text-white hover:bg-white/5")">
                         <Icon Name="HeroiconName.DocumentText" Class="w-4 h-4 shrink-0" />

@@ -88,7 +88,7 @@
                         <select id="store-sort" class="appearance-none min-h-[44px] bg-[#1c1c22] border border-white/15 text-white text-xs font-bold rounded-xl outline-none cursor-pointer pl-4 pr-10 py-2.5 hover:border-[#0078f2]/50 focus:border-[#0078f2] focus:ring-2 focus:ring-[#0078f2]/30 transition-all shadow-md"
                                 value="@ViewModel.SortBy"
                                 @onchange='@(e => ChangeSort(e.Value?.ToString() ?? "newest"))'>
-                            <option class="bg-[#1c1c22]" value="newest">⚡ Mới nhất (New Releases)</option>
+                            <option class="bg-[#1c1c22]" value="newest">⚡ Mới phát hành</option>
                             <option class="bg-[#1c1c22]" value="discount">🔥 Ưu đãi giảm giá tốt nhất</option>
                             <option class="bg-[#1c1c22]" value="price_asc">🏷️ Giá: Thấp đến Cao</option>
                             <option class="bg-[#1c1c22]" value="price_desc">💎 Giá: Cao đến Thấp</option>
@@ -632,6 +632,12 @@
                                    @bind="_categorySearchText" 
                                    @bind:event="oninput"
                                    class="w-full bg-[#1f1f26] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#0078f2]/60 focus:ring-1 focus:ring-[#0078f2]/50 transition-all" />
+                            @if (!string.IsNullOrEmpty(_categorySearchText))
+                            {
+                                <button type="button" @onclick='() => _categorySearchText = ""' class="absolute right-2.5 top-2.5 text-zinc-400 hover:text-white" aria-label="Xóa từ khóa tìm thể loại">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            }
                         </div>
                     }
 
@@ -639,29 +645,38 @@
                         @{
                             var mFilteredCats = GetFilteredCategories().ToList();
                         }
-                        @foreach (var cat in mFilteredCats)
+                        @if (!mFilteredCats.Any())
                         {
-                            var isSelected = ViewModel.SelectedCategories.Contains(cat);
-                            <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-[#0078F2]/15 border border-[#0078F2]/50" : "bg-[#1f1f26] border border-transparent")">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-gradient-to-br from-[#0078f2] to-[#005fb8] border border-[#4da6ff]/50 shadow-[0_0_10px_rgba(0,120,242,0.6)]" : "bg-[#25252e] border border-white/30")">
-                                        <input type="checkbox" checked="@isSelected" 
-                                               @onchange='@(_ => ToggleCategory(cat))'
-                                               class="absolute opacity-0 cursor-pointer w-full h-full" />
-                                        @if (isSelected)
-                                        {
-                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                            </svg>
-                                        }
+                            <div class="py-4 text-center text-xs text-zinc-500">
+                                Không có thể loại khớp với "@_categorySearchText"
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var cat in mFilteredCats)
+                            {
+                                var isSelected = ViewModel.SelectedCategories.Contains(cat);
+                                <label class="group flex items-center justify-between min-h-[44px] px-3.5 py-2 rounded-xl cursor-pointer transition-all active:scale-[0.98] @(isSelected ? "bg-[#0078F2]/15 border border-[#0078F2]/50" : "bg-[#1f1f26] border border-transparent")">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="relative flex items-center justify-center w-5 h-5 rounded-md transition-all flex-shrink-0 @(isSelected ? "bg-gradient-to-br from-[#0078f2] to-[#005fb8] border border-[#4da6ff]/50 shadow-[0_0_10px_rgba(0,120,242,0.6)]" : "bg-[#25252e] border border-white/30")">
+                                            <input type="checkbox" checked="@isSelected" 
+                                                   @onchange='@(_ => ToggleCategory(cat))'
+                                                   class="absolute opacity-0 cursor-pointer w-full h-full" />
+                                            @if (isSelected)
+                                            {
+                                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                            }
+                                        </div>
+                                        <span class="text-xs transition-colors truncate @(isSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">@cat</span>
                                     </div>
-                                    <span class="text-xs transition-colors truncate @(isSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">@cat</span>
-                                </div>
-                                @if (isSelected)
-                                {
-                                    <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
-                                }
-                            </label>
+                                    @if (isSelected)
+                                    {
+                                        <span class="w-2 h-2 rounded-full bg-[#0078f2] shadow-[0_0_6px_#0078f2] flex-shrink-0"></span>
+                                    }
+                                </label>
+                            }
                         }
                     </div>
                 </div>
@@ -803,17 +818,17 @@
     private string GetHeaderTitle()
     {
         if (string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase))
-            return "Kho Trò Chơi (Games)";
+            return "Kho Trò Chơi Bản Quyền";
         if (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
-            return "Kho Ứng Dụng & Phần Mềm (Apps)";
+            return "Kho Ứng Dụng & Phần Mềm";
         return "Kho Game & Ứng Dụng Bản Quyền";
     }
 
     private string GetHeaderDescription()
     {
         if (string.Equals(ViewModel.SelectedType, "Game", StringComparison.OrdinalIgnoreCase))
-            return "Khám phá hàng ngàn tựa game AAA đỉnh cao, indie độc đáo và ưu đãi bản quyền Steam/Epic.";
+            return "Khám phá hàng ngàn tựa game AAA đỉnh cao, indie độc đáo và ưu đãi bản quyền chính hãng tại NexusKeys.";
         if (string.Equals(ViewModel.SelectedType, "Software", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(ViewModel.SelectedType, "App", StringComparison.OrdinalIgnoreCase))
             return "Bộ công cụ phần mềm đồ họa, biên tập video, âm thanh và tiện ích bản quyền chuyên nghiệp.";

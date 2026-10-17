@@ -134,10 +134,21 @@
                 </div>
             }
 
-            @* Phân trang tối giản NexusKeys: 1 2 3 4 5 ... 212 > *@
+            @* Phân trang tối giản NexusKeys: < 1 2 3 4 5 ... 212 > *@
             @if (VM.TotalPages > 1)
             {
                 <div class="flex justify-center items-center gap-4 text-xs sm:text-sm font-semibold pt-10 pb-16 select-none">
+                    @if (VM.CurrentPage > 1)
+                    {
+                        <button type="button"
+                                class="text-white/50 hover:text-white transition-colors mr-2"
+                                title="Trang trước"
+                                aria-label="Trang trước"
+                                @onclick="@(() => VM.LoadPageAsync(VM.CurrentPage - 1))">
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                    }
+
                     @foreach (var p in GetPageNumbers(VM.CurrentPage, VM.TotalPages))
                     {
                         if (p == -1)
@@ -160,6 +171,7 @@
                         <button type="button"
                                 class="text-white/50 hover:text-white transition-colors ml-2"
                                 title="Trang kế tiếp"
+                                aria-label="Trang kế tiếp"
                                 @onclick="@(() => VM.LoadPageAsync(VM.CurrentPage + 1))">
                             <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </button>
@@ -198,15 +210,15 @@
         if (span.TotalDays < 30)
         {
             var days = (int)span.TotalDays;
-            return $"{days}NG TRƯỚC";
+            return $"{days} NGÀY TRƯỚC";
         }
         if (span.TotalDays < 365)
         {
             var months = Math.Max(1, (int)(span.TotalDays / 30));
-            return $"{months}THG TRƯỚC";
+            return $"{months} THÁNG TRƯỚC";
         }
         var years = Math.Max(1, (int)(span.TotalDays / 365));
-        return $"{years}N TRƯỚC";
+        return $"{years} NĂM TRƯỚC";
     }
 
     private string FormatCategoryAndTime(NewsArticleDto article)

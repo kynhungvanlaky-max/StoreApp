@@ -1,6 +1,7 @@
 @page "/wishlist"
 @inject Frontend.ViewModels.WishlistViewModel VM
 @inject Frontend.ViewModels.CartViewModel CartVM
+@inject Frontend.Services.ToastService ToastService
 @layout Frontend.Components.Layout.ProfileLayout
 @implements IDisposable
 
@@ -47,6 +48,8 @@
                                 Name = item.Product.Name,
                                 Type = item.Product.Type ?? string.Empty,
                                 BasePrice = item.Product.BasePrice,
+                                DiscountPrice = item.Product.DiscountPrice,
+                                DiscountPercent = item.Product.DiscountPercent,
                                 ImageUrl = item.Product.ImageUrl ?? string.Empty,
                                 Categories = item.Product.Categories ?? new()
                             })"
@@ -84,8 +87,9 @@
         {
             ProductId = item.Product.Id,
             Name = item.Product.Name,
-            Price = item.Product.BasePrice,
+            Price = item.Product.DiscountPrice ?? item.Product.BasePrice,
             ImageUrl = item.Product.ImageUrl ?? string.Empty
         });
+        ToastService.ShowSuccess($"Đã thêm {item.Product.Name} vào giỏ hàng!");
     }
 }

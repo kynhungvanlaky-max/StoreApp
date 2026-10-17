@@ -85,18 +85,18 @@
         @* ================================================================= *@
         @* SECTION 2: DISCOVER SOMETHING NEW & 6 MINI CARDS                   *@
         @* ================================================================= *@
-        <section aria-label="Khám phá tựa game mới">
+        <section aria-label="Khám phá sản phẩm mới">
             <div class="egs-section-header mb-4">
                 <div class="egs-section-title-wrap">
                     <a href="/products" class="egs-section-title hover:text-white flex items-center gap-2">
-                        <span>Khám phá tựa game mới</span>
+                        <span>Khám phá sản phẩm mới</span>
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 </div>
             </div>
 
             <div class="egs-discover-row">
-                <a href="/products" class="egs-discover-banner egs-card-hover egs-shimmer-card">
+                <a href="@($"/products?search={Uri.EscapeDataString("Red Dead Redemption 2")}")" class="egs-discover-banner egs-card-hover egs-shimmer-card">
                     <img src="https://cdn.akamai.steamstatic.com/steam/apps/1174180/library_hero.jpg" alt="Red Dead Redemption 2" />
                     <div class="egs-discover-overlay">
                         <span class="egs-discover-badge">Tâm điểm nổi bật</span>
@@ -108,9 +108,9 @@
                     </div>
                 </a>
 
-                <div class="egs-mini-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                <div class="egs-mini-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @* Mini 1: Chop Chop Together (From User Screenshot) *@
-                    <a href="/products" class="egs-mini-card group">
+                    <a href="@($"/products?search={Uri.EscapeDataString("Chop Chop Together")}")" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
                             <img src="https://cdn.akamai.steamstatic.com/steam/apps/3065360/header.jpg" alt="Chop Chop Together" class="egs-mini-thumb" />
                             <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Chop Chop Together") ? "is-active text-[#0078f2]" : "")"
@@ -122,14 +122,17 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag">Trò chơi cơ bản</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-[#0078f2]/90 text-white border border-sky-400/30">🎮 GAME</span>
+                                <span class="egs-mini-tag">Trò chơi cơ bản</span>
+                            </div>
                             <span class="egs-mini-title">Chop Chop Together</span>
                             <span class="egs-mini-price">136.000 <u>đ</u></span>
                         </div>
                     </a>
 
                     @* Mini 2: Control Ultimate Edition *@
-                    <a href="/products" class="egs-mini-card group">
+                    <a href="@($"/products?search={Uri.EscapeDataString("Control Ultimate Edition")}")" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
                             <img src="https://cdn.akamai.steamstatic.com/steam/apps/870780/library_600x900.jpg" alt="Control Ultimate Edition" class="egs-mini-thumb" />
                             <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Control Ultimate Edition") ? "is-active text-[#0078f2]" : "")"
@@ -141,14 +144,17 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag">Bản đặc biệt</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-[#0078f2]/90 text-white border border-sky-400/30">🎮 GAME</span>
+                                <span class="egs-mini-tag">Bản đặc biệt</span>
+                            </div>
                             <span class="egs-mini-title">Control Ultimate Edition</span>
                             <span class="egs-mini-price">599.000 <u>đ</u></span>
                         </div>
                     </a>
 
                     @* Mini 3: Blender 3D Studio *@
-                    <a href="/products?type=App" class="egs-mini-card group">
+                    <a href="@($"/products?search={Uri.EscapeDataString("Blender 3D Studio")}")" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
                             <img src="https://cdn.akamai.steamstatic.com/steam/apps/365670/library_600x900.jpg" alt="Blender 3D Studio" class="egs-mini-thumb" />
                             <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Blender 3D Studio") ? "is-active text-[#0078f2]" : "")"
@@ -160,14 +166,17 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag text-emerald-400">Đồ họa & Thiết kế 3D</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-purple-600/90 text-white border border-purple-400/30">💻 APP</span>
+                                <span class="egs-mini-tag text-emerald-400">Đồ họa & Thiết kế 3D</span>
+                            </div>
                             <span class="egs-mini-title">Blender 3D Studio</span>
                             <span class="egs-mini-price text-emerald-400 font-bold">Miễn phí</span>
                         </div>
                     </a>
 
                     @* Mini 4: Hades II *@
-                    <a href="/products" class="egs-mini-card group">
+                    <a href="@($"/products?search={Uri.EscapeDataString("Hades II")}")" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
                             <img src="https://cdn.akamai.steamstatic.com/steam/apps/1145350/library_600x900.jpg" alt="Hades II" class="egs-mini-thumb" />
                             <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Hades II") ? "is-active text-[#0078f2]" : "")"
@@ -179,14 +188,17 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag">Truy cập sớm</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-[#0078f2]/90 text-white border border-sky-400/30">🎮 GAME</span>
+                                <span class="egs-mini-tag">Truy cập sớm</span>
+                            </div>
                             <span class="egs-mini-title">Hades II</span>
                             <span class="egs-mini-price">385.000 <u>đ</u></span>
                         </div>
                     </a>
 
                     @* Mini 5: Wallpaper Engine *@
-                    <a href="/products?type=App" class="egs-mini-card group">
+                    <a href="@($"/products?search={Uri.EscapeDataString("Wallpaper Engine")}")" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
                             <img src="https://cdn.akamai.steamstatic.com/steam/apps/431960/library_600x900.jpg" alt="Wallpaper Engine" class="egs-mini-thumb" />
                             <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Wallpaper Engine") ? "is-active text-[#0078f2]" : "")"
@@ -198,14 +210,17 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag text-emerald-400">Lập trình & Tiện ích</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-purple-600/90 text-white border border-purple-400/30">💻 APP</span>
+                                <span class="egs-mini-tag text-emerald-400">Lập trình & Tiện ích</span>
+                            </div>
                             <span class="egs-mini-title">Wallpaper Engine</span>
                             <span class="egs-mini-price">99.000 <u>đ</u></span>
                         </div>
                     </a>
 
                     @* Mini 6: Dave The Diver *@
-                    <a href="/products" class="egs-mini-card group">
+                    <a href="@($"/products?search={Uri.EscapeDataString("Dave The Diver")}")" class="egs-mini-card group">
                         <div class="egs-mini-thumb-wrap">
                             <img src="https://cdn.akamai.steamstatic.com/steam/apps/1868140/library_600x900.jpg" alt="Dave The Diver" class="egs-mini-thumb" />
                             <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Dave The Diver") ? "is-active text-[#0078f2]" : "")"
@@ -217,7 +232,10 @@
                             </button>
                         </div>
                         <div class="egs-mini-info">
-                            <span class="egs-mini-tag">Trò chơi cơ bản</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-[#0078f2]/90 text-white border border-sky-400/30">🎮 GAME</span>
+                                <span class="egs-mini-tag">Trò chơi cơ bản</span>
+                            </div>
                             <span class="egs-mini-title">Dave The Diver</span>
                             <span class="egs-mini-price">260.000 <u>đ</u></span>
                         </div>
@@ -231,7 +249,7 @@
         @* ================================================================= *@
         <section aria-label="Banner nổi bật">
             <div class="egs-full-banner-wrap">
-                <a href="/products" class="egs-full-banner egs-card-hover egs-shimmer-card">
+                <a href="@($"/products?search={Uri.EscapeDataString("HELLDIVERS™ 2")}")" class="egs-full-banner egs-card-hover egs-shimmer-card">
                     <img src="https://cdn.akamai.steamstatic.com/steam/apps/553850/library_hero.jpg" alt="HELLDIVERS™ 2" />
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent p-6 sm:p-10 flex flex-col justify-center max-w-xl">
                         <span class="text-xs uppercase tracking-widest font-extrabold text-[#0078f2] mb-1">Hiện có trên Store</span>
@@ -269,7 +287,7 @@
 
             <div class="egs-discounts-grid" id="discounts-track" style="scroll-behavior: smooth;">
                 @* Discount 1: The Witcher 3 *@
-                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("The Witcher 3: Wild Hunt")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
                         <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
                         <img src="https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg" alt="The Witcher 3: Wild Hunt" />
@@ -291,7 +309,7 @@
                 </a>
 
                 @* Discount 2: Cyberpunk 2077 *@
-                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Cyberpunk 2077")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
                         <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
                         <img src="https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg" alt="Cyberpunk 2077" />
@@ -313,7 +331,7 @@
                 </a>
 
                 @* Discount 3: Resident Evil 4 Remake *@
-                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Resident Evil 4 Remake")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
                         <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
                         <img src="https://cdn.akamai.steamstatic.com/steam/apps/2050650/library_600x900.jpg" alt="Resident Evil 4 Remake" />
@@ -335,7 +353,7 @@
                 </a>
 
                 @* Discount 4: Outward Definitive Edition *@
-                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Outward Definitive Edition")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
                         <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
                         <img src="https://cdn.akamai.steamstatic.com/steam/apps/794260/library_600x900.jpg" alt="Outward Definitive Edition" />
@@ -357,7 +375,7 @@
                 </a>
 
                 @* Discount 5: Medieval Dynasty (Exact Match with User Screenshot) *@
-                <a href="/products" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Medieval Dynasty")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
                         <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0078f2]/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-sky-400/30 pointer-events-none">🎮 GAME</span>
                         <img src="https://cdn.akamai.steamstatic.com/steam/apps/1129580/library_600x900.jpg" alt="Medieval Dynasty" />
@@ -445,9 +463,9 @@
             @* Featured Software Cards Grid *@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @* Software Card 1: Adobe Photoshop CC *@
-                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Adobe Photoshop CC")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
-                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-purple-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/30 pointer-events-none">💻 APP</span>
                         <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800" alt="Adobe Photoshop CC" class="object-cover w-full h-full" />
                         <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Adobe Photoshop CC") ? "is-active text-[#0078f2]" : "")"
                                 @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -467,9 +485,9 @@
                 </a>
 
                 @* Software Card 2: Adobe Premiere Pro *@
-                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Adobe Premiere Pro")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
-                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-purple-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/30 pointer-events-none">💻 APP</span>
                         <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800" alt="Adobe Premiere Pro" class="object-cover w-full h-full" />
                         <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Adobe Premiere Pro") ? "is-active text-[#0078f2]" : "")"
                                 @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -489,9 +507,9 @@
                 </a>
 
                 @* Software Card 3: Visual Studio Professional *@
-                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("Visual Studio Professional 2022")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
-                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-purple-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/30 pointer-events-none">💻 APP</span>
                         <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800" alt="Visual Studio Professional 2022" class="object-cover w-full h-full" />
                         <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("Visual Studio Professional 2022") ? "is-active text-[#0078f2]" : "")"
                                 @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -511,9 +529,9 @@
                 </a>
 
                 @* Software Card 4: FL Studio Producer Edition *@
-                <a href="/products?type=App" class="egs-discount-card egs-shimmer-card group">
+                <a href="@($"/products?search={Uri.EscapeDataString("FL Studio Producer Edition")}")" class="egs-discount-card egs-shimmer-card group">
                     <div class="egs-discount-poster relative" style="position: relative;">
-                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-emerald-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-emerald-400/30 pointer-events-none">💻 APP</span>
+                        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-purple-600/90 text-white text-[11px] font-black uppercase tracking-wider shadow-md backdrop-blur-sm border border-purple-400/30 pointer-events-none">💻 APP</span>
                         <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800" alt="FL Studio Producer Edition" class="object-cover w-full h-full" />
                         <button type="button" class="egs-card-bookmark @(_wishlistedTitles.Contains("FL Studio Producer Edition") ? "is-active text-[#0078f2]" : "")"
                                 @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -537,7 +555,7 @@
         @* ================================================================= *@
         @* SECTION 6: TOP 3 LISTS                                            *@
         @* ================================================================= *@
-        <section aria-label="Bảng xếp hạng game">
+        <section aria-label="Bảng xếp hạng nổi bật">
             <div class="egs-lists-row">
                 @* Column 1: Coming Soon *@
                 <div class="egs-list-col">
@@ -549,7 +567,7 @@
                     </a>
 
                     <div class="egs-list-col-items">
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Monster Hunter Wilds")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/2246340/library_600x900.jpg" alt="Monster Hunter Wilds" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Monster Hunter Wilds") ? "is-active text-[#0078f2]" : "")"
@@ -567,7 +585,7 @@
                         </a>
 
                         @* Graveyard Keeper 2 (Exact Match from User Screenshot Image 1) *@
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Graveyard Keeper 2")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/599140/library_600x900.jpg" alt="Graveyard Keeper 2" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Graveyard Keeper 2") ? "is-active text-[#0078f2]" : "")"
@@ -584,7 +602,7 @@
                             </div>
                         </a>
 
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Dragon Age: The Veilguard")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/1845910/library_600x900.jpg" alt="Dragon Age: The Veilguard" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Dragon Age: The Veilguard") ? "is-active text-[#0078f2]" : "")"
@@ -613,7 +631,7 @@
                     </a>
 
                     <div class="egs-list-col-items">
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Black Myth: Wukong")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/2358720/library_600x900.jpg" alt="Black Myth: Wukong" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Black Myth: Wukong") ? "is-active text-[#0078f2]" : "")"
@@ -630,7 +648,7 @@
                             </div>
                         </a>
 
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Silent Hill 2")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/2124490/library_600x900.jpg" alt="Silent Hill 2" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Silent Hill 2") ? "is-active text-[#0078f2]" : "")"
@@ -647,7 +665,7 @@
                             </div>
                         </a>
 
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Hogwarts Legacy")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/990080/library_600x900.jpg" alt="Hogwarts Legacy" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Hogwarts Legacy") ? "is-active text-[#0078f2]" : "")"
@@ -676,7 +694,7 @@
                     </a>
 
                     <div class="egs-list-col-items">
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("EA SPORTS FC™ 25")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/2669320/library_600x900.jpg" alt="EA SPORTS FC 25" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("EA SPORTS FC™ 25") ? "is-active text-[#0078f2]" : "")"
@@ -693,7 +711,7 @@
                             </div>
                         </a>
 
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("God of War Ragnarök")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/2322010/library_600x900.jpg" alt="God of War Ragnarök" class="egs-list-item-thumb" />
                                 <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("God of War Ragnarök") ? "is-active text-[#0078f2]" : "")"
@@ -710,15 +728,15 @@
                             </div>
                         </a>
 
-                        <a href="/products" class="egs-list-item group">
+                        <a href="@($"/products?search={Uri.EscapeDataString("Baldur's Gate 3")}")" class="egs-list-item group">
                             <div class="egs-list-thumb-wrap relative flex-shrink-0" style="position: relative;">
                                 <img src="https://cdn.akamai.steamstatic.com/steam/apps/1086940/library_600x900.jpg" alt="Baldur's Gate 3" class="egs-list-item-thumb" />
-                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Baldurs Gate 3") ? "is-active text-[#0078f2]" : "")"
+                                <button type="button" class="egs-mini-bookmark @(_wishlistedTitles.Contains("Baldur's Gate 3") ? "is-active text-[#0078f2]" : "")"
                                         @onclick:preventDefault="true" @onclick:stopPropagation="true"
-                                        @onclick='() => ToggleWishlist("Baldurs Gate 3")'
-                                        title="@(_wishlistedTitles.Contains("Baldurs Gate 3") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
+                                        @onclick="@(() => ToggleWishlist("Baldur's Gate 3"))"
+                                        title="@(_wishlistedTitles.Contains("Baldur's Gate 3") ? "Xóa khỏi danh sách ước" : "Thêm vào danh sách ước")"
                                         aria-label="Thêm vào danh sách ước">
-                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Baldurs Gate 3") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
+                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="@(_wishlistedTitles.Contains("Baldur's Gate 3") ? "currentColor" : "none")" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-4.5 7 4.5V5c0-1.1-.9-2-2-2z"/></svg>
                                 </button>
                             </div>
                             <div class="egs-list-item-info">
@@ -734,7 +752,7 @@
         @* ================================================================= *@
         @* SECTION 7: DUO BANNERS (Baldur's Gate 3 & Black Myth: Wukong)     *@
         @* ================================================================= *@
-        <section aria-label="Tựa game đề cử song hành">
+        <section aria-label="Sản phẩm đề cử song hành">
             <div class="egs-duo-grid">
                 @* Left: Baldur's Gate 3 *@
                 <div class="egs-duo-card egs-shimmer-card">
@@ -745,7 +763,7 @@
                     <p class="egs-duo-desc">
                         Tuyệt tác RPG của thập kỷ - Khám phá thế giới Forgotten Realms với hàng trăm giờ cốt truyện sâu sắc và quyết định then chốt.
                     </p>
-                    <a href="/products" class="egs-duo-btn">Mua ngay • 990.000 đ</a>
+                    <a href="@($"/products?search={Uri.EscapeDataString("Baldur's Gate 3")}")" class="egs-duo-btn">Mua ngay • 990.000 đ</a>
                 </div>
 
                 @* Right: Black Myth: Wukong *@
@@ -757,7 +775,7 @@
                     <p class="egs-duo-desc">
                         Trở thành Thiên Mệnh Nhân, dấn thân vào hành trình khám phá những huyền tích bí ẩn và đối đầu với vô số yêu ma chốn thần thoại.
                     </p>
-                    <a href="/products" class="egs-duo-btn">Mua ngay • 1.299.000 đ</a>
+                    <a href="@($"/products?search={Uri.EscapeDataString("Black Myth: Wukong")}")" class="egs-duo-btn">Mua ngay • 1.299.000 đ</a>
                 </div>
             </div>
         </section>
@@ -765,20 +783,20 @@
         @* ================================================================= *@
         @* SECTION 8: TRENDING                                               *@
         @* ================================================================= *@
-        <section aria-label="Game thịnh hành">
+        <section aria-label="Xu hướng nổi bật">
             <div class="egs-section-header" style="margin-bottom: 16px;">
                 <h2 class="egs-section-title">Xu Hướng Nổi Bật</h2>
                 <a href="/products" class="egs-outline-btn">Xem tất cả</a>
             </div>
 
             <div class="egs-trending-grid">
-                <a href="/products" class="egs-trending-card egs-card-hover">
+                <a href="@($"/products?search={Uri.EscapeDataString("Forza Horizon 5")}")" class="egs-trending-card egs-card-hover">
                     <img src="https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_616x353.jpg" alt="Forza Horizon 5" />
                 </a>
-                <a href="/products" class="egs-trending-card egs-card-hover">
+                <a href="@($"/products?search={Uri.EscapeDataString("Red Dead Redemption 2")}")" class="egs-trending-card egs-card-hover">
                     <img src="https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_616x353.jpg" alt="Red Dead Redemption 2" />
                 </a>
-                <a href="/products" class="egs-trending-card egs-card-hover">
+                <a href="@($"/products?search={Uri.EscapeDataString("Ghost of Tsushima DIRECTOR'S CUT")}")" class="egs-trending-card egs-card-hover">
                     <img src="https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_616x353.jpg" alt="Ghost of Tsushima DIRECTOR'S CUT" />
                 </a>
             </div>
@@ -799,7 +817,7 @@
             "Black Myth: Wukong",
             "Hóa thân thành Thiên Mệnh Nhân, dấn thân vào hành trình Tây Du kỳ ảo đầy thử thách và hiểm nguy.",
             "1.299.000 đ",
-            "/products"),
+            $"/products?search={Uri.EscapeDataString("Black Myth: Wukong")}"),
         new HeroSlide(
             "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_hero.jpg",
             "https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900.jpg",
@@ -807,7 +825,7 @@
             "Cyberpunk 2077: Ultimate Edition",
             "Trở thành lính đánh thuê cyberpunk V giữa thành phố Night City rực rỡ nhưng đầy hiểm họa chết chóc.",
             "990.000 đ",
-            "/products"),
+            $"/products?search={Uri.EscapeDataString("Cyberpunk 2077: Ultimate Edition")}"),
         new HeroSlide(
             "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg",
             "https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_600x900.jpg",
@@ -815,7 +833,7 @@
             "Elden Ring: Shadow of the Erdtree",
             "Bước vào Vùng Đất Bóng Tối, khám phá những bí mật chưa từng được kể cùng Thánh Kiếm Miquella.",
             "1.099.000 đ",
-            "/products"),
+            $"/products?search={Uri.EscapeDataString("Elden Ring: Shadow of the Erdtree")}"),
         new HeroSlide(
             "https://cdn.akamai.steamstatic.com/steam/apps/2215430/library_hero.jpg",
             "https://cdn.akamai.steamstatic.com/steam/apps/2215430/library_600x900.jpg",
@@ -823,7 +841,7 @@
             "Ghost of Tsushima DIRECTOR'S CUT",
             "Theo chân samurai Jin Sakai trên con đường bảo vệ quê hương đảo Tsushima khỏi quân xâm lược.",
             "1.399.000 đ",
-            "/products"),
+            $"/products?search={Uri.EscapeDataString("Ghost of Tsushima DIRECTOR'S CUT")}"),
         new HeroSlide(
             "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_hero.jpg",
             "https://cdn.akamai.steamstatic.com/steam/apps/292030/library_600x900.jpg",
@@ -831,7 +849,7 @@
             "The Witcher 3: Wild Hunt",
             "Săn lùng Đứa Trẻ Lời Nguyền trong thế giới mở kỳ ảo tàn khốc, chiến đấu với quái vật cổ xưa.",
             "165.000 đ",
-            "/products")
+            $"/products?search={Uri.EscapeDataString("The Witcher 3: Wild Hunt")}")
     };
 
     private int _heroIndex = 0;

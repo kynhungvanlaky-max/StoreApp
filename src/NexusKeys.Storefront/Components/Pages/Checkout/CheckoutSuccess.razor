@@ -4,125 +4,130 @@
 
 <PageTitle>@(_order is null ? "Xác Minh Thanh Toán" : "Thanh Toán Thành Công") — NexusKeys</PageTitle>
 
-<div class="min-h-[calc(100vh-200px)] py-12 px-4 flex flex-col items-center justify-center">
-    @* Checkout Stepper: Step 3 Completed / Active *@
-    <div class="w-full max-w-3xl mx-auto mb-8 p-4 sm:p-5 rounded-2xl bg-[#18181c] border border-white/10 shadow-lg">
-        <div class="flex items-center justify-between max-w-3xl mx-auto">
-            <!-- Step 1: Completed -->
-            <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/10">
-                    <Icon Name="HeroiconName.Check" Class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+<div class="egs-wrap">
+    <div class="egs-content">
+        @* Checkout Stepper: Step 3 Completed / Active *@
+        <div class="mb-8 p-4 sm:p-5 rounded-2xl bg-[#18181c] border border-white/10 shadow-lg">
+            <div class="flex items-center justify-between max-w-3xl mx-auto">
+                <!-- Step 1: Completed -->
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/10">
+                        <Icon Name="HeroiconName.Check" Class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase font-bold text-emerald-400 block tracking-wider">Bước 1 ✓</span>
+                        <span class="text-xs sm:text-sm font-bold text-white whitespace-nowrap">Giỏ Hàng</span>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-xs uppercase font-bold text-emerald-400 block tracking-wider">Bước 1 ✓</span>
-                    <span class="text-xs sm:text-sm font-bold text-white whitespace-nowrap">Giỏ Hàng</span>
+
+                <!-- Connector Line 1-2 -->
+                <div class="flex-1 h-[2px] mx-3 sm:mx-6 bg-emerald-500/50 rounded-full"></div>
+
+                <!-- Step 2: Completed -->
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/10">
+                        <Icon Name="HeroiconName.Check" Class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase font-bold text-emerald-400 block tracking-wider">Bước 2 ✓</span>
+                        <span class="text-xs sm:text-sm font-bold text-white whitespace-nowrap">Thanh Toán</span>
+                    </div>
+                </div>
+
+                <!-- Connector Line 2-3 -->
+                <div class="flex-1 h-[2px] mx-3 sm:mx-6 bg-emerald-500/50 rounded-full"></div>
+
+                <!-- Step 3: Completed -->
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-xs sm:text-sm shadow-md shadow-emerald-500/40 ring-4 ring-emerald-500/20">
+                        <Icon Name="HeroiconName.Check" Class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase font-bold text-emerald-400 block tracking-wider">Bước 3 ✓</span>
+                        <span class="text-xs sm:text-sm font-bold text-white whitespace-nowrap">Hoàn Tất & Nhận Key</span>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Connector Line 1-2 -->
-            <div class="flex-1 h-[2px] mx-3 sm:mx-6 bg-emerald-500/50 rounded-full"></div>
-
-            <!-- Step 2: Completed -->
-            <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/10">
-                    <Icon Name="HeroiconName.Check" Class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+        <div class="py-8 flex flex-col items-center justify-center">
+            @if (_isLoading)
+            {
+                <div class="text-center" role="status">
+                    <h1 class="sr-only">Đang xác minh thanh toán</h1>
+                    <span class="loading loading-spinner loading-lg text-[#0078f2]"></span>
+                    <p class="mt-4 text-white/60 text-sm">Đang xác minh giao dịch của bạn...</p>
                 </div>
-                <div>
-                    <span class="text-xs uppercase font-bold text-emerald-400 block tracking-wider">Bước 2 ✓</span>
-                    <span class="text-xs sm:text-sm font-bold text-white whitespace-nowrap">Thanh Toán</span>
+            }
+            else if (_order == null)
+            {
+                <div class="max-w-lg w-full bg-[#18181c] rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-white/10">
+                    <div class="w-20 h-20 bg-amber-500/15 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-amber-500/20">
+                        <Icon Name="HeroiconName.ExclamationTriangle" Class="w-10 h-10" />
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-black text-white mb-3">Chưa thể xác nhận thanh toán</h1>
+                    <p class="text-white/60 mb-8 text-sm">@_errorMessage</p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="/orders" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 flex-1 flex items-center justify-center">Kiểm Tra Đơn Hàng</a>
+                        <a href="/support" class="px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex-1 flex items-center justify-center">Liên Hệ Hỗ Trợ</a>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Connector Line 2-3 -->
-            <div class="flex-1 h-[2px] mx-3 sm:mx-6 bg-emerald-500/50 rounded-full"></div>
-
-            <!-- Step 3: Completed -->
-            <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-xs sm:text-sm shadow-md shadow-emerald-500/40 ring-4 ring-emerald-500/20">
-                    <Icon Name="HeroiconName.Check" Class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            }
+            else
+            {
+                <div class="max-w-lg w-full bg-[#18181c] rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-white/10 relative overflow-hidden">
+                    @* Decorative background glow *@
+                    <div class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-[#0078f2]/10 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-emerald-500/30">
+                            <Icon Name="HeroiconName.CheckCircle" Class="w-12 h-12 text-emerald-400" />
+                        </div>
+                        
+                        <h1 class="text-3xl font-black text-white mb-2">Thanh Toán Thành Công!</h1>
+                        <p class="text-white/60 mb-8 text-sm">Cảm ơn bạn đã mua hàng tại NexusKeys. Giao dịch đã được xác nhận và license key đã được chuyển vào thư viện.</p>
+                        
+                        <div class="bg-[#202024] rounded-2xl p-6 mb-8 border border-white/10 text-left">
+                            <h2 class="font-bold text-white mb-4 flex items-center gap-2">
+                                <Icon Name="HeroiconName.InformationCircle" Class="w-5 h-5 text-[#0078f2]" />
+                                <span>Thông tin đơn hàng</span>
+                            </h2>
+                            
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-white/60">Mã đơn hàng:</span>
+                                    <span class="text-white font-mono bg-[#18181c] px-2 py-0.5 rounded border border-white/10">#@_order.Id</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-white/60">Thời gian:</span>
+                                    <span class="text-white">@_order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <span class="text-white/60">Tổng thanh toán:</span>
+                                    <span class="text-[#0078f2] font-bold">@_order.TotalAmount.ToString("N0") đ</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-white/60">Trạng thái:</span>
+                                    <span class="text-emerald-400 font-bold">Đã hoàn thành ✓</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <a href="/profile/library" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 flex-1 flex items-center justify-center gap-2">
+                                <Icon Name="HeroiconName.BookOpen" Class="w-4 h-4" />
+                                <span>Xem Thư Viện Key</span>
+                            </a>
+                            <a href="/products" class="px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex-1 flex items-center justify-center">
+                                Tiếp Tục Mua Sắm
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-xs uppercase font-bold text-emerald-400 block tracking-wider">Bước 3 ✓</span>
-                    <span class="text-xs sm:text-sm font-bold text-white whitespace-nowrap">Hoàn Tất & Nhận Key</span>
-                </div>
-            </div>
+            }
         </div>
     </div>
-    @if (_isLoading)
-    {
-        <div class="text-center" role="status">
-            <h1 class="sr-only">Đang xác minh thanh toán</h1>
-            <span class="loading loading-spinner loading-lg text-[#0078f2]"></span>
-            <p class="mt-4 text-white/60 text-sm">Đang xác minh giao dịch của bạn...</p>
-        </div>
-    }
-    else if (_order == null)
-    {
-        <div class="max-w-lg w-full bg-[#18181c] rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-white/10">
-            <div class="w-20 h-20 bg-amber-500/15 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-amber-500/20">
-                <Icon Name="HeroiconName.ExclamationTriangle" Class="w-10 h-10" />
-            </div>
-            <h1 class="text-2xl md:text-3xl font-black text-white mb-3">Chưa thể xác nhận thanh toán</h1>
-            <p class="text-white/60 mb-8 text-sm">@_errorMessage</p>
-            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="/orders" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 flex-1 flex items-center justify-center">Kiểm Tra Đơn Hàng</a>
-                <a href="/support" class="px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex-1 flex items-center justify-center">Liên Hệ Hỗ Trợ</a>
-            </div>
-        </div>
-    }
-    else
-    {
-    <div class="max-w-lg w-full bg-[#18181c] rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-white/10 relative overflow-hidden">
-        @* Decorative background glow *@
-        <div class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-[#0078f2]/10 rounded-full blur-3xl"></div>
-        
-        <div class="relative z-10">
-            <div class="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-emerald-500/30">
-                <Icon Name="HeroiconName.CheckCircle" Class="w-12 h-12 text-emerald-400" />
-            </div>
-            
-            <h1 class="text-3xl font-black text-white mb-2">Thanh Toán Thành Công!</h1>
-            <p class="text-white/60 mb-8 text-sm">Cảm ơn bạn đã mua hàng tại NexusKeys. Giao dịch đã được xác nhận và license key đã được chuyển vào thư viện.</p>
-            
-            <div class="bg-[#202024] rounded-2xl p-6 mb-8 border border-white/10 text-left">
-                <h2 class="font-bold text-white mb-4 flex items-center gap-2">
-                    <Icon Name="HeroiconName.InformationCircle" Class="w-5 h-5 text-[#0078f2]" />
-                    <span>Thông tin đơn hàng</span>
-                </h2>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-white/60">Mã đơn hàng:</span>
-                        <span class="text-white font-mono bg-[#18181c] px-2 py-0.5 rounded border border-white/10">#@_order.Id</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-white/60">Thời gian:</span>
-                        <span class="text-white">@_order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
-                    </div>
-                    <div class="flex justify-between gap-4">
-                        <span class="text-white/60">Tổng thanh toán:</span>
-                        <span class="text-[#0078f2] font-bold">@_order.TotalAmount.ToString("N0") đ</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-white/60">Trạng thái:</span>
-                        <span class="text-emerald-400 font-bold">Đã hoàn thành ✓</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="/profile/library" class="px-6 py-3 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#0078f2]/30 flex-1 flex items-center justify-center gap-2">
-                    <Icon Name="HeroiconName.BookOpen" Class="w-4 h-4" />
-                    <span>Xem Thư Viện Key</span>
-                </a>
-                <a href="/products" class="px-6 py-3 rounded-xl bg-[#202024] hover:bg-[#28282d] border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex-1 flex items-center justify-center">
-                    Tiếp Tục Mua Sắm
-                </a>
-            </div>
-        </div>
-    </div>
-    }
 </div>
 
 @code {
