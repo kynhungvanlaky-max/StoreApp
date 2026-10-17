@@ -15,10 +15,10 @@
                     Tất cả
                 </button>
                 <button type="button" data-type="Game" onclick="filterByType('Game')" class="type-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-200/70">
-                    🎮 Trò chơi (Game)
+                    Trò chơi (Game)
                 </button>
                 <button type="button" data-type="App" onclick="filterByType('App')" class="type-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-200/70">
-                    💻 Ứng dụng (App)
+                    Ứng dụng (App)
                 </button>
             </div>
         </div>
@@ -284,8 +284,8 @@
 
             const isApp = p.type === 'App' || p.type === 'Software';
             const typeBadge = isApp
-                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 mt-1">💻 APP</span>`
-                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-300 mt-1">🎮 GAME</span>`;
+                ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 mt-1">APP</span>`
+                : `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-300 mt-1">GAME</span>`;
 
             const categoriesText = (p.categories && p.categories.length > 0)
                 ? p.categories.slice(0, 2).map(c => `<span class="inline-block bg-slate-100 text-slate-700 text-xs font-semibold px-2 py-0.5 rounded-md mr-1 mb-1 leading-normal">${escapeHtml(c)}</span>`).join('') + (p.categories.length > 2 ? `<span class="text-xs text-slate-500 font-medium">+${p.categories.length - 2}</span>` : '')

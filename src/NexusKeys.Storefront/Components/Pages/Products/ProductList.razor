@@ -20,8 +20,7 @@
                         id="tab-all-products"
                         aria-selected="@(isAllSelected ? "true" : "false")"
                         @onclick='() => SelectType(null)'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer @(isAllSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
-                    <span class="text-base">🌐</span>
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(isAllSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
                     <span>Tất cả sản phẩm</span>
                     @if (isAllSelected)
                     {
@@ -33,8 +32,7 @@
                         id="tab-game-products"
                         aria-selected="@(isGameSelected ? "true" : "false")"
                         @onclick='() => SelectType("Game")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer @(isGameSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
-                    <span class="text-base">🎮</span>
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(isGameSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
                     <span>Trò chơi (Game)</span>
                     @if (isGameSelected)
                     {
@@ -46,8 +44,7 @@
                         id="tab-app-products"
                         aria-selected="@(isAppSelected ? "true" : "false")"
                         @onclick='() => SelectType("App")'
-                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer @(isAppSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
-                    <span class="text-base">💻</span>
+                        class="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer @(isAppSelected ? "bg-gradient-to-r from-[#0078f2] to-[#005fb8] text-white shadow-[0_0_20px_rgba(0,120,242,0.45)] border border-[#4da6ff]/40 font-black scale-[1.02]" : "text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent")">
                     <span>Ứng dụng & Phần mềm</span>
                     @if (isAppSelected)
                     {
@@ -310,11 +307,11 @@
                         {
                             <div class="space-y-2 mt-2">
                                 @{
-                                    var typeOptions = new (string? Key, string Label, string Subtitle, string Icon)[]
+                                    var typeOptions = new (string? Key, string Label, string Subtitle)[]
                                     {
-                                        (null, "Tất cả sản phẩm", "Kho tổng hợp toàn bộ", "🌐"),
-                                        ("Game", "Trò chơi (Game)", "AAA & Indie bản quyền", "🎮"),
-                                        ("App", "Ứng dụng & Phần mềm", "Đồ họa, dựng phim, tiện ích", "💻")
+                                        (null, "Tất cả sản phẩm", "Kho tổng hợp toàn bộ"),
+                                        ("Game", "Trò chơi (Game)", "AAA & Indie bản quyền"),
+                                        ("App", "Ứng dụng & Phần mềm", "Đồ họa, dựng phim, tiện ích")
                                     };
                                 }
                                 @foreach (var opt in typeOptions)
@@ -337,9 +334,8 @@
                                                 }
                                             </div>
                                             <div class="flex flex-col min-w-0">
-                                                <span class="text-xs sm:text-[13px] transition-colors truncate flex items-center gap-1.5 @(isTypeSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">
-                                                    <span>@opt.Icon</span>
-                                                    <span>@opt.Label</span>
+                                                <span class="text-xs sm:text-[13px] transition-colors truncate @(isTypeSelected ? "text-white font-bold" : "text-zinc-300 group-hover:text-white font-medium")">
+                                                    @opt.Label
                                                 </span>
                                                 <span class="text-[11px] text-zinc-500 group-hover:text-zinc-400 truncate">@opt.Subtitle</span>
                                             </div>
@@ -563,11 +559,11 @@
                     </div>
                     <div class="space-y-2">
                         @{
-                            var mTypeOptions = new (string? Key, string Label, string Subtitle, string Icon)[]
+                            var mTypeOptions = new (string? Key, string Label, string Subtitle)[]
                             {
-                                (null, "Tất cả sản phẩm", "Kho tổng hợp toàn bộ", "🌐"),
-                                ("Game", "Trò chơi (Game)", "AAA & Indie bản quyền", "🎮"),
-                                ("App", "Ứng dụng & Phần mềm", "Đồ họa, dựng phim, tiện ích", "💻")
+                                (null, "Tất cả sản phẩm", "Kho tổng hợp toàn bộ"),
+                                ("Game", "Trò chơi (Game)", "AAA & Indie bản quyền"),
+                                ("App", "Ứng dụng & Phần mềm", "Đồ họa, dựng phim, tiện ích")
                             };
                         }
                         @foreach (var opt in mTypeOptions)
@@ -590,9 +586,8 @@
                                         }
                                     </div>
                                     <div class="flex flex-col min-w-0">
-                                        <span class="text-xs transition-colors truncate flex items-center gap-1.5 @(isTypeSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">
-                                            <span>@opt.Icon</span>
-                                            <span>@opt.Label</span>
+                                        <span class="text-xs transition-colors truncate @(isTypeSelected ? "text-white font-bold" : "text-zinc-300 font-medium")">
+                                            @opt.Label
                                         </span>
                                         <span class="text-[11px] text-zinc-500 truncate">@opt.Subtitle</span>
                                     </div>
@@ -886,8 +881,8 @@
 
     private string GetTypeChipLabel(string type) => type switch
     {
-        "Game" => "🎮 Loại: Trò chơi",
-        "Software" or "App" => "💻 Loại: Ứng dụng & Phần mềm",
+        "Game" => "Loại: Trò chơi",
+        "Software" or "App" => "Loại: Ứng dụng & Phần mềm",
         _ => $"Loại: {type}"
     };
 
