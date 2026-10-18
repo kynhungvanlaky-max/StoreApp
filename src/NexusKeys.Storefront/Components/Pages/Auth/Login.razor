@@ -33,6 +33,15 @@
                 <span class="text-xs font-medium">@ErrorMessage</span>
             </div>
         }
+        @if (!string.IsNullOrEmpty(InfoMessage))
+        {
+            <div class="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg flex items-center gap-2.5 text-blue-400 text-xs font-medium">
+                <svg class="w-5 h-5 shrink-0 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>@InfoMessage</span>
+            </div>
+        }
 
         @* Primary Email / Password Form *@
         <form @onsubmit="HandleLogin" @onsubmit:preventDefault="true" class="space-y-4">
@@ -102,7 +111,7 @@
 
         <div class="egs-auth-grid-3 mb-6">
             @* PlayStation Network *@
-            <button type="button" @onclick='() => DemoLogin("playstation")' class="egs-auth-tile group" title="PlayStation Network">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("PlayStation Network")' class="egs-auth-tile group" title="PlayStation Network">
                 <svg class="w-5 h-5 text-[#0070d1] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8.91 2.22c-1.89.51-3.1 1.7-3.1 3.25 0 2.27 2.45 2.87 5.17 2.94v1.89c-3.79-.15-7.46-1.14-7.46-4.57 0-3.32 3.65-4.87 7.46-5.18v1.67zm12.57 11.23c-1.14-.92-2.73-1.42-4.63-1.42-2.88 0-5.78 1.15-5.78 3.55 0 2.29 2.59 2.87 5.48 2.87 1.83 0 3.4-.33 4.54-1.02l.39 1.35c-1.39.77-3.23 1.17-5.04 1.17-4.47 0-7.39-1.57-7.39-4.51 0-3.52 3.8-4.99 7.8-4.99 2.15 0 3.96.44 5.25 1.3l-.62 1.7zm-8.83 2.06c0-1.86-1.54-2.52-3.87-2.67l-2.06-.13v4.61l2.06-.16c2.34-.18 3.87-.79 3.87-1.65z"/>
                 </svg>
@@ -110,7 +119,7 @@
             </button>
 
             @* Xbox Network *@
-            <button type="button" @onclick='() => DemoLogin("xbox")' class="egs-auth-tile group" title="Xbox network">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("Xbox network")' class="egs-auth-tile group" title="Xbox network">
                 <svg class="w-5 h-5 text-[#107c10] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-4.3 4.2c1.37-1.09 3.09-1.74 4.96-1.74 1.87 0 3.59.65 4.96 1.74-1.28 1.25-2.85 3.32-4.04 5.6-1.19-2.28-2.76-4.35-4.04-5.6zM4.37 9.17c1.76.67 3.84 2.23 5.49 4.67-2.09 2.37-4.14 3.73-5.32 4.09C3.62 16.29 3 14.22 3 12c0-1.02.13-2 .37-2.83zm15.26 0c.24.83.37 1.81.37 2.83 0 2.22-.62 4.29-1.54 5.93-1.18-.36-3.23-1.72-5.32-4.09 1.65-2.44 3.73-4 5.49-4.67zM7.22 19.33c1.61-.74 3.65-2.52 5.08-4.95 1.43 2.43 3.47 4.21 5.08 4.95-1.57.85-3.38 1.34-5.31 1.34s-3.74-.49-5.31-1.34z"/>
                 </svg>
@@ -118,7 +127,7 @@
             </button>
 
             @* Nintendo Account *@
-            <button type="button" @onclick='() => DemoLogin("nintendo")' class="egs-auth-tile group" title="Nintendo Account">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("Nintendo Account")' class="egs-auth-tile group" title="Nintendo Account">
                 <svg class="w-5 h-5 text-[#e60012] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.8 15.6H7.8V6.4h2.4v11.2zm5.6 0h-2.4V6.4h2.4v11.2z"/>
                 </svg>
@@ -142,7 +151,7 @@
             </button>
 
             @* Steam SSO *@
-            <button type="button" @onclick='() => DemoLogin("steam")' class="egs-auth-tile group" title="Steam">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("Steam")' class="egs-auth-tile group" title="Steam">
                 <svg class="w-5 h-5 text-white mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12c0 4.28 2.7 7.93 6.52 9.34l3.35-4.89a3.63 3.63 0 011.63.14l2.42-3.48a4.7 4.7 0 11-1.33-.94l-2.45 3.52c-.67-.2-1.38-.2-2.04 0L8.2 13.3c.03-.43.15-.84.34-1.22 1.37-2.73 4.7-3.83 7.43-2.46s3.83 4.7 2.46 7.43a5.53 5.53 0 01-4.7 3.04c-.65 0-1.29-.11-1.89-.34l-3.32 4.84C9.56 24.84 10.76 25 12 25c6.63 0 12-5.37 12-12S18.63 2 12 2z"/>
                 </svg>
@@ -150,7 +159,7 @@
             </button>
 
             @* Apple SSO *@
-            <button type="button" @onclick='() => DemoLogin("apple")' class="egs-auth-tile group" title="Đăng nhập bằng Apple">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("Apple")' class="egs-auth-tile group" title="Đăng nhập bằng Apple">
                 <svg class="w-5 h-5 text-white mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.72-.93 2.74 1.01.08 2.02-.49 2.64-1.24z"/>
                 </svg>
@@ -160,7 +169,7 @@
 
         <div class="egs-auth-grid-2">
             @* Facebook SSO *@
-            <button type="button" @onclick='() => DemoLogin("facebook")' class="egs-auth-tile group" title="Facebook">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("Facebook")' class="egs-auth-tile group" title="Facebook">
                 <svg class="w-5 h-5 text-[#1877f2] mb-1 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
@@ -168,7 +177,7 @@
             </button>
 
             @* LEGO SSO *@
-            <button type="button" @onclick='() => DemoLogin("lego")' class="egs-auth-tile group" title="LEGO Account">
+            <button type="button" @onclick='() => NotifyProviderInDevelopment("LEGO Account")' class="egs-auth-tile group" title="LEGO Account">
                 <span class="w-6 h-6 rounded bg-[#e3000b] text-[#ffe600] font-black text-xs flex items-center justify-center mb-1 group-hover:scale-110 transition-transform tracking-tighter">LEGO</span>
                 <span class="text-xs font-semibold text-white/90">LEGO® Account</span>
             </button>
@@ -191,6 +200,7 @@
     private bool IsLoading = false;
     private bool _showPassword = false;
     private string? ErrorMessage;
+    private string? InfoMessage;
 
     [SupplyParameterFromQuery(Name = "returnUrl")]
     public string? ReturnUrl { get; set; }
@@ -222,20 +232,30 @@
         _showPassword = !_showPassword;
     }
 
+    private void NotifyProviderInDevelopment(string provider)
+    {
+        ErrorMessage = null;
+        InfoMessage = $"Phương thức đăng nhập qua {provider} đang được phát triển. Vui lòng đăng nhập bằng email.";
+        StateHasChanged();
+    }
+
     private async Task TriggerGoogleLogin()
     {
+        ErrorMessage = null;
+        InfoMessage = null;
         try
         {
             var started = await JSRuntime.InvokeAsync<bool>("googleAuthInterop.prompt");
             if (!started)
             {
-                // Fallback to demo Google login if client ID is unconfigured in development
-                await DemoLogin("Google");
+                ErrorMessage = "Đăng nhập Google chưa khả dụng trên môi trường này. Vui lòng đăng nhập bằng email.";
+                StateHasChanged();
             }
         }
         catch
         {
-            await DemoLogin("Google");
+            ErrorMessage = "Không thể khởi động cổng đăng nhập Google. Vui lòng đăng nhập bằng email.";
+            StateHasChanged();
         }
     }
 
@@ -244,6 +264,7 @@
     {
         IsLoading = true;
         ErrorMessage = null;
+        InfoMessage = null;
         StateHasChanged();
 
         var success = await AuthViewModel.HandleExternalLoginAsync("Google", credential);
@@ -259,27 +280,6 @@
         }
     }
 
-    private async Task DemoLogin(string provider)
-    {
-        IsLoading = true;
-        ErrorMessage = null;
-        StateHasChanged();
-
-        // Convenience demo login for quick tester access
-        var demoReq = new LoginRequest { Email = "admin@gamestore.com", Password = "Password123!" };
-        var success = await AuthViewModel.LoginAsync(demoReq);
-        if (success)
-        {
-            NavigationManager.NavigateTo(GetSafeReturnUrl());
-        }
-        else
-        {
-            ErrorMessage = $"Không thể kết nối cổng xác thực {provider}. Vui lòng thử đăng nhập bằng email.";
-            IsLoading = false;
-            StateHasChanged();
-        }
-    }
-
     private async Task HandleLogin()
     {
         if (string.IsNullOrWhiteSpace(LoginRequest.Email) || string.IsNullOrWhiteSpace(LoginRequest.Password))
@@ -290,6 +290,7 @@
 
         IsLoading = true;
         ErrorMessage = null;
+        InfoMessage = null;
         
         var success = await AuthViewModel.LoginAsync(LoginRequest);
         if (success)

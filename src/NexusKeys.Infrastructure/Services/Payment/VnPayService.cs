@@ -109,7 +109,9 @@ namespace GameStore.API.Services.Payment
             }
 
             var checkHash = HmacSHA512(hashSecret, queryString);
-            return checkHash.Equals(vnp_SecureHash, StringComparison.InvariantCultureIgnoreCase);
+            var expectedBytes = Encoding.UTF8.GetBytes(checkHash.ToLowerInvariant());
+            var actualBytes = Encoding.UTF8.GetBytes((vnp_SecureHash ?? string.Empty).ToLowerInvariant());
+            return CryptographicOperations.FixedTimeEquals(expectedBytes, actualBytes);
         }
 
         private string HmacSHA512(string key, string inputData)

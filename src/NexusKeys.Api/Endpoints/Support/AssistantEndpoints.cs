@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -53,8 +54,8 @@ namespace GameStore.API.Endpoints
                 IHttpClientFactory httpClientFactory,
                 ILoggerFactory loggerFactory) =>
             {
-                if (string.IsNullOrWhiteSpace(req.Message))
-                    return Results.BadRequest("Message is required");
+                if (string.IsNullOrWhiteSpace(req.Message) || req.Message.Length > 500)
+                    return Results.BadRequest(new { message = "Tin nhắn không được để trống và không vượt quá 500 ký tự." });
 
                 var logger = loggerFactory.CreateLogger("AssistantEndpoint");
 
@@ -230,12 +231,13 @@ NHIỆM VỤ CỦA BẠN:
                     reply = "Xin chào! Hiện tại hệ thống AI đang nâng cấp hoặc chưa được cấu hình API Key. Bạn có thể duyệt các tựa game hot trên trang chủ NexusKeys hoặc liên hệ đội ngũ hỗ trợ bất cứ lúc nào nhé! 🎮",
                     provider = "Fallback"
                 });
-            });
+            }).RequireRateLimiting("chat");
 
             // ==========================================
             // 2. ADMIN CONFIGURATION ENDPOINTS
             // ==========================================
-            var adminGroup = group.RequireAuthorization(policy => policy.RequireRole("Administrator"));
+            var adminGroup = app.MapGroup($"{apiPrefix}/assistant")
+                .RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
             // GET Configurations
             adminGroup.MapGet("/configurations", async (GameStoreDbContext db, IConfiguration config) =>
@@ -246,11 +248,16 @@ NHIỆM VỤ CỦA BẠN:
                 string GetMerged(string key, string fallback) =>
                     dbDict.TryGetValue(key, out var v) && !string.IsNullOrWhiteSpace(v) ? v : (config[key] ?? fallback);
 
+                var rawApiKey = GetMerged("AiAssistant:Gemini:ApiKey", "");
+                var maskedApiKey = !string.IsNullOrEmpty(rawApiKey) && rawApiKey.Length > 4
+                    ? new string('*', Math.Max(4, rawApiKey.Length - 4)) + rawApiKey[^4..]
+                    : rawApiKey;
+
                 var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["AiAssistant:IsEnabled"] = GetMerged("AiAssistant:IsEnabled", "true"),
                     ["AiAssistant:Provider"] = GetMerged("AiAssistant:Provider", "Auto"),
-                    ["AiAssistant:Gemini:ApiKey"] = GetMerged("AiAssistant:Gemini:ApiKey", ""),
+                    ["AiAssistant:Gemini:ApiKey"] = maskedApiKey,
                     ["AiAssistant:Gemini:Model"] = GetMerged("AiAssistant:Gemini:Model", "gemini-3.6-flash"),
                     ["AiAssistant:Gemini:Temperature"] = GetMerged("AiAssistant:Gemini:Temperature", "0.7"),
                     ["AiAssistant:Gemini:MaxTokens"] = GetMerged("AiAssistant:Gemini:MaxTokens", "2048"),
@@ -280,6 +287,19 @@ NHIỆM VỤ CỦA BẠN:
                 foreach (var dto in req)
                 {
                     if (string.IsNullOrWhiteSpace(dto.ConfigKey)) continue;
+
+                    if (dto.ConfigKey.Equals("AiAssistant:Ollama:BaseUrl", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(dto.ConfigValue))
+                    {
+                        if (IsForbiddenSsrfUrl(dto.ConfigValue, out var ssrfError))
+                        {
+                            return Results.BadRequest(new { message = ssrfError ?? "URL Ollama không hợp lệ hoặc thuộc dải mạng bị cấm." });
+                        }
+                    }
+
+                    if (dto.ConfigKey.Equals("AiAssistant:Gemini:ApiKey", StringComparison.OrdinalIgnoreCase) && (dto.ConfigValue?.Contains("****") == true))
+                    {
+                        continue;
+                    }
 
                     var entity = await db.AiAssistantConfigs
                         .FirstOrDefaultAsync(c => c.ConfigKey == dto.ConfigKey);
@@ -380,6 +400,11 @@ NHIỆM VỤ CỦA BẠN:
                     try
                     {
                         var baseUrl = !string.IsNullOrWhiteSpace(req.OllamaBaseUrl) ? req.OllamaBaseUrl : "http://localhost:11434";
+                        if (IsForbiddenSsrfUrl(baseUrl, out var ssrfError))
+                        {
+                            return Results.BadRequest(new { success = false, message = ssrfError ?? "Địa chỉ đích bị cấm truy cập." });
+                        }
+
                         var model = !string.IsNullOrWhiteSpace(req.OllamaModel) ? req.OllamaModel : "qwen2.5:0.5b";
 
                         var client = httpClientFactory.CreateClient();
@@ -435,6 +460,77 @@ NHIỆM VỤ CỦA BẠN:
                     latencyMs = sw.ElapsedMilliseconds
                 });
             });
+        }
+
+        private static bool IsForbiddenSsrfUrl(string url, out string? errorMessage)
+        {
+            errorMessage = null;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var parsedUri) ||
+                (parsedUri.Scheme != Uri.UriSchemeHttp && parsedUri.Scheme != Uri.UriSchemeHttps))
+            {
+                errorMessage = "URL không hợp lệ. Chỉ chấp nhận giao thức http hoặc https.";
+                return true;
+            }
+
+            var host = parsedUri.Host.ToLowerInvariant();
+
+            // Cloud metadata endpoints
+            if (host == "169.254.169.254" || host.StartsWith("169.254.") ||
+                host == "metadata.google.internal" || host.EndsWith(".metadata.google.internal") ||
+                host == "metadata.azure.internal" || host == "instance-data")
+            {
+                errorMessage = "Địa chỉ đích bị cấm truy cập (Cloud Metadata).";
+                return true;
+            }
+
+            // IP address checks
+            if (IPAddress.TryParse(host, out var ip))
+            {
+                if (ip.IsIPv4MappedToIPv6)
+                {
+                    ip = ip.MapToIPv4();
+                }
+
+                var bytes = ip.GetAddressBytes();
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    // 10.0.0.0/8
+                    if (bytes[0] == 10)
+                    {
+                        errorMessage = "Địa chỉ IP mạng nội bộ (10.x.x.x) bị cấm truy cập.";
+                        return true;
+                    }
+                    // 172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
+                    if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
+                    {
+                        errorMessage = "Địa chỉ IP mạng nội bộ (172.16-31.x.x) bị cấm truy cập.";
+                        return true;
+                    }
+                    // 192.168.0.0/16
+                    if (bytes[0] == 192 && bytes[1] == 168)
+                    {
+                        errorMessage = "Địa chỉ IP mạng nội bộ (192.168.x.x) bị cấm truy cập.";
+                        return true;
+                    }
+                    // 169.254.0.0/16 (Link-local)
+                    if (bytes[0] == 169 && bytes[1] == 254)
+                    {
+                        errorMessage = "Địa chỉ IP link-local bị cấm truy cập.";
+                        return true;
+                    }
+                }
+                else if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                {
+                    // fe80::/10 (link-local), fc00::/7 (unique local)
+                    if (ip.IsIPv6LinkLocal || (bytes[0] & 0xfe) == 0xfc)
+                    {
+                        errorMessage = "Địa chỉ IPv6 mạng nội bộ bị cấm truy cập.";
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

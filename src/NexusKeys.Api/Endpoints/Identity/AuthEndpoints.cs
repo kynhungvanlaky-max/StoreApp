@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +70,7 @@ namespace GameStore.API.Endpoints
                 await db.SaveChangesAsync(ct);
 
                 return Results.Created($"{EndpointRouteConventions.PublicPrefix(apiPrefix)}/users/{user.Id}", new { user.Id, message = "Đăng ký thành công!" });
-            });
+            }).RequireRateLimiting("auth");
 
             // LOGIN
             group.MapPost("/login", async (
@@ -135,7 +136,7 @@ namespace GameStore.API.Endpoints
                 var tokenService = ResolveTokenService(sp, db, config);
                 var authResponse = await tokenService.IssueTokensAsync(user, ct);
                 return Results.Ok(authResponse);
-            });
+            }).RequireRateLimiting("auth");
 
             // REFRESH TOKEN
             group.MapPost("/refresh", async (
@@ -204,8 +205,17 @@ namespace GameStore.API.Endpoints
                 if (user == null)
                     return Results.Ok(new { message = "Nếu email tồn tại, một liên kết khôi phục sẽ được gửi." });
 
-                // Tạo token reset password (hết hạn sau 1 giờ)
-                var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("=", "").Replace("+", "").Replace("/", "");
+                // Vô hiệu hóa các token chưa dùng trước đó của user
+                var oldTokens = await db.PasswordResetTokens
+                    .Where(t => t.UserId == user.Id && !t.IsUsed && t.ExpiresAt > DateTime.UtcNow)
+                    .ToListAsync();
+                foreach (var old in oldTokens)
+                {
+                    old.IsUsed = true;
+                }
+
+                // Tạo token reset password CSPRNG (hết hạn sau 1 giờ)
+                var token = Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(32));
                 var resetToken = new PasswordResetToken
                 {
                     UserId = user.Id,
@@ -214,7 +224,7 @@ namespace GameStore.API.Endpoints
                     ExpiresAt = DateTime.UtcNow.AddHours(1),
                     IsUsed = false
                 };
-                db.Set<PasswordResetToken>().Add(resetToken);
+                db.PasswordResetTokens.Add(resetToken);
                 await db.SaveChangesAsync();
 
                 // Gửi email reset password
@@ -238,7 +248,7 @@ namespace GameStore.API.Endpoints
                 }
                 
                 return Results.Ok(new { message = "Nếu email tồn tại, một liên kết khôi phục sẽ được gửi." });
-            });
+            }).RequireRateLimiting("auth");
 
             // RESET PASSWORD
             group.MapPost("/reset-password", async (
@@ -248,7 +258,7 @@ namespace GameStore.API.Endpoints
                 IServiceProvider sp,
                 CancellationToken ct) =>
             {
-                var resetToken = await db.Set<PasswordResetToken>()
+                var resetToken = await db.PasswordResetTokens
                     .Include(rt => rt.User)
                     .FirstOrDefaultAsync(rt => rt.Token == req.Token && !rt.IsUsed && rt.ExpiresAt > DateTime.UtcNow, ct);
 
@@ -268,13 +278,14 @@ namespace GameStore.API.Endpoints
                 await tokenService.RevokeUserTokensAsync(resetToken.UserId, ct);
 
                 return Results.Ok(new { message = "Mật khẩu đã được thay đổi thành công." });
-            });
+            }).RequireRateLimiting("auth");
 
             // EXTERNAL LOGIN (Google / Facebook MOCK & REAL)
             group.MapPost("/external-login", async (
                 ExternalLoginRequest req,
                 GameStoreDbContext db,
                 IConfiguration config,
+                IWebHostEnvironment env,
                 IServiceProvider sp,
                 CancellationToken ct) =>
             {
@@ -282,14 +293,32 @@ namespace GameStore.API.Endpoints
                 string name = "";
                 string googleId = "";
 
-                if (req.Provider.Equals("Google", StringComparison.OrdinalIgnoreCase))
+                if (!req.Provider.Equals("Google", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!env.IsDevelopment())
+                        return Results.BadRequest(new { message = "Nhà cung cấp xác thực chưa được hỗ trợ." });
+
+                    email = $"{req.Provider.ToLowerInvariant()}_user@example.com";
+                    name = $"{req.Provider} User";
+                }
+                else
                 {
                     try
                     {
+                        var googleClientId = config["Authentication:Google:ClientId"];
+                        var settings = new Google.Apis.Auth.GoogleJsonWebSignature.ValidationSettings();
+                        if (!string.IsNullOrWhiteSpace(googleClientId))
+                        {
+                            settings.Audience = new[] { googleClientId };
+                        }
+
                         if (req.AccessToken.StartsWith("ey"))
                         {
                             // Validate Google ID Token
-                            var payload = await Google.Apis.Auth.GoogleJsonWebSignature.ValidateAsync(req.AccessToken);
+                            var payload = await Google.Apis.Auth.GoogleJsonWebSignature.ValidateAsync(req.AccessToken, settings);
+                            if (!payload.EmailVerified)
+                                return Results.BadRequest(new { message = "Email Google chưa được xác minh." });
+
                             email = payload.Email;
                             name = payload.Name;
                             googleId = payload.Subject;
@@ -304,6 +333,10 @@ namespace GameStore.API.Endpoints
                             {
                                 var content = await response.Content.ReadAsStringAsync(ct);
                                 var jsonDoc = System.Text.Json.JsonDocument.Parse(content);
+                                var emailVerified = jsonDoc.RootElement.TryGetProperty("email_verified", out var evProp) && evProp.GetBoolean();
+                                if (!emailVerified)
+                                    return Results.BadRequest(new { message = "Email Google chưa được xác minh." });
+
                                 email = jsonDoc.RootElement.GetProperty("email").GetString() ?? "";
                                 name = jsonDoc.RootElement.GetProperty("name").GetString() ?? "";
                                 if (jsonDoc.RootElement.TryGetProperty("sub", out var subProp))
@@ -321,21 +354,16 @@ namespace GameStore.API.Endpoints
                     catch (Exception ex)
                     {
                         Console.WriteLine($"[OAUTH] Real Google Validation failed: {ex.Message}");
-                        if (req.AccessToken.StartsWith("MOCK_"))
+                        if (env.IsDevelopment() && req.AccessToken.StartsWith("MOCK_", StringComparison.Ordinal))
                         {
                             email = "google_user@example.com";
                             name = "Google User (Mock)";
                         }
                         else
                         {
-                            return Results.BadRequest("Xác thực Google thất bại: " + ex.Message);
+                            return Results.BadRequest(new { message = "Xác thực Google thất bại." });
                         }
                     }
-                }
-                else
-                {
-                    email = $"{req.Provider.ToLower()}_user@example.com";
-                    name = $"{req.Provider} User";
                 }
 
                 var user = await db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email, ct);

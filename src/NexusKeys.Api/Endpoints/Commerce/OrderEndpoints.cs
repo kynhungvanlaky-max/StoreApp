@@ -138,7 +138,7 @@ namespace GameStore.API.Endpoints
 
             // CHECKOUT: Tạo Order trạng thái Pending và trả về Payment URL
             var checkoutGroup = isV1 ? app.MapGroup(apiPrefix) : group;
-            checkoutGroup.MapPost(isV1 ? "/checkouts" : "/checkout", async (CheckoutRequest req, HttpContext httpContext, GameStoreDbContext db, ClaimsPrincipal userClaim, VnPayService vnPayService, MoMoService moMoService, IEmailService emailService) =>
+            checkoutGroup.MapPost(isV1 ? "/checkouts" : "/checkout", async (CheckoutRequest req, HttpContext httpContext, GameStoreDbContext db, ClaimsPrincipal userClaim, VnPayService vnPayService, MoMoService moMoService, IEmailService emailService, IWebHostEnvironment env) =>
             {
                 if (req.ProductIds == null || !req.ProductIds.Any())
                     return Results.BadRequest("Giỏ hàng trống.");
@@ -232,23 +232,28 @@ namespace GameStore.API.Endpoints
                         string paymentUrl = string.Empty;
                         var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
 
-                        if (req.PaymentMethod == "VNPay")
+                        if (string.Equals(req.PaymentMethod, "VNPay", StringComparison.OrdinalIgnoreCase))
                         {
                             paymentUrl = vnPayService.CreatePaymentUrl(order.Id, totalAmount, ipAddress);
                         }
-                        else if (req.PaymentMethod == "MoMo")
+                        else if (string.Equals(req.PaymentMethod, "MoMo", StringComparison.OrdinalIgnoreCase))
                         {
                             paymentUrl = await moMoService.CreatePaymentUrlAsync(order.Id, totalAmount, "Thanh toan game");
                         }
-                        else
+                        else if (env.IsDevelopment() && string.Equals(req.PaymentMethod, "MockGateway", StringComparison.OrdinalIgnoreCase))
                         {
-                            // MockGateway: complete immediately
+                            // MockGateway: complete immediately (development only)
                             await CompleteOrder(order, db, userId.Value, req.ProductIds, "MockGateway", Guid.NewGuid().ToString(), coupon, emailService, userClaim.FindFirst(ClaimTypes.Email)?.Value ?? "");
                             await transaction.CommitAsync();
                             var completedResponse = new { message = "Thanh toán thành công!", orderId = order.Id, paymentUrl = "" };
                             return isV1
                                 ? Results.Created($"{EndpointRouteConventions.PublicPrefix(apiPrefix)}/orders/{order.Id}", completedResponse)
                                 : Results.Ok(completedResponse);
+                        }
+                        else
+                        {
+                            await transaction.RollbackAsync();
+                            return Results.BadRequest(new { message = "Phương thức thanh toán không hợp lệ." });
                         }
 
                         await transaction.CommitAsync();
@@ -267,7 +272,7 @@ namespace GameStore.API.Endpoints
 
             // Re-create a payment URL for an existing pending order. This does
             // not create a second order or reserve additional product keys.
-            group.MapPost(isV1 ? "/{id:int}/payment-attempts" : "/{id:int}/payment", async (int id, RetryPaymentRequest req, HttpContext httpContext, GameStoreDbContext db, ClaimsPrincipal userClaim, VnPayService vnPayService, MoMoService moMoService, IEmailService emailService) =>
+            group.MapPost(isV1 ? "/{id:int}/payment-attempts" : "/{id:int}/payment", async (int id, RetryPaymentRequest req, HttpContext httpContext, GameStoreDbContext db, ClaimsPrincipal userClaim, VnPayService vnPayService, MoMoService moMoService, IEmailService emailService, IWebHostEnvironment env) =>
             {
                 var userId = userClaim.GetUserId();
                 if (userId == null) return Results.Unauthorized();
@@ -303,7 +308,7 @@ namespace GameStore.API.Endpoints
                 {
                     paymentUrl = await moMoService.CreatePaymentUrlAsync(order.Id, order.TotalAmount, "Thanh toan game");
                 }
-                else if (string.Equals(paymentMethod, "MockGateway", StringComparison.OrdinalIgnoreCase) || string.Equals(paymentMethod, "Mock", StringComparison.OrdinalIgnoreCase))
+                else if (env.IsDevelopment() && (string.Equals(paymentMethod, "MockGateway", StringComparison.OrdinalIgnoreCase) || string.Equals(paymentMethod, "Mock", StringComparison.OrdinalIgnoreCase)))
                 {
                     var productIds = order.OrderItems.Select(oi => oi.ProductId).ToList();
                     Coupon? coupon = null;
@@ -339,6 +344,14 @@ namespace GameStore.API.Endpoints
                     var order = await db.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == orderId);
                     if (order != null && order.Status == "Pending")
                     {
+                        if (!long.TryParse(query["vnp_Amount"], out var vnpAmount) || vnpAmount != (long)(order.TotalAmount * 100))
+                        {
+                            order.Status = "Failed";
+                            await db.SaveChangesAsync();
+                            var frontend = httpContext.RequestServices.GetRequiredService<IConfiguration>()["AppSettings:FrontendBaseUrl"] ?? "http://localhost:5205";
+                            return Results.Redirect($"{frontend}/cart?error=amount_mismatch");
+                        }
+
                         if (vnp_ResponseCode == "00")
                         {
                             var productIds = order.OrderItems.Select(oi => oi.ProductId).ToList();
@@ -378,6 +391,11 @@ namespace GameStore.API.Endpoints
                     var order = await db.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == dbOrderId);
                     if (order != null && order.Status == "Pending")
                     {
+                        if (req.amount != (long)order.TotalAmount)
+                        {
+                            return Results.BadRequest(new { message = "Amount mismatch" });
+                        }
+
                         if (req.resultCode == 0)
                         {
                             var productIds = order.OrderItems.Select(oi => oi.ProductId).ToList();
@@ -567,6 +585,13 @@ namespace GameStore.API.Endpoints
                 return Results.Redirect($"{GetFrontendUrl(httpContext)}/checkout/success?orderId={orderId}");
             }
 
+            if (!long.TryParse(query["vnp_Amount"], out var vnpAmount) || vnpAmount != (long)(order.TotalAmount * 100))
+            {
+                order.Status = "Failed";
+                await db.SaveChangesAsync();
+                return Results.Redirect($"{GetFrontendUrl(httpContext)}/cart?error=amount_mismatch");
+            }
+
             if (!string.Equals(order.Status, "Pending", StringComparison.OrdinalIgnoreCase) || responseCode != "00")
             {
                 order.Status = "Failed";
@@ -649,6 +674,13 @@ namespace GameStore.API.Endpoints
                 return Results.Problem(
                     statusCode: StatusCodes.Status409Conflict,
                     title: "Order is not pending");
+            }
+
+            if (request.amount != (long)order.TotalAmount)
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Amount mismatch");
             }
 
             if (request.resultCode != 0)

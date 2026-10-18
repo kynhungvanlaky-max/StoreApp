@@ -91,6 +91,8 @@ namespace GameStore.API.Endpoints
                 return Results.Ok(article);
             });
 
+            var sanitizer = new Ganss.Xss.HtmlSanitizer();
+
             group.MapPost("/", async (CreateNewsDto dto, HttpContext httpContext, GameStoreDbContext db) =>
             {
                 var authorId = httpContext.User.GetUserId() ?? 1;
@@ -104,7 +106,7 @@ namespace GameStore.API.Endpoints
                 {
                     Title = dto.Title,
                     Summary = dto.Summary,
-                    Content = dto.Content,
+                    Content = sanitizer.Sanitize(dto.Content ?? string.Empty),
                     CoverImageUrl = dto.CoverImageUrl,
                     IsPublished = true,
                     PublishedAt = DateTime.UtcNow,
@@ -125,7 +127,7 @@ namespace GameStore.API.Endpoints
 
                 news.Title = dto.Title;
                 news.Summary = dto.Summary;
-                news.Content = dto.Content;
+                news.Content = sanitizer.Sanitize(dto.Content ?? string.Empty);
                 news.CoverImageUrl = dto.CoverImageUrl;
 
                 await db.SaveChangesAsync();

@@ -22,11 +22,19 @@ namespace GameStore.API.Endpoints
             var group = app.MapGroup($"{apiPrefix}/{resourceName}")
                 .RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
-            // Lấy tất cả cấu hình
+            // Lấy tất cả cấu hình (đã che thông tin nhạy cảm)
             group.MapGet("/", async (HttpContext httpContext, GameStoreDbContext db) =>
             {
-                var configs = await db.PaymentGatewayConfigs.ToListAsync();
-                return Results.Ok(configs);
+                var configs = await db.PaymentGatewayConfigs.AsNoTracking().ToListAsync();
+                var masked = configs.Select(c => new PaymentGatewayConfig
+                {
+                    Id = c.Id,
+                    GatewayName = c.GatewayName,
+                    ConfigKey = c.ConfigKey,
+                    ConfigValue = MaskValue(c.ConfigKey, c.ConfigValue),
+                    UpdatedAt = c.UpdatedAt
+                }).ToList();
+                return Results.Ok(masked);
             });
 
             // Cập nhật cấu hình
@@ -34,6 +42,12 @@ namespace GameStore.API.Endpoints
             {
                 foreach (var dto in req)
                 {
+                    if (dto.ConfigValue.Contains("****"))
+                    {
+                        // Giữ nguyên giá trị cũ nếu client gửi lên chuỗi đã che
+                        continue;
+                    }
+
                     var config = await db.PaymentGatewayConfigs
                         .FirstOrDefaultAsync(c => c.GatewayName == dto.GatewayName && c.ConfigKey == dto.ConfigKey);
                     
@@ -57,6 +71,22 @@ namespace GameStore.API.Endpoints
                 await db.SaveChangesAsync();
                 return Results.NoContent();
             });
+        }
+
+        private static bool IsSensitiveKey(string key)
+        {
+            return key.Contains("Secret", StringComparison.OrdinalIgnoreCase) ||
+                   key.Contains("Key", StringComparison.OrdinalIgnoreCase) ||
+                   key.Contains("Password", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string MaskValue(string key, string? value)
+        {
+            if (string.IsNullOrEmpty(value) || !IsSensitiveKey(key))
+                return value ?? string.Empty;
+            if (value.Length <= 4)
+                return "****";
+            return new string('*', Math.Max(4, value.Length - 4)) + value[^4..];
         }
     }
 }

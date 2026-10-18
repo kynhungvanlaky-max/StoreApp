@@ -4,7 +4,7 @@
     var antiforgeryToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
     var adminName = ViewData["AdminName"]?.ToString() ?? Context.Request.Cookies["admin_name"] ?? "Quản trị viên";
     var adminEmail = ViewData["AdminEmail"]?.ToString() ?? Context.Request.Cookies["admin_email"] ?? string.Empty;
-    var adminRole = ViewData["AdminRole"]?.ToString() ?? (Context.Items["AdminRole"] as string) ?? Backend.Extensions.JwtRoleExtractor.ExtractRole(Context.Request.Cookies["access_token"]) ?? "Administrator";
+    var adminRole = ViewData["AdminRole"]?.ToString() ?? (Context.Items["AdminRole"] as string) ?? Backend.Extensions.JwtRoleExtractor.ExtractRole(Context.Request.Cookies["access_token"]) ?? string.Empty;
     var isAdmin = string.Equals(adminRole, "Administrator", StringComparison.OrdinalIgnoreCase);
     var isDeveloper = string.Equals(adminRole, "Developer", StringComparison.OrdinalIgnoreCase);
     var isStaff = string.Equals(adminRole, "Staff", StringComparison.OrdinalIgnoreCase);

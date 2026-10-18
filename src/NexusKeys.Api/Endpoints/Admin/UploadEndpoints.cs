@@ -59,12 +59,28 @@ namespace GameStore.API.Endpoints
                             return Results.BadRequest($"Định dạng file '{extension}' không được hỗ trợ. Chỉ cho phép: {string.Join(", ", AllowedExtensions)}");
                         }
 
+                        using var readStream = file.OpenReadStream();
+                        var header = new byte[16];
+                        int bytesRead = await readStream.ReadAsync(header.AsMemory(0, 16));
+                        if (!IsValidFileSignature(header, bytesRead, extension))
+                        {
+                            return Results.BadRequest($"Nội dung file '{file.FileName}' không đúng định dạng hợp lệ.");
+                        }
+
                         var newFileName = $"{Guid.CreateVersion7()}{extension}";
                         var filePath = Path.Combine(uploadDir, newFileName);
 
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
-                            await file.CopyToAsync(stream);
+                            if (readStream.CanSeek)
+                            {
+                                readStream.Seek(0, SeekOrigin.Begin);
+                            }
+                            else
+                            {
+                                await stream.WriteAsync(header.AsMemory(0, bytesRead));
+                            }
+                            await readStream.CopyToAsync(stream);
                         }
 
                         uploadedUrls.Add($"{apiBaseUrl}/media/{newFileName}");
@@ -106,10 +122,19 @@ namespace GameStore.API.Endpoints
             {
                 var uploadDir = config["AppSettings:MediaStoragePath"] ?? Path.Combine(Directory.GetCurrentDirectory(), "..", "MediaStorage");
                 uploadDir = Path.GetFullPath(uploadDir);
-                var filePath = Path.Combine(uploadDir, fileName);
-                
+
                 // Prevent directory traversal
-                if (Path.GetFullPath(filePath) != filePath || !Path.GetFullPath(filePath).StartsWith(uploadDir))
+                var safeFileName = Path.GetFileName(fileName);
+                if (string.IsNullOrWhiteSpace(safeFileName) || safeFileName != fileName || safeFileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+                {
+                    return Results.BadRequest("Invalid file path.");
+                }
+
+                var filePath = Path.Combine(uploadDir, safeFileName);
+                var fullFilePath = Path.GetFullPath(filePath);
+                var fullUploadDir = uploadDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+                if (!fullFilePath.StartsWith(fullUploadDir, StringComparison.OrdinalIgnoreCase))
                 {
                     return Results.BadRequest("Invalid file path.");
                 }
@@ -122,6 +147,27 @@ namespace GameStore.API.Endpoints
 
                 return Results.NotFound();
             }).RequireAuthorization(policy => policy.RequireRole("Administrator", "Developer", "Staff"));
+        }
+
+        private static bool IsValidFileSignature(byte[] header, int bytesRead, string extension)
+        {
+            if (bytesRead < 4) return false;
+
+            return extension switch
+            {
+                ".jpg" or ".jpeg" => header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
+                ".png" => bytesRead >= 8 &&
+                          header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
+                          header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A,
+                ".gif" => header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38,
+                ".webp" => bytesRead >= 12 &&
+                           header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
+                           header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50,
+                ".mp4" => bytesRead >= 8 &&
+                          header[4] == 0x66 && header[5] == 0x74 && header[6] == 0x79 && header[7] == 0x70,
+                ".webm" => header[0] == 0x1A && header[1] == 0x45 && header[2] == 0xDF && header[3] == 0xA3,
+                _ => false
+            };
         }
     }
 }

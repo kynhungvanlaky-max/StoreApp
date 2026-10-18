@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile.api
     image: ${DOCKER_USERNAME:-nexus}/gamestore-api:latest
     ports:
-      - "5021:5021"
+      - "127.0.0.1:5021:5021"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5021
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.frontend
     image: ${DOCKER_USERNAME:-nexus}/gamestore-frontend:latest
     ports:
-      - "5205:5205"
+      - "127.0.0.1:5205:5205"
     depends_on:
       - nexuskeys-api
     environment:
@@ -41,7 +41,7 @@ services:
       dockerfile: Dockerfile.backend
     image: ${DOCKER_USERNAME:-nexus}/gamestore-backend:latest
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     depends_on:
       - nexuskeys-api
     environment:

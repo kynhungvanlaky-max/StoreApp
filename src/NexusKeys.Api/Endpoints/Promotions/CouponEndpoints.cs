@@ -131,7 +131,7 @@ namespace GameStore.API.Endpoints
                 if (coupon.CurrentUsage >= coupon.MaxUsage && coupon.MaxUsage > 0) return Results.BadRequest(new { message = "Mã giảm giá đã hết lượt sử dụng." });
 
                 return Results.Ok(new { discountPercent = coupon.DiscountPercent, couponId = coupon.Id });
-            });
+            }).RequireRateLimiting("coupon");
         }
     }
 }

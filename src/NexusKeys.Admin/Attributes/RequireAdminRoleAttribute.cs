@@ -9,8 +9,7 @@ namespace Backend.Attributes
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var role = (context.HttpContext.Items["AdminRole"] as string)
-                ?? Backend.Extensions.JwtRoleExtractor.ExtractRole(context.HttpContext.Request.Cookies["access_token"])
-                ?? "Administrator";
+                ?? Backend.Extensions.JwtRoleExtractor.ExtractRole(context.HttpContext.Request.Cookies["access_token"]);
 
             if (!string.Equals(role, "Administrator", StringComparison.OrdinalIgnoreCase))
             {

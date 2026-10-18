@@ -53,6 +53,22 @@ namespace Backend.Controllers
         [RequestSizeLimit(32 * 1024)]
         public async Task<IActionResult> Bridge([FromForm] string token)
         {
+            var allowedOrigin = (_configuration?["AppSettings:FrontendBaseUrl"] ?? "http://localhost:5205").TrimEnd('/');
+            var requestOrigin = Request.Headers.Origin.ToString().TrimEnd('/');
+            if (string.IsNullOrEmpty(requestOrigin) && Request.Headers.TryGetValue("Referer", out var refererVal))
+            {
+                if (Uri.TryCreate(refererVal.ToString(), UriKind.Absolute, out var refererUri))
+                {
+                    requestOrigin = $"{refererUri.Scheme}://{refererUri.Authority}".TrimEnd('/');
+                }
+            }
+
+            if (!string.IsNullOrEmpty(requestOrigin) && !string.Equals(requestOrigin, allowedOrigin, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ErrorMessage"] = "Yêu cầu đăng nhập không hợp lệ từ nguồn không được xác thực.";
+                return RedirectToAction(nameof(Login));
+            }
+
             if (string.IsNullOrWhiteSpace(token))
             {
                 TempData["ErrorMessage"] = "Không tìm thấy phiên đăng nhập từ ứng dụng.";
@@ -109,7 +125,7 @@ namespace Backend.Controllers
             Response.Cookies.Append(name, value, new CookieOptions
             {
                 HttpOnly = true,
-                Expires = DateTimeOffset.UtcNow.AddHours(12),
+                Expires = DateTimeOffset.UtcNow.AddMinutes(30),
                 SameSite = SameSiteMode.Lax,
                 Secure = Request.IsHttps,
                 Path = "/"

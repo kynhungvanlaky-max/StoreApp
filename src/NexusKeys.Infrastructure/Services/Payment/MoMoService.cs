@@ -111,7 +111,9 @@ namespace GameStore.API.Services.Payment
                           "&transId=" + transId;
 
             var checkHash = HmacSHA256(secretKey, rawHash);
-            return checkHash.Equals(signature, StringComparison.InvariantCultureIgnoreCase);
+            var expectedBytes = Encoding.UTF8.GetBytes(checkHash.ToLowerInvariant());
+            var actualBytes = Encoding.UTF8.GetBytes((signature ?? string.Empty).ToLowerInvariant());
+            return CryptographicOperations.FixedTimeEquals(expectedBytes, actualBytes);
         }
 
         private string HmacSHA256(string key, string inputData)

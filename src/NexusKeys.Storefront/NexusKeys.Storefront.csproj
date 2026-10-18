@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Heroicons" Version="3.2.1.1" />
+    <PackageReference Include="HtmlSanitizer" Version="9.2.1039" />
   </ItemGroup>
 
 </Project>

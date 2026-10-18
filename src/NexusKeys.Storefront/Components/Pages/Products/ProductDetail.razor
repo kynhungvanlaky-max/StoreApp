@@ -253,7 +253,7 @@ else
                                     }
                                 </p>
                                 <div class="text-white/80">
-                                    @((MarkupString)(product.Description ?? "").Replace("\n", "<br/>"))
+                                    @((MarkupString)System.Net.WebUtility.HtmlEncode(product.Description ?? "").Replace("\n", "<br/>"))
                                 </div>
                             </div>
 

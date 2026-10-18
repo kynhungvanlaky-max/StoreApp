@@ -10,6 +10,7 @@ using GameStore.API.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,19 @@ builder.Services.AddDbContext<GameStoreDbContext>(options =>
     }));
 
 // Configure JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        jwtKey = "TemporaryStartupKeyMustBeAtLeastThirtyTwoCharacters123456";
+    }
+    else
+    {
+        throw new InvalidOperationException("Chưa cấu hình 'Jwt:Key' trên môi trường Production. Vui lòng thiết lập biến môi trường Jwt:Key hoặc cấu hình tương ứng.");
+    }
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -40,10 +54,34 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.Zero
         };
     });
+
+// Configure Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("auth", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 10;
+        opt.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("coupon", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 15;
+        opt.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("chat", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 20;
+        opt.QueueLimit = 0;
+    });
+});
 
 // Configure CORS - đọc origins từ config
 var corsOrigins = builder.Configuration.GetSection("AppSettings:CorsOrigins").Get<string[]>()
@@ -118,6 +156,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 app.UseCors("AllowNextjs");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
@@ -136,6 +175,7 @@ if (Directory.Exists(mediaStoragePath))
         OnPrepareResponse = ctx =>
         {
             ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+            ctx.Context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
         }
     });
 }
@@ -197,9 +237,10 @@ v1.MapRecommendationEndpoints(string.Empty);
 v1.MapCategoryEndpoints(string.Empty);
 app.MapHub<NexusHub>("/hubs/nexus");
 
-// Đảm bảo database đã được tạo và seed dữ liệu đầy đủ
-using (var scope = app.Services.CreateScope())
+// Đảm bảo database đã được tạo và seed dữ liệu đầy đủ chỉ trong môi trường Development
+if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<GameStoreDbContext>();
     try
     {

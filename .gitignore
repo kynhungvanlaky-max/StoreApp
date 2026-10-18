@@ -25,3 +25,6 @@ Nexus_UI_Design_Report.docx
 Thumbs.db
 [Dd]esktop.ini
 .DS_Store
+
+# DataProtection Keys
+**/App_Data/DataProtection-Keys/

@@ -94,7 +94,7 @@ else
             </p>
 
             <div class="prose prose-invert max-w-none text-white/80 space-y-4">
-                @((MarkupString)article.Content)
+                @((MarkupString)SanitizeHtml(article.Content))
             </div>
         </div>
 
@@ -147,4 +147,7 @@ else
     {
         VM.StateChanged -= StateHasChanged;
     }
+
+    private static readonly Ganss.Xss.HtmlSanitizer Sanitizer = new();
+    private static string SanitizeHtml(string? html) => string.IsNullOrEmpty(html) ? string.Empty : Sanitizer.Sanitize(html);
 }

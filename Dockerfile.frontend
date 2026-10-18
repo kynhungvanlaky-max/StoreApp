@@ -16,4 +16,5 @@ RUN dotnet publish "NexusKeys.Storefront.csproj" -c Release -o /app/publish /p:U
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+USER $APP_UID
 ENTRYPOINT ["dotnet", "Frontend.dll"]

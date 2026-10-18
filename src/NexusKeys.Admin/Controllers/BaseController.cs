@@ -11,7 +11,7 @@ namespace Backend.Controllers
 
             var role = (context.HttpContext.Items["AdminRole"] as string) 
                 ?? Backend.Extensions.JwtRoleExtractor.ExtractRole(Request.Cookies["access_token"]) 
-                ?? "Administrator";
+                ?? string.Empty;
 
             ViewData["AdminName"] = Request.Cookies["admin_name"] ?? "Quản trị viên";
             ViewData["AdminEmail"] = Request.Cookies["admin_email"] ?? string.Empty;

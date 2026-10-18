@@ -57,21 +57,38 @@ namespace GameStore.API.Endpoints
 
             if (!isV1)
             {
-                group.MapPut("/{id:int}/toggle-lock", async (int id, GameStoreDbContext db) =>
+                group.MapPut("/{id:int}/toggle-lock", async (
+                    int id,
+                    GameStoreDbContext db,
+                    IConfiguration config,
+                    IServiceProvider sp,
+                    CancellationToken ct) =>
                 {
-                    var user = await db.Users.FindAsync(id);
+                    var user = await db.Users.FindAsync(new object?[] { id }, cancellationToken: ct);
                     if (user == null) return Results.NotFound();
 
                     user.IsLocked = !user.IsLocked;
-                    await db.SaveChangesAsync();
+                    await db.SaveChangesAsync(ct);
+
+                    if (user.IsLocked)
+                    {
+                        var tokenService = sp.GetService<ITokenService>() ?? new TokenService(config, db);
+                        await tokenService.RevokeUserTokensAsync(user.Id, ct);
+                    }
 
                     return Results.Ok(new { message = user.IsLocked ? "Đã khoá tài khoản." : "Đã mở khoá tài khoản.", isLocked = user.IsLocked });
                 }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
             }
 
-            group.MapMethods("/{id:int}", [isV1 ? HttpMethods.Patch : HttpMethods.Put], async (int id, AdminUpdateUserDto dto, GameStoreDbContext db) =>
+            group.MapMethods("/{id:int}", [isV1 ? HttpMethods.Patch : HttpMethods.Put], async (
+                int id,
+                AdminUpdateUserDto dto,
+                GameStoreDbContext db,
+                IConfiguration config,
+                IServiceProvider sp,
+                CancellationToken ct) =>
             {
-                var user = await db.Users.FindAsync(id);
+                var user = await db.Users.FindAsync(new object?[] { id }, cancellationToken: ct);
                 if (user == null) return Results.NotFound();
 
                 if (!string.IsNullOrEmpty(dto.Username)) user.Username = dto.Username;
@@ -79,22 +96,42 @@ namespace GameStore.API.Endpoints
                 if (dto.AvatarUrl != null) user.AvatarUrl = dto.AvatarUrl;
                 if (dto.IsLocked.HasValue) user.IsLocked = dto.IsLocked.Value;
 
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync(ct);
+
+                if (dto.IsLocked == true)
+                {
+                    var tokenService = sp.GetService<ITokenService>() ?? new TokenService(config, db);
+                    await tokenService.RevokeUserTokensAsync(user.Id, ct);
+                }
+
                 return isV1
                     ? Results.NoContent()
                     : Results.Ok(new { message = "Cập nhật thành công!" });
             }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
 
-            group.MapPut("/{id:int}/role", async (int id, ChangeRoleDto dto, GameStoreDbContext db) =>
+            group.MapPut("/{id:int}/role", async (
+                int id,
+                ChangeRoleDto dto,
+                GameStoreDbContext db,
+                IConfiguration config,
+                IServiceProvider sp,
+                CancellationToken ct) =>
             {
-                var user = await db.Users.FindAsync(id);
+                var user = await db.Users.FindAsync(new object?[] { id }, cancellationToken: ct);
                 if (user == null) return Results.NotFound();
 
-                var role = await db.Set<Role>().FirstOrDefaultAsync(r => r.RoleName == dto.RoleName);
+                var role = await db.Set<Role>().FirstOrDefaultAsync(r => r.RoleName == dto.RoleName, ct);
                 if (role == null) return Results.BadRequest(new { message = "Role không tồn tại." });
 
+                var roleChanged = user.RoleId != role.Id;
                 user.RoleId = role.Id;
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync(ct);
+
+                if (roleChanged)
+                {
+                    var tokenService = sp.GetService<ITokenService>() ?? new TokenService(config, db);
+                    await tokenService.RevokeUserTokensAsync(user.Id, ct);
+                }
 
                 return Results.Ok(new { message = $"Đã thay đổi quyền thành {role.RoleName}." });
             }).RequireAuthorization(policy => policy.RequireRole("Administrator"));
