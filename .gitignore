@@ -20,6 +20,9 @@ missing_*.txt
 concept_*.html
 menu_styles_showcase.html
 Nexus_UI_Design_Report.docx
+.env
+.env.*
+
 
 # OS files
 Thumbs.db

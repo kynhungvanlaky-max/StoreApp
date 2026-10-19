@@ -10,6 +10,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5021
+      - ConnectionStrings__DefaultConnection=${DATABASE_URL:-}
+      - Jwt__Key=${JWT_KEY:-}
     networks:
       - nexuskeys-net
     restart: unless-stopped
