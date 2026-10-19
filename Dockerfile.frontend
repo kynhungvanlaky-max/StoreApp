@@ -15,6 +15,7 @@ RUN dotnet publish "NexusKeys.Storefront.csproj" -c Release -o /app/publish /p:U
 
 FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build --chown=$APP_UID:$APP_UID /app/publish .
+RUN mkdir -p /app/App_Data/DataProtection-Keys && chown -R $APP_UID:$APP_UID /app
 USER $APP_UID
 ENTRYPOINT ["dotnet", "Frontend.dll"]

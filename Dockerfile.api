@@ -19,6 +19,6 @@ RUN dotnet publish "NexusKeys.Api.csproj" -c Release -o /app/publish /p:UseAppHo
 
 FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build --chown=$APP_UID:$APP_UID /app/publish .
 USER $APP_UID
 ENTRYPOINT ["dotnet", "GameStore.API.dll"]

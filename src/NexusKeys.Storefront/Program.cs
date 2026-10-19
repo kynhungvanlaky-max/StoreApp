@@ -9,11 +9,29 @@ viCulture.NumberFormat.CurrencySymbol = "đ";
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = viCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = viCulture;
 
-// Configure DataProtection to use local folder to avoid permission issues
+// Configure DataProtection to use local folder with resilient fallback for container non-root users
 var dataProtectionKeysPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "DataProtection-Keys");
+try
+{
+    Directory.CreateDirectory(dataProtectionKeysPath);
+}
+catch
+{
+    dataProtectionKeysPath = Path.Combine(Path.GetTempPath(), "NexusKeys-DataProtection-Keys");
+    Directory.CreateDirectory(dataProtectionKeysPath);
+}
+
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
     .SetApplicationName("GameStore.Frontend");
+
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 
 // Keep local/server logging portable and avoid requiring Windows Event Log privileges.
 builder.Logging.ClearProviders();
@@ -67,6 +85,8 @@ builder.Services.AddScoped<Frontend.Services.RecentlyViewedService>();
 builder.Services.AddScoped<Frontend.Services.RecommendationService>();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
