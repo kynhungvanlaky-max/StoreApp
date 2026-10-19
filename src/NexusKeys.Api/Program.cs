@@ -237,31 +237,37 @@ v1.MapRecommendationEndpoints(string.Empty);
 v1.MapCategoryEndpoints(string.Empty);
 app.MapHub<NexusHub>("/hubs/nexus");
 
-// Đảm bảo database đã được tạo và seed dữ liệu đầy đủ chỉ trong môi trường Development
-if (app.Environment.IsDevelopment())
+// Đảm bảo database đã được tạo và seed dữ liệu đầy đủ nếu chưa có bảng/dữ liệu
+var defaultConnStr = app.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrWhiteSpace(defaultConnStr))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<GameStoreDbContext>();
     try
     {
+        var databaseCreator = Microsoft.EntityFrameworkCore.Infrastructure.AccessorExtensions.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>(db.Database);
+        if (databaseCreator != null && !databaseCreator.HasTables())
+        {
+            try
+            {
+                databaseCreator.CreateTables();
+                Console.WriteLine("[DB INIT] PostgreSQL tables created successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DB INIT] CreateTables note: {ex.Message}");
+            }
+        }
+
         if (!db.Products.Any())
         {
-            var databaseCreator = Microsoft.EntityFrameworkCore.Infrastructure.AccessorExtensions.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>(db.Database);
-            if (databaseCreator != null)
-            {
-                try
-                {
-                    databaseCreator.CreateTables();
-                    Console.WriteLine("[DB INIT] PostgreSQL tables created successfully on Supabase.");
-                }
-                catch { }
-            }
             GameStore.API.Data.DbInitializer.Seed(db);
+            Console.WriteLine("[DB INIT] Initial seed data inserted successfully.");
         }
         else
         {
             GameStore.API.Data.DbInitializer.EnsureSeedRolesAndUsers(db);
-            Console.WriteLine("[DB INIT] Supabase database is ready and roles/users ensured.");
+            Console.WriteLine("[DB INIT] Database is ready and roles/users ensured.");
         }
     }
     catch (Exception ex)

@@ -1,4 +1,22 @@
 services:
+  nexuskeys-db:
+    image: postgres:16-alpine
+    container_name: nexuskeys-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gamestore}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-NexusPassword123!}
+    volumes:
+      - nexuskeys-db-data:/var/lib/postgresql/data
+    networks:
+      - nexuskeys-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-gamestore}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   nexuskeys-api:
     container_name: nexuskeys-api
     build:
@@ -7,11 +25,14 @@ services:
     image: ${DOCKER_USERNAME:-nexus}/gamestore-api:latest
     ports:
       - "127.0.0.1:5021:5021"
+    depends_on:
+      nexuskeys-db:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5021
-      - ConnectionStrings__DefaultConnection=${DATABASE_URL:-}
-      - Jwt__Key=${JWT_KEY:-}
+      - ConnectionStrings__DefaultConnection=${DATABASE_URL:-Host=nexuskeys-db;Port=5432;Database=gamestore;Username=postgres;Password=NexusPassword123!;Include Error Detail=true;}
+      - Jwt__Key=${JWT_KEY:-NexusKeysDefaultSecretKeyForJwtAuthentication2026!@#$%^&*}
     networks:
       - nexuskeys-net
     restart: unless-stopped
@@ -73,3 +94,7 @@ services:
 networks:
   nexuskeys-net:
     driver: bridge
+
+volumes:
+  nexuskeys-db-data:
+
