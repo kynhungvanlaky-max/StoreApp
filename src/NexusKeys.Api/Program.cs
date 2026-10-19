@@ -20,10 +20,39 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+// Helper function to normalize connection strings (handles Render/Heroku/Supabase postgresql:// URI format)
+static string NormalizePostgresConnectionString(string? connStr)
+{
+    if (string.IsNullOrWhiteSpace(connStr)) return string.Empty;
+    if (connStr.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+        connStr.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+    {
+        try
+        {
+            var uri = new Uri(connStr);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : "";
+            var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+            var database = uri.AbsolutePath.TrimStart('/');
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Prefer;Trust Server Certificate=true;Pooling=true;";
+        }
+        catch
+        {
+            return connStr;
+        }
+    }
+    return connStr;
+}
+
 // Add services to the container.
 builder.Services.AddMemoryCache();
+var effectiveConnectionString = NormalizePostgresConnectionString(
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration["DATABASE_URL"]);
+
 builder.Services.AddDbContext<GameStoreDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
+    options.UseNpgsql(effectiveConnectionString, npgsqlOptions =>
     {
         npgsqlOptions.EnableRetryOnFailure(3);
         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
@@ -238,8 +267,7 @@ v1.MapCategoryEndpoints(string.Empty);
 app.MapHub<NexusHub>("/hubs/nexus");
 
 // Đảm bảo database đã được tạo và seed dữ liệu đầy đủ nếu chưa có bảng/dữ liệu
-var defaultConnStr = app.Configuration.GetConnectionString("DefaultConnection");
-if (!string.IsNullOrWhiteSpace(defaultConnStr))
+if (!string.IsNullOrWhiteSpace(effectiveConnectionString))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<GameStoreDbContext>();
