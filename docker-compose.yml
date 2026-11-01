@@ -91,10 +91,36 @@ services:
     networks:
       - nexuskeys-net
 
+  nexuskeys-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: nexuskeys-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN:-dummy}
+    depends_on:
+      - nexuskeys-nginx
+    networks:
+      - nexuskeys-net
+    profiles:
+      - tunnel
+
+  nexuskeys-ngrok:
+    image: ngrok/ngrok:latest
+    container_name: nexuskeys-ngrok
+    restart: unless-stopped
+    command: http nexuskeys-nginx:80 --url=https://${NGROK_DOMAIN:-animal-precook-reacquire.ngrok-free.dev} --log=stdout
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN:-}
+    depends_on:
+      - nexuskeys-nginx
+    networks:
+      - nexuskeys-net
+    profiles:
+      - ngrok
+
 networks:
   nexuskeys-net:
+    name: nexuskeys-net
     driver: bridge
 
 volumes:
   nexuskeys-db-data:
-

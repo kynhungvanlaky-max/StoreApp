@@ -31,3 +31,7 @@ Thumbs.db
 
 # DataProtection Keys
 **/App_Data/DataProtection-Keys/
+
+# Tunnel Tools
+tools/
+*.exe
