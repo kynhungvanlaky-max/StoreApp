@@ -38,6 +38,13 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+// Configure port dynamically for environments like Render, Railway, Cloud Run
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -46,8 +53,12 @@ builder.Services.AddHttpContextAccessor();
 
 // HttpClient -> API
 builder.Services.AddHttpClient("API", client => {
-    client.BaseAddress = new Uri(
-        builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5021/");
+    var rawUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5021/";
+    if (!rawUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !rawUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {
+        rawUrl = "https://" + rawUrl;
+    }
+    if (!rawUrl.EndsWith("/")) rawUrl += "/";
+    client.BaseAddress = new Uri(rawUrl);
 });
 
 // Services & ViewModels will be registered here as they are created

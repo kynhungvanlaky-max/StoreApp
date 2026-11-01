@@ -45,6 +45,13 @@ static string NormalizePostgresConnectionString(string? connStr)
     return connStr;
 }
 
+// Configure port dynamically for environments like Render, Railway, Cloud Run
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 // Add services to the container.
 builder.Services.AddMemoryCache();
 var effectiveConnectionString = NormalizePostgresConnectionString(

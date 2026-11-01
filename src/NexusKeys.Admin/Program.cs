@@ -5,6 +5,13 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+// Configure port dynamically for environments like Render, Railway, Cloud Run
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -14,6 +21,8 @@ builder.Services.AddTransient<Backend.HttpHandlers.TokenHandler>();
 builder.Services.AddHttpClient("API", client =>
 {
     var baseUrl = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "http://localhost:5021/";
+    if (!baseUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !baseUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) baseUrl = "https://" + baseUrl;
+    if (!baseUrl.EndsWith("/")) baseUrl += "/";
     client.BaseAddress = new Uri(baseUrl);
 }).AddHttpMessageHandler<Backend.HttpHandlers.TokenHandler>();
 
