@@ -54,9 +54,11 @@ if (!string.IsNullOrWhiteSpace(port))
 
 // Add services to the container.
 builder.Services.AddMemoryCache();
-var effectiveConnectionString = NormalizePostgresConnectionString(
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["DATABASE_URL"]);
+var defaultConn = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = builder.Configuration["DATABASE_URL"] ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+var rawConn = !string.IsNullOrWhiteSpace(defaultConn) ? defaultConn : databaseUrl;
+var effectiveConnectionString = NormalizePostgresConnectionString(rawConn);
+Console.WriteLine($"[DB DIAGNOSTIC] defaultConn has value: {!string.IsNullOrWhiteSpace(defaultConn)}, databaseUrl has value: {!string.IsNullOrWhiteSpace(databaseUrl)}, effectiveConn has value: {!string.IsNullOrWhiteSpace(effectiveConnectionString)}");
 
 builder.Services.AddDbContext<GameStoreDbContext>(options =>
     options.UseNpgsql(effectiveConnectionString, npgsqlOptions =>
@@ -280,7 +282,7 @@ v1.MapAdminAuditEndpoints(string.Empty);
 v1.MapRecommendationEndpoints(string.Empty);
 v1.MapCategoryEndpoints(string.Empty);
 app.MapHub<NexusHub>("/hubs/nexus");
-app.MapGet("/api/v1/health-db", async (GameStoreDbContext db) => { try { var canConnect = await db.Database.CanConnectAsync(); var count = db.Products.Count(); return Results.Ok(new { canConnect, productCount = count }); } catch (Exception ex) { return Results.Problem(detail: ex.ToString(), statusCode: 500); } });
+app.MapGet("/api/v1/health-db", async (GameStoreDbContext db, IConfiguration cfg) => { try { var defaultConn = cfg.GetConnectionString("DefaultConnection"); var databaseUrl = cfg["DATABASE_URL"] ?? Environment.GetEnvironmentVariable("DATABASE_URL"); var canConnect = await db.Database.CanConnectAsync(); var count = db.Products.Count(); return Results.Ok(new { canConnect, productCount = count, hasDefaultConn = !string.IsNullOrWhiteSpace(defaultConn), hasDatabaseUrl = !string.IsNullOrWhiteSpace(databaseUrl) }); } catch (Exception ex) { return Results.Problem(detail: ex.ToString(), statusCode: 500); } });
 
 // Đảm bảo database đã được tạo và seed dữ liệu đầy đủ nếu chưa có bảng/dữ liệu
 if (!string.IsNullOrWhiteSpace(effectiveConnectionString))
