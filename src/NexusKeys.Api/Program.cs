@@ -280,6 +280,7 @@ v1.MapAdminAuditEndpoints(string.Empty);
 v1.MapRecommendationEndpoints(string.Empty);
 v1.MapCategoryEndpoints(string.Empty);
 app.MapHub<NexusHub>("/hubs/nexus");
+app.MapGet("/api/v1/health-db", async (GameStoreDbContext db) => { try { var canConnect = await db.Database.CanConnectAsync(); var count = db.Products.Count(); return Results.Ok(new { canConnect, productCount = count }); } catch (Exception ex) { return Results.Problem(detail: ex.ToString(), statusCode: 500); } });
 
 // Đảm bảo database đã được tạo và seed dữ liệu đầy đủ nếu chưa có bảng/dữ liệu
 if (!string.IsNullOrWhiteSpace(effectiveConnectionString))
