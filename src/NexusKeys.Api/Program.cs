@@ -84,8 +84,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
@@ -123,11 +123,18 @@ builder.Services.AddRateLimiter(options =>
 var corsOrigins = builder.Configuration.GetSection("AppSettings:CorsOrigins").Get<string[]>()
     ?? new[] { "http://localhost:5205", "http://localhost:5000", "http://localhost:3001" };
 
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowNextjs", policy =>
     {
-        policy.WithOrigins(corsOrigins)
+        policy.SetIsOriginAllowed(_ => true)
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -179,6 +186,7 @@ app.UseStatusCodePages(async statusCodeContext =>
         }
     });
 });
+app.UseForwardedHeaders();
 app.UseMiddleware<LegacyApiDeprecationMiddleware>();
 
 // Configure the HTTP request pipeline.
