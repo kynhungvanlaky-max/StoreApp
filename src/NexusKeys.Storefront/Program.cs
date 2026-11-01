@@ -111,6 +111,7 @@ app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapGet("/health-storefront", (IConfiguration cfg) => { var apiBase = cfg["ApiSettings:BaseUrl"]; return Results.Ok(new { status = "healthy", apiBase }); });
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
