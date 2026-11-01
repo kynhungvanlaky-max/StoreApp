@@ -37,6 +37,11 @@ services:
           type: web
           name: nexuskeys-api
           property: host
+      - key: AdminPortal__BaseUrl
+        fromService:
+          type: web
+          name: nexuskeys-admin
+          property: host
 
   # 3. Admin Portal (Trang Quản trị)
   - type: web
@@ -52,4 +57,9 @@ services:
         fromService:
           type: web
           name: nexuskeys-api
+          property: host
+      - key: AppSettings__FrontendBaseUrl
+        fromService:
+          type: web
+          name: nexuskeys-storefront
           property: host
