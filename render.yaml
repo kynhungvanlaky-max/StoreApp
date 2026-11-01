@@ -1,7 +1,7 @@
 databases:
   - name: gamestore-db
     databaseName: gamestore
-    user: postgres
+    user: gamestore_user
     plan: free
 
 services:
