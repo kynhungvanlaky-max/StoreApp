@@ -33,10 +33,7 @@ services:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ApiSettings__BaseUrl
-        fromService:
-          type: web
-          name: nexuskeys-api
-          property: host
+        value: https://nexuskeys-api.onrender.com/
       - key: AdminPortal__BaseUrl
         fromService:
           type: web
@@ -54,10 +51,7 @@ services:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ApiSettings__BaseUrl
-        fromService:
-          type: web
-          name: nexuskeys-api
-          property: host
+        value: https://nexuskeys-api.onrender.com/
       - key: AppSettings__FrontendBaseUrl
         fromService:
           type: web
