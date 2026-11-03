@@ -35,10 +35,7 @@ services:
       - key: ApiSettings__BaseUrl
         value: https://nexuskeys-api.onrender.com/
       - key: AdminPortal__BaseUrl
-        fromService:
-          type: web
-          name: nexuskeys-admin
-          property: host
+        value: https://nexuskeys-admin.onrender.com/
 
   # 3. Admin Portal (Trang Quản trị)
   - type: web
@@ -53,7 +50,4 @@ services:
       - key: ApiSettings__BaseUrl
         value: https://nexuskeys-api.onrender.com/
       - key: AppSettings__FrontendBaseUrl
-        fromService:
-          type: web
-          name: nexuskeys-storefront
-          property: host
+        value: https://nexuskeys-storefront.onrender.com/

@@ -1,0 +1,65 @@
+@page "/admin"
+@inject Frontend.ViewModels.AuthViewModel AuthViewModel
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
+
+<PageTitle>Chuyển hướng Quản trị — NexusKeys</PageTitle>
+
+<div class="min-h-[60vh] flex items-center justify-center p-4">
+    <div class="text-center space-y-4">
+        <div class="w-12 h-12 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto"></div>
+        <p class="text-sm font-bold text-white">Đang chuyển hướng đến Cổng Quản trị...</p>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await AuthViewModel.InitializeAsync();
+            if (!AuthViewModel.IsLoggedIn)
+            {
+                NavigationManager.NavigateTo("/login?returnUrl=/admin");
+                return;
+            }
+
+            var role = AuthViewModel.Role;
+            var isAllowed = string.Equals(role, "Administrator", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(role, "Developer", StringComparison.OrdinalIgnoreCase);
+
+            if (!isAllowed)
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
+            var token = await AuthViewModel.GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
+            {
+                var adminUrl = Configuration["AdminPortal:BaseUrl"] ?? Configuration["AdminPortal__BaseUrl"] ?? "http://localhost:3001";
+                if (!adminUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !adminUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    adminUrl = "https://" + adminUrl;
+                }
+                adminUrl = adminUrl.TrimEnd('/');
+
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
+                    return;
+                }
+                catch
+                {
+                    NavigationManager.NavigateTo(adminUrl, forceLoad: true);
+                    return;
+                }
+            }
+
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

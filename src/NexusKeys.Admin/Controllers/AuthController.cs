@@ -53,7 +53,11 @@ namespace Backend.Controllers
         [RequestSizeLimit(32 * 1024)]
         public async Task<IActionResult> Bridge([FromForm] string token)
         {
-            var allowedOrigin = (_configuration?["AppSettings:FrontendBaseUrl"] ?? "http://localhost:5205").TrimEnd('/');
+            var allowedOrigin = (_configuration?["AppSettings:FrontendBaseUrl"] ?? _configuration?["AppSettings__FrontendBaseUrl"] ?? "http://localhost:5205").TrimEnd('/');
+            if (!allowedOrigin.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !allowedOrigin.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                allowedOrigin = "https://" + allowedOrigin;
+            }
             var requestOrigin = Request.Headers.Origin.ToString().TrimEnd('/');
             if (string.IsNullOrEmpty(requestOrigin) && Request.Headers.TryGetValue("Referer", out var refererVal))
             {
