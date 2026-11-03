@@ -53,7 +53,7 @@ builder.Services.AddHttpContextAccessor();
 
 // HttpClient -> API
 builder.Services.AddHttpClient("API", client => {
-    var rawUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5021/";
+    var rawUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? builder.Configuration["ApiSettings__BaseUrl"] ?? "https://nexuskeys-api.onrender.com/";
     if (!rawUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !rawUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {
         rawUrl = "https://" + rawUrl;
     }

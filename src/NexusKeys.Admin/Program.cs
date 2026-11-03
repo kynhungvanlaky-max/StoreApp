@@ -20,7 +20,7 @@ builder.Services.AddTransient<Backend.HttpHandlers.TokenHandler>();
 
 builder.Services.AddHttpClient("API", client =>
 {
-    var baseUrl = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "http://localhost:5021/";
+    var baseUrl = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ?? builder.Configuration.GetValue<string>("ApiSettings__BaseUrl") ?? "https://nexuskeys-api.onrender.com/";
     if (!baseUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !baseUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) baseUrl = "https://" + baseUrl;
     if (!baseUrl.EndsWith("/")) baseUrl += "/";
     client.BaseAddress = new Uri(baseUrl);
