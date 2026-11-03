@@ -16,14 +16,16 @@ namespace Backend.Middleware
         {
             var path = context.Request.Path.Value?.ToLowerInvariant() ?? "";
 
-            // Cho phép truy cập công khai vào Auth endpoints và static files
+            // Cho phép truy cập công khai vào Auth endpoints, health checks và static files
             if (path.StartsWith("/auth/login") ||
+                path.Equals("/login") ||
                 path.StartsWith("/auth/bridge") ||
                 path.StartsWith("/auth/logout") || 
+                path.StartsWith("/health") || 
                 path.StartsWith("/css") || 
                 path.StartsWith("/js") || 
                 path.StartsWith("/lib") || 
-                path.StartsWith("/favicon.ico"))
+                path.StartsWith("/favicon"))
             {
                 await _next(context);
                 return;

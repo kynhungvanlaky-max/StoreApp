@@ -37,6 +37,10 @@ var app = builder.Build();
 
 app.UseForwardedHeaders();
 
+// Health check endpoints for Render, Railway, Docker probes
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "nexuskeys-admin" }));
+app.MapGet("/healthz", () => Results.Ok(new { status = "healthy", service = "nexuskeys-admin" }));
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
