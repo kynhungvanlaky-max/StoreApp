@@ -59,10 +59,21 @@ namespace Backend.Controllers
             ViewBag.FrontendUrl = frontendBase;
             ViewBag.StorefrontLoginUrl = $"{frontendBase}/login?returnUrl=/admin";
 
-            if (string.Equals(action, "demo", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(action, "demo", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(action, "demo-admin", StringComparison.OrdinalIgnoreCase))
             {
                 email = "admin@nexuskeys.com";
                 password = "Admin123!";
+            }
+            else if (string.Equals(action, "demo-staff", StringComparison.OrdinalIgnoreCase))
+            {
+                email = "staff@nexuskeys.com";
+                password = "Staff123!";
+            }
+            else if (string.Equals(action, "demo-dev", StringComparison.OrdinalIgnoreCase))
+            {
+                email = "dev@cdprojekt.com";
+                password = "Dev123!";
             }
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
