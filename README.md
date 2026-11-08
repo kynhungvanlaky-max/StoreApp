@@ -18,17 +18,76 @@
   <img src="https://img.shields.io/badge/Tailwind_CSS-3.4+-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Docker-Multi--stage-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
   <img src="https://img.shields.io/badge/Tests-72%2F72%20Passed%20(100%25)-brightgreen?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests Passed" />
+  <img src="https://img.shields.io/badge/Render-Deployed%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render Deployed" />
 </p>
 
 ---
 
-## 📖 1. Giới thiệu Tổng quan (Project Overview)
+## 🌐 TRẢI NGHIỆM TRỰC TUYẾN (LIVE WEB DEMO)
 
-**NexusKeys** là hệ thống thương mại điện tử chuyên biệt phục vụ phân phối bản quyền trò chơi điện tử và phần mềm kỹ thuật số trực tuyến. Hệ thống giải quyết trọn vẹn bài toán từ khâu khám phá sản phẩm, giao dịch thanh toán đa kênh tự động, kích hoạt và bàn giao License Key tức thì theo thời gian thực (Zero Key-Collision), cho đến quản lý hậu mãi và tích hợp trợ lý trí tuệ nhân tạo (AI Copilot) hỗ trợ người mua.
+Hệ thống đã được **triển khai hoàn chỉnh trên môi trường Cloud (Render)**, bạn có thể trải nghiệm trực tiếp ngay trên trình duyệt mà không cần cài đặt bất kỳ công cụ nào:
 
-### 🎯 Điểm nổi bật của đề tài:
+| Dịch vụ | Địa chỉ Trực tuyến (Live URL) | Trạng thái | Ghi chú Trải nghiệm |
+| :--- | :--- | :---: | :--- |
+| 🛒 **Web Khách Hàng (Storefront)** | [**nexuskeys-storefront.onrender.com**](https://nexuskeys-storefront.onrender.com) | 🟢 **Hoạt động** | Khám phá 29 game bom tấn, giỏ hàng, mua key, ví tiền |
+| 🔑 **Trang Đăng Nhập Storefront** | [**nexuskeys-storefront.onrender.com/login**](https://nexuskeys-storefront.onrender.com/login) | 🟢 **Hoạt động** | Tích hợp nút **1-Click Demo Admin** & Google OAuth |
+| 🛡️ **Cổng Quản Trị (Admin Portal)** | [**nexuskeys-admin.onrender.com**](https://nexuskeys-admin.onrender.com) | 🟢 **Hoạt động** | Dashboard doanh thu, kho key, đơn hàng, người dùng |
+| ⚡ **Backend REST API v1** | [**nexuskeys-api.onrender.com/api/v1/products**](https://nexuskeys-api.onrender.com/api/v1/products) | 🟢 **Hoạt động** | API dữ liệu trả về 29 tựa game mẫu theo chuẩn REST |
+
+> [!NOTE]
+> **Lưu ý khi mở lần đầu trên Render:**  
+> Do sử dụng gói Cloud miễn phí, nếu dịch vụ không nhận lượt truy cập trong 15 phút, máy chủ sẽ tạm chuyển sang chế độ ngủ (sleep). Lần tải đầu tiên có thể mất từ **30 - 50 giây** để khởi động lại container; các thao tác tiếp theo sẽ phản hồi tức thì.
+
+---
+
+### ⚡ Hướng dẫn Đánh giá & Chấm điểm Nhanh (Live Demo Walkthrough)
+
+#### 1. Đăng nhập Quyền Quản trị viên (Admin) chỉ với 1 Cú Click:
+- **Cách 1 (Từ Web Storefront):** Vào [nexuskeys-storefront.onrender.com/login](https://nexuskeys-storefront.onrender.com/login) $\rightarrow$ Tại khung tím **"Tài khoản Demo Admin"**, bấm nút **"👑 Đăng nhập Admin"** để vào Storefront với vai trò Administrator (Ví có sẵn **50.000.000 đ**), hoặc bấm **"⚡ Vào Admin Portal"** để chuyển thẳng sang Cổng Quản trị.
+- **Cách 2 (Từ Admin Portal):** Vào [nexuskeys-admin.onrender.com](https://nexuskeys-admin.onrender.com) $\rightarrow$ Bấm nút **"⚡ Đăng nhập Demo Admin (1-Click)"** để vào thẳng Dashboard quản trị.
+
+#### 2. Thử nghiệm Luồng Mua Hàng & Nhận License Key Bản Quyền Tự Động:
+1. Mở trang chủ [Storefront](https://nexuskeys-storefront.onrender.com), chọn một tựa game (ví dụ: *God of War Ragnarök*, *Elden Ring*, *Cyberpunk 2077*...).
+2. Bấm **"Thêm vào giỏ"** $\rightarrow$ Vào **Giỏ hàng** $\rightarrow$ Bấm **"Tiến hành thanh toán"**.
+3. Chọn phương thức **"Ví điện tử NexusPay"** (được trừ trực tiếp từ số dư tài khoản demo) hoặc chọn **VNPay / MoMo Sandbox**.
+4. Bấm **"Xác nhận thanh toán"**: Hệ thống xử lý giao dịch và tự động cấp phát mã License Key từ kho.
+5. Vào **"Tài khoản -> Quản lý License Key"** ([Library](https://nexuskeys-storefront.onrender.com/profile/library)) để xem key vừa mua: Hệ thống hỗ trợ **Ẩn/Hiện mã bản quyền (Mask/Reveal)** và nút **Copy 1-Click**.
+
+#### 3. Thử nghiệm Cổng Quản Trị (Admin Portal):
+1. Đăng nhập vào [Admin Portal](https://nexuskeys-admin.onrender.com).
+2. Xem **Dashboard thống kê**: Doanh thu, số lượng đơn hàng, người dùng, biểu đồ trực quan, cảnh báo key sắp hết (*Low-stock alerts*).
+3. Thử các phân hệ:
+   - **Kho License Key:** Xem danh sách mã bản quyền, trạng thái (`Available`, `Sold`), thử tính năng nhập thêm key theo lô.
+   - **Sản phẩm:** Quản lý danh mục game, cấu hình thông số phần cứng tối thiểu / đề nghị.
+   - **Đơn hàng:** Tra soát lịch sử hóa đơn và mã key đã phát hành cho từng khách.
+   - **Mã giảm giá & Khuyến mãi:** Tạo voucher giảm giá %, số tiền cố định.
+   - **Người dùng & Phân quyền:** Quản lý quyền hạn `Administrator`, `Developer`, `Staff`, `Customer`.
+
+#### 4. Thử nghiệm Trợ lý Trí tuệ Nhân tạo (Gemini AI Copilot):
+- Bấm vào biểu tượng **Chatbot AI** ở góc dưới màn hình Storefront để hỏi đáp về cấu hình máy tính, yêu cầu tư vấn game hoặc hỏi cách kích hoạt mã bản quyền.
+
+---
+
+## 👑 Bảng Tài khoản Demo Trải Nghiệm (Demo Accounts)
+
+Hệ thống đã nạp sẵn dữ liệu mẫu (Seeded Data) với 29 tựa game bom tấn và các tài khoản phân quyền đầy đủ số dư:
+
+| Vai trò | Email đăng nhập | Mật khẩu | Số dư ví | Quyền hạn & Mục đích kiểm thử |
+| :--- | :--- | :---: | :---: | :--- |
+| 👑 **Administrator** | `admin@nexuskeys.com` | `Admin123!` | **50.000.000 đ** | Toàn quyền Storefront & Admin Portal, kho key, đơn hàng, doanh thu |
+| 🛡️ **Staff** | `staff@nexuskeys.com` | `Staff123!` | **20.000.000 đ** | Vận hành đơn hàng, duyệt kho key, hỗ trợ xử lý vé khiếu nại |
+| 💻 **Developer** | `dev@cdprojekt.com` | `Dev123!` | **12.000.000 đ** | Quản lý danh mục game phát hành và theo dõi báo cáo doanh số |
+| 🎮 **Customer** | `gamer99@gmail.com` | `User123!` | **2.500.000 đ** | Mua sắm game, nạp tiền ví, nhận key, đánh giá và bình luận |
+
+---
+
+## 📖 1. Giới thiệu Đề tài (Project Overview)
+
+**NexusKeys** là đồ án tốt nghiệp hệ thống thương mại điện tử chuyên biệt phục vụ phân phối bản quyền trò chơi điện tử và phần mềm kỹ thuật số trực tuyến. Hệ thống giải quyết trọn vẹn bài toán từ khâu khám phá sản phẩm, giao dịch thanh toán đa kênh tự động, kích hoạt và bàn giao License Key tức thì theo thời gian thực (Zero Key-Collision), cho đến quản lý hậu mãi và tích hợp trợ lý trí tuệ nhân tạo (AI Copilot) hỗ trợ người mua.
+
+### 🎯 Các trụ cột kỹ thuật nổi bật:
 - **Kiến trúc Clean Architecture đa tầng:** Phân tách rõ ràng giữa Core Business Rules, Infrastructure, API Contract và Presentation Layers.
-- **Giao License Key tức thì & Chống bán trùng:** Cơ chế giữ chỗ (reserve), khóa bi quan/lạc quan (concurrency control) đảm bảo không bao giờ phát hành trùng lặp mã kích hoạt.
+- **Giao License Key tức thì & Chống bán trùng:** Cơ chế giữ chỗ (reserve), khóa bi quan/lạc quan (concurrency control) đảm bảo không bao giờ phát hành trùng lặp mã kích hoạt khi nhiều người mua cùng lúc.
 - **Tự động hóa hoàn tiền / hủy đơn hết hạn:** `OrderCleanupService` chạy ngầm giải phóng key và hủy đơn hàng quá hạn 15 phút chưa thanh toán.
 - **Thanh toán đa cổng tích hợp:** Hỗ trợ **VNPay** (Sandbox VNPAY-QR, Thẻ nội địa ATM, Thẻ quốc tế), **MoMo Gateway**, và **Ví điện tử nội bộ NexusPay**.
 - **Trợ lý ảo AI Copilot:** Tích hợp **Google Gemini AI** hỗ trợ tra cứu thông số game, tư vấn cấu hình phần cứng phù hợp và giải đáp thắc mắc khách hàng.
@@ -183,8 +242,8 @@ datn/
   - Nhân viên quản trị phản hồi và cập nhật trạng thái phiếu hỗ trợ trực tiếp.
 - **Nhật ký Kiểm toán (Audit Logs):**
   - Ghi nhận lịch sử mọi thao tác nhạy cảm: thay đổi giá, xuất key thủ công, sửa thông tin người dùng, điều chỉnh cấu hình hệ thống.
-- **Cấu hình Độc lập & Tích hợp:**
-  - Trang đăng nhập độc lập có sẵn tính năng **👑 1-Click Demo Admin** để kiểm tra nhanh hệ thống.
+- **Đăng nhập Độc lập & 1-Click Demo:**
+  - Trang đăng nhập riêng biệt tại `/Auth/Login` có sẵn tính năng **👑 1-Click Demo Admin** để kiểm tra nhanh hệ thống.
 
 ---
 
@@ -204,31 +263,14 @@ datn/
 
 ---
 
-## 👑 4. Tài khoản Demo Trải Nghiệm Nhanh (Demo Accounts)
+## 🚀 4. Hướng dẫn Khởi chạy ở Môi trường Local (Local Development)
 
-Hệ thống đã nạp sẵn dữ liệu mẫu (Seeded Data) với 29 tựa game bom tấn và các tài khoản phân quyền đầy đủ số dư:
-
-| Vai trò | Email đăng nhập | Mật khẩu | Số dư ví | Quyền hạn chính |
-| :--- | :--- | :---: | :---: | :--- |
-| **Administrator** | `admin@nexuskeys.com` | `Admin123!` | 50.000.000 đ | Toàn quyền quản trị Store, Admin Portal, Kho Key, User, Doanh thu |
-| **Staff** | `staff@nexuskeys.com` | `Staff123!` | 20.000.000 đ | Quản trị đơn hàng, duyệt kho key, hỗ trợ khách hàng |
-| **Developer** | `dev@cdprojekt.com` | `Dev123!` | 12.000.000 đ | Quản lý danh mục game phát hành và báo cáo doanh số |
-| **Customer** | `gamer99@gmail.com` | `User123!` | 2.500.000 đ | Mua sắm game, nạp ví, kích hoạt key, viết đánh giá |
-
-> [!TIP]
-> **Đăng nhập 1-Click thuận tiện khi chấm điểm / đánh giá:**  
-> Tại trang đăng nhập của cả **Storefront** (`/login`) lẫn **Admin Portal** (`/Auth/Login`), hệ thống đều tích hợp sẵn nút bấm **"👑 Đăng nhập Demo Admin (1-Click)"** giúp đăng nhập ngay lập tức vào vai trò Administrator mà không cần gõ tay tài khoản.
-
----
-
-## 🚀 5. Hướng dẫn Khởi chạy ở Môi trường Local (Getting Started)
-
-### 5.1. Yêu cầu Tiên quyết (Prerequisites)
+### 4.1. Yêu cầu Tiên quyết (Prerequisites)
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [PostgreSQL 16+](https://www.postgresql.org/download/) (hoặc sử dụng dịch vụ PostgreSQL Cloud như Render/Supabase)
 - [Git](https://git-scm.com/)
 
-### 5.2. Các bước Cài đặt & Khởi chạy
+### 4.2. Các bước Cài đặt & Khởi chạy
 
 #### Bước 1: Clone kho mã nguồn
 ```bash
@@ -276,14 +318,14 @@ Mở 3 cửa sổ terminal riêng biệt và thực thi các lệnh sau:
   ```
 
 Sau khi chạy, truy cập trình duyệt tại:
-- **Web Mua Hàng:** [http://localhost:5205](http://localhost:5205)
-- **Trang Đăng Nhập:** [http://localhost:5205/login](http://localhost:5205/login)
-- **Cổng Quản Trị:** [http://localhost:3001](http://localhost:3001)
-- **API Swagger / Endpoint:** [http://localhost:5021/api/v1/products](http://localhost:5021/api/v1/products)
+- **Web Mua Hàng Local:** [http://localhost:5205](http://localhost:5205)
+- **Trang Đăng Nhập Local:** [http://localhost:5205/login](http://localhost:5205/login)
+- **Cổng Quản Trị Local:** [http://localhost:3001](http://localhost:3001)
+- **API Swagger / Endpoint Local:** [http://localhost:5021/api/v1/products](http://localhost:5021/api/v1/products)
 
 ---
 
-## ☁️ 6. Hướng dẫn Triển khai Cloud (Cloud Deployment Guide)
+## ☁️ 5. Hướng dẫn Triển khai Cloud (Cloud Deployment Guide)
 
 Dự án đã sẵn sàng triển khai tự động lên nền tảng đám mây **Render** qua tệp cấu hình **Infrastructure as Code** [`render.yaml`](render.yaml).
 
@@ -306,7 +348,7 @@ Dự án đã sẵn sàng triển khai tự động lên nền tảng đám mây
 
 ---
 
-## 🧪 7. Kiểm thử & Đảm bảo Chất lượng (Testing & QA)
+## 🧪 6. Kiểm thử & Đảm bảo Chất lượng (Testing & QA)
 
 Dự án áp dụng quy trình kiểm thử tự động nghiêm ngặt với **72 bài test** được cấu hình trong `tests/GameStore.API.ProductKeyTests`:
 
@@ -322,7 +364,7 @@ Passed!  - Failed: 0, Passed: 72, Skipped: 0, Total: 72 (100% Passed)
 
 ---
 
-## 📚 8. Tài liệu Kỹ thuật Tham khảo
+## 📚 7. Tài liệu Kỹ thuật Tham khảo
 
 - [Đặc tả Hợp đồng REST API v1 (docs/REST_API_V1.md)](docs/REST_API_V1.md): Chi tiết từng Endpoint, Request/Response payload mẫu.
 - [Hệ thống Thiết kế Nexus UI (docs/NEXUS_UI.md)](docs/NEXUS_UI.md): Bảng mã màu, kiểu chữ, Design Tokens.
@@ -330,7 +372,7 @@ Passed!  - Failed: 0, Passed: 72, Skipped: 0, Total: 72 (100% Passed)
 
 ---
 
-## 👥 9. Thông tin Đồ án & Tác giả (Thesis Information)
+## 👥 8. Thông tin Đồ án & Tác giả (Thesis Information)
 
 - **Đề tài:** Xây dựng hệ thống thương mại điện tử phân phối game bản quyền và license key trực tuyến NexusKeys.
 - **Hệ thống:** Clean Architecture, .NET 10, Blazor Server, ASP.NET Core MVC, PostgreSQL, Docker.
