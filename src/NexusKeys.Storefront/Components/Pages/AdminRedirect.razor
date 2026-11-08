@@ -38,15 +38,9 @@
             }
 
             var token = await AuthViewModel.GetTokenAsync();
+            var adminUrl = Frontend.Services.AdminPortalUrlResolver.ResolveAdminPortalUrl(Configuration, NavigationManager);
             if (!string.IsNullOrEmpty(token))
             {
-                var adminUrl = Configuration["AdminPortal:BaseUrl"] ?? Configuration["AdminPortal__BaseUrl"] ?? "http://localhost:3001";
-                if (!adminUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !adminUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                {
-                    adminUrl = "https://" + adminUrl;
-                }
-                adminUrl = adminUrl.TrimEnd('/');
-
                 try
                 {
                     await JSRuntime.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
@@ -54,12 +48,12 @@
                 }
                 catch
                 {
-                    NavigationManager.NavigateTo(adminUrl, forceLoad: true);
+                    NavigationManager.NavigateTo($"{adminUrl}/Auth/AutoLogin?token={token}", forceLoad: true);
                     return;
                 }
             }
 
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo(adminUrl, forceLoad: true);
         }
     }
 }

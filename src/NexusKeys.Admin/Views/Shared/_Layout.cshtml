@@ -11,7 +11,7 @@
     var roleDisplayName = isAdmin ? "Quản Trị Viên" : (isDeveloper ? "Developer" : "Nhân Viên");
     var panelSubtitle = isAdmin ? "Admin Control" : (isDeveloper ? "Developer Studio" : "Staff Panel");
     var apiOnline = Equals(Context.Items["ApiOnline"], true);
-    var frontendBaseUrl = Configuration["AppSettings:FrontendBaseUrl"]?.TrimEnd('/') ?? "http://localhost:5205";
+    var frontendBaseUrl = Backend.Extensions.PortalUrlHelper.GetFrontendUrl(Configuration, Context);
 }
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">

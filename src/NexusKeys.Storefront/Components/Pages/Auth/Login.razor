@@ -298,12 +298,7 @@
 
     private string GetNormalizedAdminUrl()
     {
-        var adminUrl = Configuration["AdminPortal:BaseUrl"] ?? Configuration["AdminPortal__BaseUrl"] ?? "http://localhost:3001";
-        if (!adminUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !adminUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-        {
-            adminUrl = "https://" + adminUrl;
-        }
-        return adminUrl.TrimEnd('/');
+        return Frontend.Services.AdminPortalUrlResolver.ResolveAdminPortalUrl(Configuration, NavigationManager);
     }
 
     private bool IsAdminOrStaff()
@@ -326,9 +321,9 @@
     private async Task NavigateToAdminPortal()
     {
         var token = await AuthViewModel.GetTokenAsync();
+        var adminUrl = GetNormalizedAdminUrl();
         if (!string.IsNullOrEmpty(token))
         {
-            var adminUrl = GetNormalizedAdminUrl();
             try
             {
                 await JSRuntime.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
@@ -336,11 +331,11 @@
             }
             catch
             {
-                NavigationManager.NavigateTo(adminUrl, forceLoad: true);
+                NavigationManager.NavigateTo($"{adminUrl}/Auth/AutoLogin?token={token}", forceLoad: true);
                 return;
             }
         }
-        NavigationManager.NavigateTo(GetSafeReturnUrl());
+        NavigationManager.NavigateTo(adminUrl, forceLoad: true);
     }
 
     private async Task LoginAsDemoAdmin(bool goToAdminPortal)

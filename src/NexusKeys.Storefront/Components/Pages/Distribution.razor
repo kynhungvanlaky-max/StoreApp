@@ -59,7 +59,7 @@
         <div class="flex items-center gap-2 shrink-0">
             @if (AuthViewModel.IsLoggedIn && (string.Equals(AuthViewModel.Role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase)))
             {
-                var adminPortalUrl = Configuration["AdminPortal:BaseUrl"] ?? "http://localhost:3001";
+                var adminPortalUrl = Frontend.Services.AdminPortalUrlResolver.ResolveAdminPortalUrl(Configuration, NavigationManager);
                 <a href="@adminPortalUrl" target="_blank" rel="noopener noreferrer" class="px-3 sm:px-4 py-2 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#0078f2]/30 hover:shadow-[#0078f2]/50 transition-all">
                     <span>Developer Portal</span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
@@ -102,7 +102,7 @@
                     <div class="flex flex-wrap items-center gap-4 pt-2">
                         @if (AuthViewModel.IsLoggedIn && (string.Equals(AuthViewModel.Role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase)))
                         {
-                            var adminPortalUrl = Configuration["AdminPortal:BaseUrl"] ?? "http://localhost:3001";
+                            var adminPortalUrl = Frontend.Services.AdminPortalUrlResolver.ResolveAdminPortalUrl(Configuration, NavigationManager);
                             <a href="@adminPortalUrl" target="_blank" rel="noopener noreferrer" class="px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-black text-sm tracking-wide shadow-xl shadow-[#0078f2]/40 hover:shadow-[#0078f2]/60 hover:-translate-y-0.5 transition-all flex items-center gap-3">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
                                 <span>MỞ CỔNG QUẢN TRỊ DEVELOPER (PORTAL)</span>
@@ -895,7 +895,7 @@
                 <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
                     @if (AuthViewModel.IsLoggedIn && (string.Equals(AuthViewModel.Role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(AuthViewModel.Role, "Developer", StringComparison.OrdinalIgnoreCase)))
                     {
-                        var adminPortalUrl = Configuration["AdminPortal:BaseUrl"] ?? "http://localhost:3001";
+                        var adminPortalUrl = Frontend.Services.AdminPortalUrlResolver.ResolveAdminPortalUrl(Configuration, NavigationManager);
                         <a href="@adminPortalUrl" target="_blank" rel="noopener noreferrer" class="px-8 py-4 rounded-xl bg-[#0078f2] hover:bg-[#006bd8] text-white font-black text-sm tracking-wide shadow-xl shadow-[#0078f2]/40 hover:shadow-[#0078f2]/60 hover:-translate-y-0.5 transition-all flex items-center gap-2">
                             <span>TRUY CẬP CỔNG THÔNG TIN NHÀ PHÁT TRIỂN</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>

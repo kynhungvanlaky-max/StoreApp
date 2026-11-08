@@ -346,9 +346,9 @@
             token = await AuthVM.GetTokenAsync();
         }
 
+        var adminUrl = Frontend.Services.AdminPortalUrlResolver.ResolveAdminPortalUrl(Configuration, NavigationManager);
         if (!string.IsNullOrEmpty(token))
         {
-            var adminUrl = Configuration["AdminPortal:BaseUrl"]?.TrimEnd('/') ?? "http://localhost:3001";
             try
             {
                 await JS.InvokeVoidAsync("adminPortalBridge.signIn", adminUrl, token);
@@ -357,6 +357,10 @@
             {
                 await JS.InvokeVoidAsync("open", $"{adminUrl}/Auth/AutoLogin?token={token}", "_blank");
             }
+        }
+        else
+        {
+            NavigationManager.NavigateTo(adminUrl, forceLoad: true);
         }
     }
 

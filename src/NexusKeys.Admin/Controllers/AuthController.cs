@@ -25,20 +25,7 @@ namespace Backend.Controllers
 
         private string GetSafeFrontendUrl()
         {
-            var frontendBase = _configuration?["AppSettings:FrontendBaseUrl"] ?? _configuration?["AppSettings__FrontendBaseUrl"];
-            if (string.IsNullOrWhiteSpace(frontendBase) || 
-                frontendBase.Contains("nexuskeys-api.onrender.com", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(frontendBase.Trim(), "nexuskeys-api", StringComparison.OrdinalIgnoreCase))
-            {
-                frontendBase = "https://nexuskeys-storefront.onrender.com";
-            }
-
-            if (!frontendBase.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !frontendBase.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-            {
-                frontendBase = "https://" + frontendBase;
-            }
-
-            return frontendBase.TrimEnd('/');
+            return Backend.Extensions.PortalUrlHelper.GetFrontendUrl(_configuration, HttpContext);
         }
 
         [HttpGet("/login")]
@@ -142,7 +129,14 @@ namespace Backend.Controllers
                 }
             }
 
-            if (!string.IsNullOrEmpty(requestOrigin) && !string.Equals(requestOrigin, allowedOrigin, StringComparison.OrdinalIgnoreCase))
+            var isTrustedOrigin = string.IsNullOrEmpty(requestOrigin) ||
+                string.Equals(requestOrigin, allowedOrigin, StringComparison.OrdinalIgnoreCase) ||
+                requestOrigin.Contains("nexuskeys-storefront.onrender.com", StringComparison.OrdinalIgnoreCase) ||
+                requestOrigin.Contains("localhost:5205", StringComparison.OrdinalIgnoreCase) ||
+                requestOrigin.Contains("localhost:5000", StringComparison.OrdinalIgnoreCase) ||
+                requestOrigin.Contains("localhost:5002", StringComparison.OrdinalIgnoreCase);
+
+            if (!isTrustedOrigin)
             {
                 TempData["ErrorMessage"] = "Yêu cầu đăng nhập không hợp lệ từ nguồn không được xác thực.";
                 return RedirectToAction(nameof(Login));
@@ -151,6 +145,60 @@ namespace Backend.Controllers
             if (string.IsNullOrWhiteSpace(token))
             {
                 TempData["ErrorMessage"] = "Không tìm thấy phiên đăng nhập từ ứng dụng.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("API");
+                using var request = new HttpRequestMessage(HttpMethod.Get, "api/v1/users/me");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using var response = await client.SendAsync(request, HttpContext.RequestAborted);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn hoặc không hợp lệ.";
+                    return RedirectToAction(nameof(Login));
+                }
+
+                var profile = await response.Content.ReadJsonAsync<AdminProfileDto>();
+                if (profile?.IsLocked == true)
+                {
+                    TempData["ErrorMessage"] = "Tài khoản của bạn đã bị khoá. Vui lòng liên hệ hỗ trợ.";
+                    return RedirectToAction(nameof(Login));
+                }
+
+                var isAllowedRole = profile != null && (
+                    string.Equals(profile.RoleName, "Administrator", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(profile.RoleName, "Developer", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(profile.RoleName, "Staff", StringComparison.OrdinalIgnoreCase));
+
+                if (!isAllowedRole)
+                {
+                    TempData["ErrorMessage"] = "Tài khoản không có quyền truy cập cổng quản trị.";
+                    return RedirectToAction(nameof(Login));
+                }
+
+                AppendAdminCookie("access_token", token);
+                AppendAdminCookie("admin_name", profile!.Username ?? "Quản trị viên");
+                AppendAdminCookie("admin_email", profile.Email ?? string.Empty);
+
+                TempData["SuccessMessage"] = $"Đăng nhập thành công! Xin chào {profile.Username ?? profile.Email}.";
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex) when (ex is HttpRequestException or JsonException)
+            {
+                TempData["ErrorMessage"] = "Không thể xác thực phiên đăng nhập. Vui lòng thử lại.";
+                return RedirectToAction(nameof(Login));
+            }
+        }
+
+        [HttpGet("/Auth/AutoLogin")]
+        public async Task<IActionResult> AutoLogin([FromQuery] string? token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy phiên đăng nhập.";
                 return RedirectToAction(nameof(Login));
             }
 

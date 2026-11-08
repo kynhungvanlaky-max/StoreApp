@@ -3,8 +3,8 @@
     Layout = null;
     ViewData["Title"] = "Đăng nhập Quản Trị - NEXUSKEYS";
     var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
-    var storefrontLoginUrl = (string?)ViewBag.StorefrontLoginUrl ?? "http://localhost:5205/login?returnUrl=/admin";
-    var frontendUrl = (string?)ViewBag.FrontendUrl ?? "http://localhost:5205";
+    var frontendUrl = (string?)ViewBag.FrontendUrl ?? Backend.Extensions.PortalUrlHelper.GetFrontendUrl(null, Context);
+    var storefrontLoginUrl = (string?)ViewBag.StorefrontLoginUrl ?? $"{frontendUrl}/login?returnUrl=/admin";
     var errorMessage = (string?)ViewBag.ErrorMessage;
 }
 <!DOCTYPE html>

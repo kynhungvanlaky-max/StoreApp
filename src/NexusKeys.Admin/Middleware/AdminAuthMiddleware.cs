@@ -20,6 +20,7 @@ namespace Backend.Middleware
             if (path.StartsWith("/auth/login") ||
                 path.Equals("/login") ||
                 path.StartsWith("/auth/bridge") ||
+                path.StartsWith("/auth/autologin") ||
                 path.StartsWith("/auth/logout") || 
                 path.StartsWith("/health") || 
                 path.StartsWith("/css") || 
@@ -57,7 +58,9 @@ namespace Backend.Middleware
             try
             {
                 var client = httpClientFactory.CreateClient("API");
-                using var validationResponse = await client.GetAsync("api/v1/users/me", context.RequestAborted);
+                using var validationRequest = new HttpRequestMessage(HttpMethod.Get, "api/v1/users/me");
+                validationRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                using var validationResponse = await client.SendAsync(validationRequest, context.RequestAborted);
                 if (!validationResponse.IsSuccessStatusCode)
                 {
                     context.Response.Cookies.Delete("access_token");
