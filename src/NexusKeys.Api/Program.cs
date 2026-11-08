@@ -252,6 +252,33 @@ app.MapAdminAuditEndpoints();
 app.MapRecommendationEndpoints();
 app.MapCategoryEndpoints();
 
+// Fallback redirects for Admin Auth endpoints misdirected to API domain
+app.MapMethods("/Auth/Bridge", [HttpMethods.Post, HttpMethods.Get], () =>
+{
+    var adminUrl = Environment.GetEnvironmentVariable("AdminPortal__BaseUrl") ?? "https://nexuskeys-admin.onrender.com";
+    if (adminUrl.Contains("nexuskeys-api", StringComparison.OrdinalIgnoreCase))
+    {
+        adminUrl = "https://nexuskeys-admin.onrender.com";
+    }
+    return Results.Redirect($"{adminUrl.TrimEnd('/')}/Auth/Bridge", permanent: false, preserveMethod: true);
+});
+
+app.MapGet("/Auth/AutoLogin", (HttpContext context) =>
+{
+    var adminUrl = Environment.GetEnvironmentVariable("AdminPortal__BaseUrl") ?? "https://nexuskeys-admin.onrender.com";
+    if (adminUrl.Contains("nexuskeys-api", StringComparison.OrdinalIgnoreCase))
+    {
+        adminUrl = "https://nexuskeys-admin.onrender.com";
+    }
+    var query = context.Request.QueryString.Value;
+    return Results.Redirect($"{adminUrl.TrimEnd('/')}/Auth/AutoLogin{query}", permanent: false);
+});
+
+app.MapGet("/login", () =>
+{
+    return Results.Redirect("https://nexuskeys-admin.onrender.com/Auth/Login", permanent: false);
+});
+
 // Versioned API contract. Legacy /api routes remain available during migration.
 const string v1Prefix = "/api/v1";
 app.MapGet(v1Prefix, () => Results.Ok(new

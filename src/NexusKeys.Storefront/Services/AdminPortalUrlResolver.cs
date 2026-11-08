@@ -24,13 +24,29 @@ namespace Frontend.Services
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(adminUrl) ||
-                (!isLocal && (adminUrl.Contains("localhost", StringComparison.OrdinalIgnoreCase) || adminUrl.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase))))
+            if (isLocal)
             {
-                if (isLocal)
+                if (string.IsNullOrWhiteSpace(adminUrl) ||
+                    adminUrl.Contains("nexuskeys-api", StringComparison.OrdinalIgnoreCase) ||
+                    adminUrl.Contains("nexuskeys-storefront", StringComparison.OrdinalIgnoreCase))
                 {
                     return "http://localhost:3001";
                 }
+
+                if (!adminUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !adminUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    adminUrl = "http://" + adminUrl;
+                }
+                return adminUrl.TrimEnd('/');
+            }
+
+            // In production / Cloud (Render):
+            if (string.IsNullOrWhiteSpace(adminUrl) ||
+                adminUrl.Contains("localhost", StringComparison.OrdinalIgnoreCase) ||
+                adminUrl.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase) ||
+                adminUrl.Contains("nexuskeys-api", StringComparison.OrdinalIgnoreCase) ||
+                adminUrl.Contains("nexuskeys-storefront", StringComparison.OrdinalIgnoreCase))
+            {
                 return "https://nexuskeys-admin.onrender.com";
             }
 
